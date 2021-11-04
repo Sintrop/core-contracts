@@ -3,14 +3,28 @@ pragma solidity >=0.5.0 <=0.9.0;
 
 
 contract inspectionContract {
+    enum InspectionStatus { OPEN, CLOSED, CLOSED_WITH_SUCCESS, ACCEPTED }
+    
+    struct Inspection {
+        uint id;
+        InspectionStatus status;
+        address producer_wallet;
+        uint created_at;
+    }
+    
+    Inspection[] inspections;
+    uint inspectionsCount;
 
     function requestInspection() public {
-        //require produtor validado
-        //solicita inspeção
+        uint id = inspectionsCount + 1;
         
+        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, block.timestamp);
+        inspections.push(inspection);
+        inspectionsCount++;
     }  
     
-    function acceptInspection() public {
+    function acceptInspection(uint inspection_id) public {
+        
         //require ativista validado
         //aceita inspeção
         //permite que o ativista realize a inspeção por um determinado período de tempo (exemplo 1 dia)
@@ -29,7 +43,12 @@ contract inspectionContract {
         
     }  
     
-    function getRequestedInspections() public {
-        
+    function getRequestedInspections() public view returns (Inspection[] memory) {
+        return inspections;
     }
+    
+    function getInspectionsStatus() public pure returns(string memory, string memory, string memory, string memory) {
+        return ("OPEN", "CLOSED", "CLOSED_WITH_SUCCESS", "ACCEPTED");
+    }
+    
 }
