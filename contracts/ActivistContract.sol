@@ -21,7 +21,8 @@ contract ActivistContract {
         string cep;
     }
     
-    Activist[] activists;
+    Activist[] activistsArray;
+    mapping(address => Activist) activists;
     uint public activistsCount;
     
     
@@ -34,23 +35,26 @@ contract ActivistContract {
         string memory city, 
         string memory cep) public returns(Activist memory) {
             
-            uint id = generateId();
+            uint id = activistsCount + 1;
             string memory role = 'ACTIVIST';
             
             ActivistAddress memory activist_address = ActivistAddress(country, state, city, cep);
             Activist memory activist = Activist(id, msg.sender, name, role, document, document_type, activist_address);
             
-            activists.push(activist);
+            activistsArray.push(activist);
+            activists[msg.sender] = activist;
             activistsCount++;
             
             return activist;
     }
     
     function getActivists() public view returns(Activist[] memory) {
-        return activists;
+        return activistsArray;
     }
     
-    function generateId() internal view returns(uint) {
-        return activistsCount + 1;
+    function activistExists(address addr) public view returns(bool) {
+        bool exists = bytes(activists[addr].name).length > 0;
+        return exists;
     }
+    
 }
