@@ -3,8 +3,13 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 
-contract CategoryContract {
+   /**
+    * @title CategoryContract
+   * @dev Category resource that is a part of Sintrop business
+   */
+   contract CategoryContract {
     struct Category {
+        uint256 id;
         address createdBy;
         string name;
         string description;
@@ -13,48 +18,77 @@ contract CategoryContract {
         string neutro;
         string partiallyNotSustainable;
         string totallyNotSustainable;
-        int16 votesCount;
+        uint votesCount;
+        uint index;
     }
-    Category category;
+    Category public category;
     uint public categoryCounts;
-    Category[] categories;
+    Category[] categoriesArray;
+    mapping(uint => Category) categories;
     
+    /**
+   * @dev Returns all added categories
+   * @return category struc array
+   */
     function getCategories() public view returns(Category[] memory) {
-        return categories;
+        return categoriesArray;
     }
     
-    function addCategory(string memory name, string memory description, string memory totallySustainable, string memory partiallySustainable, string memory neutro, string memory partiallyNotSustainable, string memory totallyNotSustainable) public returns(bool) {
-        category = Category(msg.sender, name, description, totallySustainable, partiallySustainable, neutro, partiallyNotSustainable, totallyNotSustainable, 0);
+    /**
+   * @dev add a new category
+   * @param name the name of category
+   * @param description the description of category
+   * @param totallySustainable the description text to this metric
+   * @param partiallySustainable the description text to this metric
+   * @param neutro the description text to this metric
+   * @param partiallyNotSustainable the description text to this metric
+   * @param totallyNotSustainable the description text to this metric
+   * @return bool
+   */
+    function addCategory(
+        string memory name, 
+        string memory description, 
+        string memory totallySustainable, 
+        string memory partiallySustainable, 
+        string memory neutro, 
+        string memory partiallyNotSustainable, 
+        string memory totallyNotSustainable) public returns(bool) {
+        uint256 id = categoryCounts + 1;
+        uint index = id - 1;
         
-        categories.push(category);
+        category = Category(id, msg.sender, name, description, totallySustainable, partiallySustainable, neutro, partiallyNotSustainable, totallyNotSustainable, 0, index);
+        
+        categoriesArray.push(category);
+        categories[id] = category;
         categoryCounts++;
         
         return true;
     }
     
-    function getLastCategory() public view returns(Category memory) {
-        return category;
-    }
-    
-    function vote(string memory categoryName) public returns (bool) {
-        for (uint i = 0; i < categories.length; i++) {
-            Category memory categoryVoted = categories[i];
-            if (keccak256(bytes(categoryName)) == keccak256(bytes(categoryVoted.name))) {
-                categories[i].votesCount++;
-                break;
-            }
-        }
+    /**
+   * @dev Allow a user vote in a category
+   * @param id the id of a category that receives a vote.
+   * @return category struc array
+   */
+    function vote(uint id) categoryMustExists(id) public returns (bool) {
+        Category memory categoryVoted = categories[id];
+        
+        categories[id].votesCount++;
+        categoriesArray[categoryVoted.index].votesCount++;
         
         return true;
     }
     
-    // modifier requireCategoryname(string memory name) {
-    //     require( bytes(name).length > 0);
-    //     _;
-    // };
-    // modifier requireUniqueCampaignName(string memory name) {
-    //     bool nameExists = true
-    //     require( !nameExists );
-    //     _;
-    // }
+    function getCategory(uint id) public view returns(Category memory) {
+        return categories[id];
+    }
+    
+    
+    // Modifiers
+    modifier categoryMustExists(uint id) {
+        require(uint(id) == id, "The id of category must be passed");
+        require(categories[id].id > 0, "This category don't exists");
+        
+        _;
+    }
 }
