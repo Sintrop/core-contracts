@@ -10,7 +10,7 @@ contract ActivistContract {
         string role;
         string name;
         string document;
-        string document_type;
+        string documentType;
         ActivistAddress activist_address;
     }
     
@@ -25,11 +25,21 @@ contract ActivistContract {
     mapping(address => Activist) activists;
     uint public activistsCount;
     
-    
+    /**
+   * @dev Allow a new register of activist
+   * @param name the name of the activist
+   * @param document the document of activist
+   * @param documentType the document type type of activist. CPF/CNPJ
+   * @param country the country where the activist is
+   * @param state the state of the activist
+   * @param city the of the activist
+   * @param cep the cep of the activist
+   * @return a Activist
+   */
     function addActivist( 
         string memory name, 
         string memory document, 
-        string memory document_type, 
+        string memory documentType, 
         string memory country, 
         string memory state, 
         string memory city, 
@@ -39,7 +49,7 @@ contract ActivistContract {
             string memory role = 'ACTIVIST';
             
             ActivistAddress memory activist_address = ActivistAddress(country, state, city, cep);
-            Activist memory activist = Activist(id, msg.sender, name, role, document, document_type, activist_address);
+            Activist memory activist = Activist(id, msg.sender, name, role, document, documentType, activist_address);
             
             activistsArray.push(activist);
             activists[msg.sender] = activist;
@@ -48,10 +58,18 @@ contract ActivistContract {
             return activist;
     }
     
+    /**
+   * @dev Returns all registered activists
+   * @return Activist struct array
+   */
     function getActivists() public view returns(Activist[] memory) {
         return activistsArray;
     }
     
+    /**
+   * @dev Check if a specific activist exists
+   * @return a bool that represent if a activist exists or not
+   */
     function activistExists(address addr) public view returns(bool) {
         bool exists = bytes(activists[addr].name).length > 0;
         return exists;
