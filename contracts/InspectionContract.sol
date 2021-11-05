@@ -28,7 +28,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    * @dev Allows the current user (producer) request a inspection.
    */
     function requestInspection() public {
-        require(producerExists(msg.sender), "You is not a producer! Please register as one");
+        require(producerExists(msg.sender), "You are not a producer! Please register as one");
         
         uint id = inspectionsCount + 1;
         
