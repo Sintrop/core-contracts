@@ -10,13 +10,14 @@ import './CategoryContract.sol';
 * @dev Inpection action core
 */
 contract InspectionContract is ProducerContract, ActivistContract, CategoryContract {
-    enum InspectionStatus { OPEN, CLOSED, CLOSED_WITH_SUCCESS, ACCEPTED }
+    enum InspectionStatus { OPEN, EXPIRED, INSPECTED, ACCEPTED } 
     
     struct Inspection {
         uint id;
         InspectionStatus status;
         address producer_wallet;
         address activist_wallet;
+        uint[][] isas;
         uint created_at;
     }
     
@@ -32,7 +33,8 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         
         uint id = inspectionsCount + 1;
         
-        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, block.timestamp);
+        uint[][] memory isas;
+        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,  block.timestamp);
         inspectionsArray.push(inspection);
         inspections[id] = inspection;
         inspectionsCount++;
@@ -40,32 +42,34 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     
     /**
    * @dev Allows the current user (activist) accept a inspection.
-   * @param id The id of the inspection that the activist want accept.
+   * @param inspectionId The id of the inspection that the activist want accept.
    */
-    function acceptInspection(uint id) public returns(bool) {
-        require(activistExists(msg.sender), "You must be an activist! Please register as one");
-        require(inspectionExists(id), "This inspection don't exists");
-        
-        Inspection memory inspection = inspections[id];
+    function acceptInspection(uint inspectionId) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
+        Inspection memory inspection = inspections[inspectionId];
         
         inspection.status = InspectionStatus.ACCEPTED;
         inspection.activist_wallet = msg.sender;
-        inspections[id] = inspection;
+        inspections[inspectionId] = inspection;
         
         return true;
     }  
     
     function calculateIsa() public {
+        
         //atribui um nota para cada nível de sustentabilidade
         //faz a média utilizando as categorias mais votadas
         //retorna o ISA
     }
     
-    function realizeInspection() public {
-        //lista as categorias mais votadas do ISA
-        //permite o ativista selecionar um nível por categorias
-        //retorna o ISA da inspeção
-        
+    /**
+     * @dev Allow a activist realize a inspection and mark as INSPECTED
+     * @param inspectionId The id of the inspection to be realized
+     * @param isas The uint[][] of categoryId and isaIndex. Ex: isas = [ [categoryId, isaIndex], [categoryId, isaIndex] ]
+     */ 
+    function realizeInspection(uint inspectionId, uint[][] memory isas) public requireActivist requireInspectionExists(inspectionId) returns(Inspection memory) {
+        inspections[inspectionId].isas = isas;
+        inspections[inspectionId].status = InspectionStatus.INSPECTED;
+        return inspections[inspectionId];
     }  
     
     /**
@@ -87,7 +91,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    * @dev Returns all inpections status string.
    */
     function getInspectionsStatus() public pure returns(string memory, string memory, string memory, string memory) {
-        return ("OPEN", "CLOSED", "CLOSED_WITH_SUCCESS", "ACCEPTED");
+        return ("OPEN", "EXPIRED", "INSPECTED", "ACCEPTED");
     }
     
     /**
@@ -95,8 +99,33 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    * @param id The id of the inspection that the activist want accept.
    */
     function inspectionExists(uint256 id) public view returns(bool) {
-        bool exists = inspections[id].id >= 1;
-        return exists;
+        return inspections[id].id >= 1;
+    }
+    
+    
+    // MODIFIERS
+    modifier requireActivist() {
+        require(activistExists(msg.sender), "You must be an activist! Please register as one");
+        _;
+    }
+    
+    modifier requireInspectionExists(uint inspectionId) {
+        require(inspectionExists(inspectionId), "This inspection don't exists");
+        _;
     }
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

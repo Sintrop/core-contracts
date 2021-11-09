@@ -8,6 +8,8 @@ pragma solidity >=0.7.0 <0.9.0;
    * @dev Category resource that is a part of Sintrop business
    */
    contract CategoryContract {
+    enum isas { TOTALLY_SUSTAINABLE, PARTIAL_SUSTAINABLE, NEUTRO, PARTIAL_NOT_SUSTAINABLE, TOTALLY_NOT_SUSTAINABLE }
+       
     struct Category {
         uint256 id;
         address createdBy;
@@ -25,6 +27,7 @@ pragma solidity >=0.7.0 <0.9.0;
     uint public categoryCounts;
     Category[] categoriesArray;
     mapping(uint => Category) categories;
+
     
     /**
    * @dev Returns all added categories
@@ -72,7 +75,6 @@ pragma solidity >=0.7.0 <0.9.0;
    */
     function vote(uint id) categoryMustExists(id) public returns (bool) {
         Category memory categoryVoted = categories[id];
-        
         categories[id].votesCount++;
         categoriesArray[categoryVoted.index].votesCount++;
         
