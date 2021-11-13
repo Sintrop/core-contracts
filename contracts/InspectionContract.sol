@@ -5,20 +5,24 @@ import './ProducerContract.sol';
 import './ActivistContract.sol';
 import './CategoryContract.sol';
 
+
 /**
 * @title InspectionContract
 * @dev Inpection action core
 */
 contract InspectionContract is ProducerContract, ActivistContract, CategoryContract {
     enum InspectionStatus { OPEN, EXPIRED, INSPECTED, ACCEPTED } 
+    uint inspactionExpireIn = 604800; // Seven days
     
     struct Inspection {
         uint id;
         InspectionStatus status;
-        address producer_wallet;
-        address activist_wallet;
+        address producerWallet;
+        address activistWallet;
         uint[][] isas;
-        uint created_at;
+        uint isaAverage;
+        uint expiresIn;
+        uint createdAt;
     }
     
     Inspection[] inspectionsArray;
@@ -34,7 +38,8 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         uint id = inspectionsCount + 1;
         
         uint[][] memory isas;
-        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,  block.timestamp);
+        uint expiresIn = block.timestamp + inspactionExpireIn;
+        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,  0, expiresIn,  block.timestamp);
         inspectionsArray.push(inspection);
         inspections[id] = inspection;
         inspectionsCount++;
@@ -46,16 +51,18 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    */
     function acceptInspection(uint inspectionId) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
         Inspection memory inspection = inspections[inspectionId];
-        
-        inspection.status = InspectionStatus.ACCEPTED;
-        inspection.activist_wallet = msg.sender;
-        inspections[inspectionId] = inspection;
-        
-        return true;
+        if (inspection.status == InspectionStatus.OPEN) {
+            inspection.status = InspectionStatus.ACCEPTED;
+            inspection.activistWallet = msg.sender;
+            inspections[inspectionId] = inspection;
+            return true;
+        }
+        else {
+            return false;
+        }
     }  
     
-    function calculateIsa() public {
-        
+    function calculateIsa(Inspection memory inspection) public returns(uint){
         //atribui um nota para cada nível de sustentabilidade
         //faz a média utilizando as categorias mais votadas
         //retorna o ISA
@@ -66,10 +73,13 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
      * @param inspectionId The id of the inspection to be realized
      * @param isas The uint[][] of categoryId and isaIndex. Ex: isas = [ [categoryId, isaIndex], [categoryId, isaIndex] ]
      */ 
-    function realizeInspection(uint inspectionId, uint[][] memory isas) public requireActivist requireInspectionExists(inspectionId) returns(Inspection memory) {
+    function realizeInspection(uint inspectionId, uint[][] memory isas) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
+        if (inspections[inspectionId].status == InspectionStatus.ACCEPTED) return false;
+        if (inspections[inspectionId].activistWallet != msg.sender) return false;
+        
         inspections[inspectionId].isas = isas;
         inspections[inspectionId].status = InspectionStatus.INSPECTED;
-        return inspections[inspectionId];
+        return true;
     }  
     
     /**
