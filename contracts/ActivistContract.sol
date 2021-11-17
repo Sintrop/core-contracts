@@ -11,6 +11,8 @@ contract ActivistContract {
         string name;
         string document;
         string documentType;
+        bool recentInspection;
+        uint totalInspections;
         ActivistAddress activist_address;
     }
     
@@ -49,7 +51,7 @@ contract ActivistContract {
             string memory role = 'ACTIVIST';
             
             ActivistAddress memory activist_address = ActivistAddress(country, state, city, cep);
-            Activist memory activist = Activist(id, msg.sender, name, role, document, documentType, activist_address);
+            Activist memory activist = Activist(id, msg.sender, name, role, document, documentType, false, 0, activist_address);
             
             activistsArray.push(activist);
             activists[msg.sender] = activist;
@@ -74,5 +76,4 @@ contract ActivistContract {
         bool exists = bytes(activists[addr].name).length > 0;
         return exists;
     }
-    
 }

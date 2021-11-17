@@ -81,10 +81,20 @@ pragma solidity >=0.7.0 <0.9.0;
         return true;
     }
     
+    /**
+   * @dev get a specific category
+   * @param id the id of a category
+   */
     function getCategory(uint id) public view returns(Category memory) {
         return categories[id];
     }
     
+    /**
+   * @dev Returns all isas string.
+   */
+    function getIsas() public pure returns(string memory, string memory, string memory, string memory, string memory) {
+        return ("TOTALLY_SUSTAINABLE", "PARTIAL_SUSTAINABLE", "NEUTRO", "PARTIAL_NOT_SUSTAINABLE", "TOTALLY_NOT_SUSTAINABLE");
+    }
     
     // Modifiers
     modifier categoryMustExists(uint id) {

@@ -15,6 +15,8 @@ contract ProducerContract {
         string name;
         string document;
         string documentType;
+        bool recentInspection;
+        uint totalRequests;
         PropertyAddress property_address;
     }
     
@@ -48,11 +50,11 @@ contract ProducerContract {
         string memory city, 
         string memory cep) public returns(Producer memory) {
             
-            uint id = generateId();
+            uint id = producersCount + 1;
             string memory role = 'PRODUCER';
             
             PropertyAddress memory property_address = PropertyAddress(country, state, city, cep);
-            Producer memory producer = Producer(id, msg.sender, role, name, document, documentType, property_address);
+            Producer memory producer = Producer(id, msg.sender, role, name, document, documentType, false, 0, property_address);
             
             producersArray.push(producer);
             producers[msg.sender] = producer;
@@ -84,9 +86,5 @@ contract ProducerContract {
     function producerExists(address addr) public view returns(bool) {
         bool exists = bytes(producers[addr].name).length > 0;
         return exists;
-    }
-    
-    function generateId() internal view returns(uint) {
-        return producersCount + 1;
     }
 }
