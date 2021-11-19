@@ -114,6 +114,8 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         inspections[inspectionId].isaAverage = calculateIsa(inspections[inspectionId]);
         afterRealizeInspection(inspectionId);
 
+        inspectionsArray[inspections[inspectionId].index].status = InspectionStatus.INSPECTED;
+
         return true;
     }  
     
