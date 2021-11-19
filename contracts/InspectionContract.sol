@@ -44,7 +44,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     function requestInspection() public returns(bool) {
         require(producerExists(msg.sender), "You are not a producer! Please register as one");
         Producer memory producer = producers[msg.sender];
-        require(producer.recentInspection == false, "You have a inspection request OPEN! Wait a activist realize inspection or you can close it");
+        require(producer.recentInspection == false, "You have a inspection request OPEN or ACCEPTED! Wait a activist realize inspection or you can close it");
         
         createRequest();
         producers[msg.sender].recentInspection = true;
