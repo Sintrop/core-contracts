@@ -109,10 +109,9 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         if (inspections[inspectionId].status != InspectionStatus.ACCEPTED) return false;
         if (inspections[inspectionId].activistWallet != msg.sender) return false;
         
-        uint isaAverage = calculateIsa(inspections[inspectionId]);
         inspections[inspectionId].isas = isas;
         inspections[inspectionId].status = InspectionStatus.INSPECTED;
-        inspections[inspectionId].isaAverage = isaAverage;
+        inspections[inspectionId].isaAverage = calculateIsa(inspections[inspectionId]);
         afterRealizeInspection(inspectionId);
 
         return true;
