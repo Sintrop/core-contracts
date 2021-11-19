@@ -23,6 +23,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         uint isaAverage;
         uint expiresIn;
         uint createdAt;
+        uint index;
     }
     
     Inspection[] inspectionsArray;
@@ -54,9 +55,10 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     
     function createRequest() internal{
         uint id = inspectionsCount + 1;
+        uint index = id - 1;
         uint[][] memory isas;
         uint expiresIn = block.timestamp + inspactionExpireIn;
-        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,  0, expiresIn,  block.timestamp);
+        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,  0, expiresIn,  block.timestamp, index);
         inspectionsArray.push(inspection);
         inspections[id] = inspection;
         inspectionsCount++;
@@ -69,9 +71,15 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     function acceptInspection(uint inspectionId) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
         Inspection memory inspection = inspections[inspectionId];
         if (inspection.status == InspectionStatus.OPEN) {
+            // Updated inspection in mapping
             inspection.status = InspectionStatus.ACCEPTED;
             inspection.activistWallet = msg.sender;
             inspections[inspectionId] = inspection;
+
+            // Updated inspection in array
+            inspectionsArray[inspection.index].status = InspectionStatus.ACCEPTED;
+            inspectionsArray[inspection.index].activistWallet = msg.sender;
+
             return true;
         }
         else {
