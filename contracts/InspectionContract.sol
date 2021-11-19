@@ -26,8 +26,16 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     }
     
     Inspection[] inspectionsArray;
+    mapping(address => Inspection[]) userInspections;
     mapping(uint256 => Inspection) inspections;
     uint256 inspectionsCount;
+    
+    /**
+   * @dev Allows the current user producer/activist get all yours inspections with status INSPECTED
+   */
+    function getInspectionsHistory() public view returns(Inspection[] memory) {
+        return userInspections[msg.sender];
+    }
 
   /**
    * @dev Allows the current user (producer) request a inspection.
@@ -42,6 +50,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         
         return true;
     }  
+    
     
     function createRequest() internal{
         uint id = inspectionsCount + 1;
@@ -101,7 +110,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     }
     
     /**
-   * @dev Returns all request inspections.
+   * @dev Returns all requested inspections.
    */
     function getRequestedInspections() public view returns (Inspection[] memory) {
         return inspectionsArray;
@@ -114,16 +123,16 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         return ("OPEN", "EXPIRED", "INSPECTED", "ACCEPTED");
     }
     
-        /**
-       * @dev Check if an inspections exists in mapping.
-       * @param id The id of the inspection that the activist want accept.
-       */
+    /**
+   * @dev Check if an inspections exists in mapping.
+   * @param id The id of the inspection that the activist want accept.
+   */
     function inspectionExists(uint256 id) public view returns(bool) {
         return inspections[id].id >= 1;
     }
     
     /**
-   * @dev Increment producer and activist request action and mark both as no recent open requests and inspection
+   * @dev Inscrement producer and activist request action and mark both as no recent open requests and inspection
    * @param inspectionId The id of the inspection
    */
     function afterRealizeInspection(uint inspectionId) internal {
@@ -137,6 +146,9 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         // Increment producer requests and release to carry out new requests
         producers[producerWallet].recentInspection = false;
         producers[producerWallet].totalRequests++;
+        
+        userInspections[producerWallet].push(inspections[inspectionId]);
+        userInspections[activistWallet].push(inspections[inspectionId]);
     }
     
     
@@ -152,17 +164,3 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
