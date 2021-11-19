@@ -23,11 +23,20 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         uint isaAverage;
         uint expiresIn;
         uint createdAt;
+        uint index;
     }
     
     Inspection[] inspectionsArray;
+    mapping(address => Inspection[]) userInspections;
     mapping(uint256 => Inspection) inspections;
     uint256 inspectionsCount;
+    
+    /**
+   * @dev Allows the current user producer/activist get all yours inspections with status INSPECTED
+   */
+    function getInspectionsHistory() public view returns(Inspection[] memory) {
+        return userInspections[msg.sender];
+    }
 
   /**
    * @dev Allows the current user (producer) request a inspection.
@@ -35,7 +44,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     function requestInspection() public returns(bool) {
         require(producerExists(msg.sender), "You are not a producer! Please register as one");
         Producer memory producer = producers[msg.sender];
-        require(producer.recentInspection == false, "You have a inspection request OPEN! Wait a activist realize inspection or you can close it");
+        require(producer.recentInspection == false, "You have a inspection request OPEN or ACCEPTED! Wait a activist realize inspection or you can close it");
         
         createRequest();
         producers[msg.sender].recentInspection = true;
@@ -43,11 +52,13 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         return true;
     }  
     
+    
     function createRequest() internal{
         uint id = inspectionsCount + 1;
+        uint index = id - 1;
         uint[][] memory isas;
         uint expiresIn = block.timestamp + inspactionExpireIn;
-        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,  0, expiresIn,  block.timestamp);
+        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,  0, expiresIn,  block.timestamp, index);
         inspectionsArray.push(inspection);
         inspections[id] = inspection;
         inspectionsCount++;
@@ -60,9 +71,15 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     function acceptInspection(uint inspectionId) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
         Inspection memory inspection = inspections[inspectionId];
         if (inspection.status == InspectionStatus.OPEN) {
+            // Updated inspection in mapping
             inspection.status = InspectionStatus.ACCEPTED;
             inspection.activistWallet = msg.sender;
             inspections[inspectionId] = inspection;
+
+            // Updated inspection in array
+            inspectionsArray[inspection.index].status = InspectionStatus.ACCEPTED;
+            inspectionsArray[inspection.index].activistWallet = msg.sender;
+
             return true;
         }
         else {
@@ -70,10 +87,17 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         }
     }  
     
-    function calculateIsa(Inspection memory inspection) public returns(uint){
-        //atribui um nota para cada nível de sustentabilidade
-        //faz a média utilizando as categorias mais votadas
-        //retorna o ISA
+    function calculateIsa(Inspection memory inspection) internal pure returns(uint){
+        uint16[5] memory isasValue = [10000, 1000, 100, 10, 1];
+        
+        uint[][] memory isas = inspection.isas;
+        uint isaSum = 0;
+        for (uint8 i = 0; i < isas.length; i++) {
+            uint isaIndex = isas[i][1];
+            isaSum += isasValue[isaIndex];
+            
+        }
+        return isaSum / isas.length;
     }
     
     /**
@@ -87,7 +111,10 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         
         inspections[inspectionId].isas = isas;
         inspections[inspectionId].status = InspectionStatus.INSPECTED;
+        inspections[inspectionId].isaAverage = calculateIsa(inspections[inspectionId]);
         afterRealizeInspection(inspectionId);
+
+        inspectionsArray[inspections[inspectionId].index].status = InspectionStatus.INSPECTED;
 
         return true;
     }  
@@ -101,7 +128,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     }
     
     /**
-   * @dev Returns all request inspections.
+   * @dev Returns all requested inspections.
    */
     function getRequestedInspections() public view returns (Inspection[] memory) {
         return inspectionsArray;
@@ -114,16 +141,16 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         return ("OPEN", "EXPIRED", "INSPECTED", "ACCEPTED");
     }
     
-        /**
-       * @dev Check if an inspections exists in mapping.
-       * @param id The id of the inspection that the activist want accept.
-       */
+    /**
+   * @dev Check if an inspections exists in mapping.
+   * @param id The id of the inspection that the activist want accept.
+   */
     function inspectionExists(uint256 id) public view returns(bool) {
         return inspections[id].id >= 1;
     }
     
     /**
-   * @dev Increment producer and activist request action and mark both as no recent open requests and inspection
+   * @dev Inscrement producer and activist request action and mark both as no recent open requests and inspection
    * @param inspectionId The id of the inspection
    */
     function afterRealizeInspection(uint inspectionId) internal {
@@ -137,6 +164,9 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         // Increment producer requests and release to carry out new requests
         producers[producerWallet].recentInspection = false;
         producers[producerWallet].totalRequests++;
+        
+        userInspections[producerWallet].push(inspections[inspectionId]);
+        userInspections[activistWallet].push(inspections[inspectionId]);
     }
     
     
@@ -152,17 +182,3 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
