@@ -87,10 +87,17 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         }
     }  
     
-    function calculateIsa(Inspection memory inspection) public returns(uint){
-        //atribui um nota para cada nível de sustentabilidade
-        //faz a média utilizando as categorias mais votadas
-        //retorna o ISA
+    function calculateIsa(Inspection memory inspection) internal pure returns(uint){
+        uint16[5] memory isasValue = [10000, 1000, 100, 10, 1];
+        
+        uint[][] memory isas = inspection.isas;
+        uint isaSum = 0;
+        for (uint8 i = 0; i < isas.length; i++) {
+            uint isaIndex = isas[i][1];
+            isaSum += isasValue[isaIndex];
+            
+        }
+        return isaSum / isas.length;
     }
     
     /**
@@ -102,8 +109,10 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         if (inspections[inspectionId].status != InspectionStatus.ACCEPTED) return false;
         if (inspections[inspectionId].activistWallet != msg.sender) return false;
         
+        uint isaAverage = calculateIsa(inspections[inspectionId]);
         inspections[inspectionId].isas = isas;
         inspections[inspectionId].status = InspectionStatus.INSPECTED;
+        inspections[inspectionId].isaAverage = isaAverage;
         afterRealizeInspection(inspectionId);
 
         return true;
