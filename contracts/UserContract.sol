@@ -17,7 +17,7 @@ contract UserContract {
    * @param addr The address of the user
    * @param userType The type of the user - enum UserType
    */
-    function addUser(address addr, UserType userType) public {
+    function addUser(address addr, UserType userType) internal {
         users[addr] = userType;
         usersCount++;
     }
