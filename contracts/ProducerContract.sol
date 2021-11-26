@@ -2,16 +2,17 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
+import './UserContract.sol';
 
 /**
 * @title ProducerContract
 * @dev Producer resource that represent a user that can request a inspection
 */
-contract ProducerContract {
+contract ProducerContract is UserContract {
     struct Producer {
         uint id;
         address producer_wallet;
-        string role;
+        UserType userType;
         string name;
         string document;
         string documentType;
@@ -51,14 +52,15 @@ contract ProducerContract {
         string memory cep) public returns(Producer memory) {
             
             uint id = producersCount + 1;
-            string memory role = 'PRODUCER';
+            UserType userType = UserType.PRODUCER;
             
             PropertyAddress memory property_address = PropertyAddress(country, state, city, cep);
-            Producer memory producer = Producer(id, msg.sender, role, name, document, documentType, false, 0, property_address);
+            Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, property_address);
             
             producersArray.push(producer);
             producers[msg.sender] = producer;
             producersCount++;
+            addUser(msg.sender, userType);
             
             return producer;
     }

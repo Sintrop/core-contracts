@@ -2,18 +2,19 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
+import "./UserContract.sol";
 
-contract ActivistContract {
+contract ActivistContract is UserContract {
     struct Activist {
         uint id;
-        address activist_wallet; // Hash of wallet
-        string role;
+        address activistWallet; // Hash of wallet
+        UserType userType;
         string name;
         string document;
         string documentType;
         bool recentInspection;
         uint totalInspections;
-        ActivistAddress activist_address;
+        ActivistAddress activistAddress;
     }
     
     struct ActivistAddress {
@@ -23,8 +24,8 @@ contract ActivistContract {
         string cep;
     }
     
-    Activist[] activistsArray;
-    mapping(address => Activist) activists;
+    Activist[] internal activistsArray;
+    mapping(address => Activist) internal activists;
     uint public activistsCount;
     
     /**
@@ -45,17 +46,17 @@ contract ActivistContract {
         string memory country, 
         string memory state, 
         string memory city, 
-        string memory cep) public returns(Activist memory) {
-            
+        string memory cep) public returns(Activist memory) {           
             uint id = activistsCount + 1;
-            string memory role = 'ACTIVIST';
+            UserType userType = UserType.ACTIVIST;
             
-            ActivistAddress memory activist_address = ActivistAddress(country, state, city, cep);
-            Activist memory activist = Activist(id, msg.sender, name, role, document, documentType, false, 0, activist_address);
+            ActivistAddress memory activistAddress = ActivistAddress(country, state, city, cep);
+            Activist memory activist = Activist(id, msg.sender, userType, name, document, documentType, false, 0, activistAddress);
             
             activistsArray.push(activist);
             activists[msg.sender] = activist;
             activistsCount++;
+            addUser(msg.sender, userType);
             
             return activist;
     }
@@ -66,6 +67,14 @@ contract ActivistContract {
    */
     function getActivists() public view returns(Activist[] memory) {
         return activistsArray;
+    }
+
+    /**
+   * @dev Return a specific activist
+   * @param addr the address of the activist.
+   */
+    function getActivist(address addr) public view returns(Activist memory) {
+        return activists[addr];
     }
     
     /**
