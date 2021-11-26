@@ -87,17 +87,30 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         }
     }  
     
-    function calculateIsa(Inspection memory inspection) internal pure returns(uint){
-        uint16[5] memory isasValue = [10000, 1000, 100, 10, 1];
-        
+    /**
+   * @dev Calculate the ISA of the inspection based in the category and the ISA level of the category
+   * @param inspection Receive the inspected inspection with your isas levels
+   */
+    function calculateIsa(Inspection memory inspection) internal pure returns(uint){ 
         uint[][] memory isas = inspection.isas;
+
+        uint isaSum = sumIsa(isas);
+        return isaSum / isas.length;
+    }
+
+    /**
+   * @dev Sum the ISA
+   * @param isas The isas values
+   */
+    function sumIsa(uint[][] memory isas) internal pure returns(uint) {
+        uint8[5] memory isasValue = [10, 8, 6, 4, 2];
         uint isaSum = 0;
         for (uint8 i = 0; i < isas.length; i++) {
             uint isaIndex = isas[i][1];
-            isaSum += isasValue[isaIndex];
-            
+            isaSum += isasValue[isaIndex];      
         }
-        return isaSum / isas.length;
+
+        return isaSum;
     }
     
     /**
@@ -108,14 +121,19 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     function realizeInspection(uint inspectionId, uint[][] memory isas) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
         if (inspections[inspectionId].status != InspectionStatus.ACCEPTED) return false;
         if (inspections[inspectionId].activistWallet != msg.sender) return false;
+
+        // TODO
+        // add result calculateIsa in a variable
         
         inspections[inspectionId].isas = isas;
         inspections[inspectionId].status = InspectionStatus.INSPECTED;
         inspections[inspectionId].isaAverage = calculateIsa(inspections[inspectionId]);
         afterRealizeInspection(inspectionId);
 
+        inspectionsArray[inspections[inspectionId].index].isas = isas;
+        inspectionsArray[inspections[inspectionId].index].isaAverage = calculateIsa(inspections[inspectionId]);
         inspectionsArray[inspections[inspectionId].index].status = InspectionStatus.INSPECTED;
-
+        
         return true;
     }  
     
@@ -130,7 +148,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     /**
    * @dev Returns all requested inspections.
    */
-    function getRequestedInspections() public view returns (Inspection[] memory) {
+    function getInspections() public view returns (Inspection[] memory) {
         return inspectionsArray;
     }
     
