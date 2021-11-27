@@ -18,6 +18,7 @@ contract ProducerContract is UserContract {
         string documentType;
         bool recentInspection;
         uint totalRequests;
+        uint isaAverage;
         PropertyAddress property_address;
     }
     
@@ -55,7 +56,7 @@ contract ProducerContract is UserContract {
             UserType userType = UserType.PRODUCER;
             
             PropertyAddress memory property_address = PropertyAddress(country, state, city, cep);
-            Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, property_address);
+            Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, 0, property_address);
             
             producersArray.push(producer);
             producers[msg.sender] = producer;
