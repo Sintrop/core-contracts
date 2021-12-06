@@ -19,7 +19,13 @@ contract ProducerContract is UserContract {
         bool recentInspection;
         uint totalRequests;
         uint isaPoints;
+        TokenApprove tokenApprove;
         PropertyAddress property_address;
+    }
+  
+    struct TokenApprove {
+        uint allowed;
+        bool withdrewToken;
     }
     
     struct PropertyAddress {
@@ -56,7 +62,8 @@ contract ProducerContract is UserContract {
             UserType userType = UserType.PRODUCER;
             
             PropertyAddress memory property_address = PropertyAddress(country, state, city, cep);
-            Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, 0, property_address);
+            TokenApprove memory tokenApprove = TokenApprove(0, false);
+            Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, 0, tokenApprove, property_address);
             
             producersArray.push(producer);
             producers[msg.sender] = producer;
@@ -89,5 +96,19 @@ contract ProducerContract is UserContract {
     function producerExists(address addr) public view returns(bool) {
         bool exists = bytes(producers[addr].name).length > 0;
         return exists;
+    }
+
+    function approveProducerNewTokens(address addr, uint numTokens) internal {
+        uint tokens = producers[addr].tokenApprove.allowed;
+        producers[addr].tokenApprove = TokenApprove(tokens += numTokens, false);
+    }
+
+    function getProducerApprove(address address_) public view returns (uint) {
+        return producers[address_].tokenApprove.allowed;
+    }
+
+    function undoProducerApprove() internal returns (bool) {
+        producers[msg.sender].tokenApprove = TokenApprove(0, false);
+        return true;
     }
 }

@@ -1,6 +1,10 @@
 pragma solidity >=0.5.0 <=0.9.0;
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+interface SintropInterface {
+    function getProducerApprove(address delegate) external view returns(uint);
+}
+
 contract SatTokenERC20 {
     string public constant name = "SUSTAINABLE AGRICULTURE TOKEN";
     string public constant symbol = "SAT";
@@ -13,23 +17,45 @@ contract SatTokenERC20 {
     mapping(address => mapping (address => uint256)) allowed;
 
     uint256 totalSupply_;
-    address public producerFundsAddress;
-    address public activistFundsAddress;
+    address producerFundsAddress_;
+    address activistFundsAddress_;
 
     using SafeMath for uint256;
+    SintropInterface sintrop;
 
-    constructor(uint256 total, address producerFundsAddress_, address activistFundsAddress_) {  
+    constructor(uint256 total, address _producerFundsAddress, address _activistFundsAddress) {  
         totalSupply_ = total;
-        producerFundsAddress = producerFundsAddress_;
-        activistFundsAddress = activistFundsAddress_;
-        shareFunds(producerFundsAddress, activistFundsAddress);
+        producerFundsAddress_ = _producerFundsAddress;
+        activistFundsAddress_ = _activistFundsAddress;
+        shareFunds(_producerFundsAddress, _activistFundsAddress);
     }  
 
-    function shareFunds(address producerFundsAddress_, address activistFundsAddress_) internal {
+    function setSintropAddress(address sintropAddress) public {
+        sintrop = SintropInterface(sintropAddress);
+    }
+
+    function producerFundsAddress() public view returns(address) {
+        return producerFundsAddress_;
+    }
+
+    function activistFundsAddress() public view returns(address) {
+        return activistFundsAddress_;
+    }
+
+    function shareFunds(address _producerFundsAddress, address _activistFundsAddress) internal {
         uint ownerFunds = totalSupply_/2;
         balances[msg.sender] = ownerFunds;
-        balances[producerFundsAddress_] = (totalSupply_ - ownerFunds)/2;
-        balances[activistFundsAddress_] = (totalSupply_ - ownerFunds)/2;
+        balances[_producerFundsAddress] = (totalSupply_ - ownerFunds)/2;
+        balances[_activistFundsAddress] = (totalSupply_ - ownerFunds)/2;
+    }
+
+    function approveWith(address from, address delegate) public returns(uint) {
+        if (from != producerFundsAddress_ && from != activistFundsAddress_) return 0;
+
+        uint numTokens = sintrop.getProducerApprove(delegate);
+        allowed[from][delegate] = numTokens;
+        emit Approval(from, delegate, numTokens);
+        return numTokens;
     }
 
     function totalSupply() public view returns (uint256) {

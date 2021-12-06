@@ -5,12 +5,6 @@ import './ProducerContract.sol';
 import './ActivistContract.sol';
 import './CategoryContract.sol';
 
-abstract contract SatToken {
-    address public producerFundsAddress;
-    address public activistFundsAddress;
-    function totalSupply() public view virtual returns (uint256);
-    function approve(address delegate, uint numTokens) public virtual returns (bool);
-}
 
 
 /**
@@ -37,11 +31,6 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     mapping(address => Inspection[]) userInspections;
     mapping(uint256 => Inspection) inspections;
     uint256 inspectionsCount;
-    SatToken satToken;
-
-    constructor(address satTokenAddress_) {
-        satToken = SatToken(satTokenAddress_);
-    }
 
     /**
    * @dev Allows the current user producer/activist get all yours inspections with status INSPECTED
@@ -116,6 +105,8 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     function realizeInspection(uint inspectionId, uint[][] memory isas) public  requireActivist requireInspectionExists(inspectionId) returns(bool) {
         if (!isAccepted(inspectionId)) return false;
         if (!isActivistOwner(inspectionId)) return false;
+
+        Inspection memory inspection = inspections[inspectionId];
         
         inspections[inspectionId].isas = isas;
         inspections[inspectionId].status = InspectionStatus.INSPECTED;
@@ -126,6 +117,8 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         inspectionsArray[inspections[inspectionId].index].isas = isas;
         inspectionsArray[inspections[inspectionId].index].isaPoints = calculateIsa(inspections[inspectionId]);
         inspectionsArray[inspections[inspectionId].index].status = InspectionStatus.INSPECTED;
+
+        approveProducerNewTokens(inspection.producerWallet, 2000);
         
         return true;
     } 
@@ -146,16 +139,16 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     /**
    * @dev Returns all requested inspections.
    */
-    function getInspections() public view returns (Inspection[] memory) {
-        return inspectionsArray;
-    }
+    // function getInspections() public view returns (Inspection[] memory) {
+    //     return inspectionsArray;
+    // }
     
     /**
    * @dev Returns all inpections status string.
    */
-    function getInspectionsStatus() public pure returns(string memory, string memory, string memory, string memory) {
-        return ("OPEN", "EXPIRED", "INSPECTED", "ACCEPTED");
-    }
+    // function getInspectionsStatus() public pure returns(string memory, string memory, string memory, string memory) {
+    //     return ("OPEN", "EXPIRED", "INSPECTED", "ACCEPTED");
+    // }
     
     /**
    * @dev Check if an inspections exists in mapping.

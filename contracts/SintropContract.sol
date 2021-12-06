@@ -1,4 +1,4 @@
-pragma solidity >=0.7.0 <=0.9.0;
+pragma solidity >=0.5.0 <=0.9.0;
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import './InspectionContract.sol';
@@ -7,6 +7,4 @@ import './InspectionContract.sol';
 * @title SintropContract
 * @dev Sintrop application to certificated a rural producer
 */
-contract SintropContract is InspectionContract {
-    constructor(address satTokenAddress_) InspectionContract(satTokenAddress_) {}
-}
+contract SintropContract is InspectionContract {}
