@@ -5,8 +5,6 @@ import './ProducerContract.sol';
 import './ActivistContract.sol';
 import './CategoryContract.sol';
 
-
-
 /**
 * @title InspectionContract
 * @dev Inpection action core
@@ -71,15 +69,11 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     function acceptInspection(uint inspectionId) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
         Inspection memory inspection = inspections[inspectionId];
         if (inspection.status == InspectionStatus.OPEN) {
-            // Updated inspection in mapping
             inspection.status = InspectionStatus.ACCEPTED;
             inspection.activistWallet = msg.sender;
             inspections[inspectionId] = inspection;
 
-            // Updated inspection in array
-            inspectionsArray[inspection.index].status = InspectionStatus.ACCEPTED;
-            inspectionsArray[inspection.index].activistWallet = msg.sender;
-
+            inspectionsArray[inspection.index] = inspection;
             return true;
         }
         else {
@@ -107,21 +101,21 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         if (!isActivistOwner(inspectionId)) return false;
 
         Inspection memory inspection = inspections[inspectionId];
-        
-        inspections[inspectionId].isas = isas;
-        inspections[inspectionId].status = InspectionStatus.INSPECTED;
-        inspections[inspectionId].isaPoints = calculateIsa(inspections[inspectionId]);
+
+        markAsRealized(inspection, isas);
         afterRealizeInspection(inspectionId);
-        updateProducerIsa(inspectionId, inspections[inspectionId].isaPoints);
-
-        inspectionsArray[inspections[inspectionId].index].isas = isas;
-        inspectionsArray[inspections[inspectionId].index].isaPoints = calculateIsa(inspections[inspectionId]);
-        inspectionsArray[inspections[inspectionId].index].status = InspectionStatus.INSPECTED;
-
-        approveProducerNewTokens(inspection.producerWallet, 2000);
-        
+        updateProducerIsa(inspectionId, inspection.isaPoints);
+        approveProducerNewTokens(inspection.producerWallet, 2000);  
         return true;
     } 
+
+    function markAsRealized(Inspection memory inspection, uint[][] memory isas) internal {   
+        inspection.isas = isas;
+        inspection.status = InspectionStatus.INSPECTED;
+        inspection.isaPoints = calculateIsa(inspection);
+        inspections[inspection.id] = inspection;
+        inspectionsArray[inspection.index] = inspection;
+    }
 
     function updateProducerIsa(uint inspectionId, uint isaPoints) internal {
         Inspection memory inspection = inspections[inspectionId];
@@ -139,16 +133,16 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     /**
    * @dev Returns all requested inspections.
    */
-    // function getInspections() public view returns (Inspection[] memory) {
-    //     return inspectionsArray;
-    // }
+    function getInspections() public view returns (Inspection[] memory) {
+        return inspectionsArray;
+    }
     
     /**
    * @dev Returns all inpections status string.
    */
-    // function getInspectionsStatus() public pure returns(string memory, string memory, string memory, string memory) {
-    //     return ("OPEN", "EXPIRED", "INSPECTED", "ACCEPTED");
-    // }
+    function getInspectionsStatus() public pure returns(string memory, string memory, string memory, string memory) {
+        return ("OPEN", "EXPIRED", "INSPECTED", "ACCEPTED");
+    }
     
     /**
    * @dev Check if an inspections exists in mapping.

@@ -94,8 +94,7 @@ contract ProducerContract is UserContract {
    * @return a bool that represent if a producer exists or not
    */
     function producerExists(address addr) public view returns(bool) {
-        bool exists = bytes(producers[addr].name).length > 0;
-        return exists;
+        return bytes(producers[addr].name).length > 0;
     }
 
     function approveProducerNewTokens(address addr, uint numTokens) internal {

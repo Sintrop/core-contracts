@@ -23,15 +23,12 @@ contract SatTokenERC20 {
     using SafeMath for uint256;
     SintropInterface sintrop;
 
-    constructor(uint256 total, address _producerFundsAddress, address _activistFundsAddress) {  
+    constructor(uint256 total, address _producerFundsAddress, address _activistFundsAddress, address sintropAddress) {  
         totalSupply_ = total;
+        sintrop = SintropInterface(sintropAddress);
         producerFundsAddress_ = _producerFundsAddress;
         activistFundsAddress_ = _activistFundsAddress;
         shareFunds(_producerFundsAddress, _activistFundsAddress);
-    }  
-
-    function setSintropAddress(address sintropAddress) public {
-        sintrop = SintropInterface(sintropAddress);
     }
 
     function producerFundsAddress() public view returns(address) {
