@@ -24,7 +24,7 @@ contract ActivistContract is UserContract {
         string cep;
     }
     
-    Activist[] internal activistsArray;
+    Activist[] internal activistsList;
     mapping(address => Activist) internal activists;
     uint public activistsCount;
     
@@ -53,7 +53,7 @@ contract ActivistContract is UserContract {
             ActivistAddress memory activistAddress = ActivistAddress(country, state, city, cep);
             Activist memory activist = Activist(id, msg.sender, userType, name, document, documentType, false, 0, activistAddress);
             
-            activistsArray.push(activist);
+            activistsList.push(activist);
             activists[msg.sender] = activist;
             activistsCount++;
             addUser(msg.sender, userType);
@@ -66,7 +66,7 @@ contract ActivistContract is UserContract {
    * @return Activist struct array
    */
     function getActivists() public view returns(Activist[] memory) {
-        return activistsArray;
+        return activistsList;
     }
 
     /**
@@ -82,7 +82,6 @@ contract ActivistContract is UserContract {
    * @return a bool that represent if a activist exists or not
    */
     function activistExists(address addr) public view returns(bool) {
-        bool exists = bytes(activists[addr].name).length > 0;
-        return exists;
+        return bytes(activists[addr].name).length > 0;
     }
 }

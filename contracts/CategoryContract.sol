@@ -24,7 +24,7 @@ pragma solidity >=0.7.0 <0.9.0;
     }
     Category public category;
     uint public categoryCounts;
-    Category[] categoriesArray;
+    Category[] categoriesList;
     mapping(uint => Category) categories;
 
     
@@ -33,7 +33,7 @@ pragma solidity >=0.7.0 <0.9.0;
    * @return category struc array
    */
     function getCategories() public view returns(Category[] memory) {
-        return categoriesArray;
+        return categoriesList;
     }
     
     /**
@@ -60,7 +60,7 @@ pragma solidity >=0.7.0 <0.9.0;
         
         category = Category(id, msg.sender, name, description, totallySustainable, partiallySustainable, neutro, partiallyNotSustainable, totallyNotSustainable, 0, index);
         
-        categoriesArray.push(category);
+        categoriesList.push(category);
         categories[id] = category;
         categoryCounts++;
         
@@ -73,9 +73,8 @@ pragma solidity >=0.7.0 <0.9.0;
    * @return category struc array
    */
     function vote(uint id) categoryMustExists(id) public returns (bool) {
-        Category memory categoryVoted = categories[id];
         categories[id].votesCount++;
-        categoriesArray[categoryVoted.index].votesCount++;
+        categoriesList[categories[id].index].votesCount++;
         
         return true;
     }
@@ -97,9 +96,7 @@ pragma solidity >=0.7.0 <0.9.0;
     
     // Modifiers
     modifier categoryMustExists(uint id) {
-        require(uint(id) == id, "The id of category must be passed");
-        require(categories[id].id > 0, "This category don't exists");
-        
+        require(categories[id].id > 0, "This category don't exists");     
         _;
     }
 }

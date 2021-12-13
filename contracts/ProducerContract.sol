@@ -35,10 +35,10 @@ contract ProducerContract is UserContract {
         string cep;
     }
     
-    Producer[] producersArray;
+    Producer[] public producersList;
     mapping(address => Producer) producers;
     uint public producersCount;
-    
+
     /**
    * @dev Allow a new register of producer
    * @param name the name of the producer
@@ -56,7 +56,7 @@ contract ProducerContract is UserContract {
         string memory country, 
         string memory state, 
         string memory city, 
-        string memory cep) public returns(Producer memory) {
+        string memory cep) public returns(bool) {
             
             uint id = producersCount + 1;
             UserType userType = UserType.PRODUCER;
@@ -65,12 +65,12 @@ contract ProducerContract is UserContract {
             TokenApprove memory tokenApprove = TokenApprove(0, false);
             Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, 0, tokenApprove, property_address);
             
-            producersArray.push(producer);
+            producersList.push(producer);
             producers[msg.sender] = producer;
             producersCount++;
             addUser(msg.sender, userType);
             
-            return producer;
+            return true;
     }
     
     /**
@@ -78,7 +78,7 @@ contract ProducerContract is UserContract {
    * @return Producer struct array
    */
     function getProducers() public view returns(Producer[] memory) {
-        return producersArray;
+        return producersList;
     }
     
     /**
