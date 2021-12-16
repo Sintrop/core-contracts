@@ -68,7 +68,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         Inspection memory inspection = inspections[inspectionId];
         if (inspection.status != InspectionStatus.OPEN) return false;
 
-        inspection.status != InspectionStatus.ACCEPTED;
+        inspection.status = InspectionStatus.ACCEPTED;
         inspection.activistWallet = msg.sender;
         inspections[inspectionId] = inspection;
 
