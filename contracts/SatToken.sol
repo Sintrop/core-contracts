@@ -1,10 +1,6 @@
 pragma solidity >=0.5.0 <=0.9.0;
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-interface SintropInterface {
-    function getProducerApprove(address delegate) external view returns(uint);
-}
-
 contract SatTokenERC20 {
     string public constant name = "SUSTAINABLE AGRICULTURE TOKEN";
     string public constant symbol = "SAT";
@@ -17,43 +13,40 @@ contract SatTokenERC20 {
     mapping(address => mapping (address => uint256)) allowed;
 
     uint256 totalSupply_;
-    address producerFundsAddress_;
-    address activistFundsAddress_;
 
     using SafeMath for uint256;
-    SintropInterface sintrop;
 
-    constructor(uint256 total, address _producerFundsAddress, address _activistFundsAddress, address sintropAddress) {  
+    mapping( address => bool) contractsPools;
+
+    constructor(uint256 total) {  
         totalSupply_ = total;
-        sintrop = SintropInterface(sintropAddress);
-        producerFundsAddress_ = _producerFundsAddress;
-        activistFundsAddress_ = _activistFundsAddress;
-        shareFunds(_producerFundsAddress, _activistFundsAddress);
+        balances[msg.sender] = totalSupply_/2;
     }
 
-    function producerFundsAddress() public view returns(address) {
-        return producerFundsAddress_;
+    // =====================================================
+    // Set this to onlyOwner
+    function addContractPool(address _fundAddress, uint _numTokens) public returns(bool) {
+        contractsPools[_fundAddress] = true;
+        setFunds(_fundAddress, _numTokens);
+        return true;
     }
 
-    function activistFundsAddress() public view returns(address) {
-        return activistFundsAddress_;
+    function setFunds(address _fundAddress, uint _numTokens) internal {
+        balances[_fundAddress] = _numTokens;
     }
 
-    function shareFunds(address _producerFundsAddress, address _activistFundsAddress) internal {
-        uint ownerFunds = totalSupply_/2;
-        balances[msg.sender] = ownerFunds;
-        balances[_producerFundsAddress] = (totalSupply_ - ownerFunds)/2;
-        balances[_activistFundsAddress] = (totalSupply_ - ownerFunds)/2;
-    }
+    function approveWith(address delegate, uint numTokens) public returns(uint) {
+        require(isContractPool(msg.sender), "Not a contract pool");
 
-    function approveWith(address from, address delegate) public returns(uint) {
-        if (from != producerFundsAddress_ && from != activistFundsAddress_) return 0;
-
-        uint numTokens = sintrop.getProducerApprove(delegate);
-        allowed[from][delegate] = numTokens;
-        emit Approval(from, delegate, numTokens);
+        allowed[msg.sender][delegate] = numTokens;
+        emit Approval(msg.sender, delegate, numTokens);
         return numTokens;
     }
+
+    function isContractPool(address contractFundsAddress) internal view returns(bool){
+        return contractsPools[contractFundsAddress];
+    }
+    // ==================================
 
     function totalSupply() public view returns (uint256) {
         return totalSupply_;
