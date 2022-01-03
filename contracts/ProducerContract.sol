@@ -18,8 +18,14 @@ contract ProducerContract is UserContract {
         string documentType;
         bool recentInspection;
         uint totalRequests;
-        uint isaAverage;
+        uint isaPoints;
+        TokenApprove tokenApprove;
         PropertyAddress property_address;
+    }
+  
+    struct TokenApprove {
+        uint allowed;
+        bool withdrewToken;
     }
     
     struct PropertyAddress {
@@ -29,10 +35,10 @@ contract ProducerContract is UserContract {
         string cep;
     }
     
-    Producer[] producersArray;
+    Producer[] public producersList;
     mapping(address => Producer) producers;
     uint public producersCount;
-    
+
     /**
    * @dev Allow a new register of producer
    * @param name the name of the producer
@@ -50,20 +56,21 @@ contract ProducerContract is UserContract {
         string memory country, 
         string memory state, 
         string memory city, 
-        string memory cep) public returns(Producer memory) {
+        string memory cep) public returns(bool) {
             
             uint id = producersCount + 1;
             UserType userType = UserType.PRODUCER;
             
             PropertyAddress memory property_address = PropertyAddress(country, state, city, cep);
-            Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, 0, property_address);
+            TokenApprove memory tokenApprove = TokenApprove(0, false);
+            Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, 0, tokenApprove, property_address);
             
-            producersArray.push(producer);
+            producersList.push(producer);
             producers[msg.sender] = producer;
             producersCount++;
             addUser(msg.sender, userType);
             
-            return producer;
+            return true;
     }
     
     /**
@@ -71,7 +78,7 @@ contract ProducerContract is UserContract {
    * @return Producer struct array
    */
     function getProducers() public view returns(Producer[] memory) {
-        return producersArray;
+        return producersList;
     }
     
     /**
@@ -87,7 +94,20 @@ contract ProducerContract is UserContract {
    * @return a bool that represent if a producer exists or not
    */
     function producerExists(address addr) public view returns(bool) {
-        bool exists = bytes(producers[addr].name).length > 0;
-        return exists;
+        return bytes(producers[addr].name).length > 0;
+    }
+
+    function approveProducerNewTokens(address addr, uint numTokens) internal {
+        uint tokens = producers[addr].tokenApprove.allowed;
+        producers[addr].tokenApprove = TokenApprove(tokens += numTokens, false);
+    }
+
+    function getProducerApprove(address address_) public view returns (uint) {
+        return producers[address_].tokenApprove.allowed;
+    }
+
+    function undoProducerApprove() internal returns (bool) {
+        producers[msg.sender].tokenApprove = TokenApprove(0, false);
+        return true;
     }
 }

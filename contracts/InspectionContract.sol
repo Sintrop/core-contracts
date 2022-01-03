@@ -5,7 +5,6 @@ import './ProducerContract.sol';
 import './ActivistContract.sol';
 import './CategoryContract.sol';
 
-
 /**
 * @title InspectionContract
 * @dev Inpection action core
@@ -20,17 +19,16 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         address producerWallet;
         address activistWallet;
         uint[][] isas;
-        uint isaAverage;
+        uint isaPoints;
         uint expiresIn;
         uint createdAt;
         uint index;
     }
-    
-    Inspection[] inspectionsArray;
+    Inspection[] inspectionsList;
     mapping(address => Inspection[]) userInspections;
     mapping(uint256 => Inspection) inspections;
     uint256 inspectionsCount;
-    
+
     /**
    * @dev Allows the current user producer/activist get all yours inspections with status INSPECTED
    */
@@ -43,15 +41,13 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    */
     function requestInspection() public returns(bool) {
         require(producerExists(msg.sender), "You are not a producer! Please register as one");
-        Producer memory producer = producers[msg.sender];
-        require(producer.recentInspection == false, "You have a inspection request OPEN or ACCEPTED! Wait a activist realize inspection or you can close it");
+        require(producers[msg.sender].recentInspection == false, "You have a inspection request OPEN or ACCEPTED! Wait a activist realize inspection or you can close it");
         
         createRequest();
         producers[msg.sender].recentInspection = true;
         
         return true;
-    }  
-    
+    }     
     
     function createRequest() internal{
         uint id = inspectionsCount + 1;
@@ -59,7 +55,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         uint[][] memory isas;
         uint expiresIn = block.timestamp + inspactionExpireIn;
         Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,  0, expiresIn,  block.timestamp, index);
-        inspectionsArray.push(inspection);
+        inspectionsList.push(inspection);
         inspections[id] = inspection;
         inspectionsCount++;
     }
@@ -70,21 +66,14 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    */
     function acceptInspection(uint inspectionId) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
         Inspection memory inspection = inspections[inspectionId];
-        if (inspection.status == InspectionStatus.OPEN) {
-            // Updated inspection in mapping
-            inspection.status = InspectionStatus.ACCEPTED;
-            inspection.activistWallet = msg.sender;
-            inspections[inspectionId] = inspection;
+        if (inspection.status != InspectionStatus.OPEN) return false;
 
-            // Updated inspection in array
-            inspectionsArray[inspection.index].status = InspectionStatus.ACCEPTED;
-            inspectionsArray[inspection.index].activistWallet = msg.sender;
+        inspection.status = InspectionStatus.ACCEPTED;
+        inspection.activistWallet = msg.sender;
+        inspections[inspectionId] = inspection;
 
-            return true;
-        }
-        else {
-            return false;
-        }
+        inspectionsList[inspection.index] = inspection;
+        return true;
     }  
     
     /**
@@ -93,24 +82,8 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    */
     function calculateIsa(Inspection memory inspection) internal pure returns(uint){ 
         uint[][] memory isas = inspection.isas;
-
-        uint isaSum = sumIsa(isas);
-        return isaSum / isas.length;
-    }
-
-    /**
-   * @dev Sum the ISA
-   * @param isas The isas values
-   */
-    function sumIsa(uint[][] memory isas) internal pure returns(uint) {
-        uint8[5] memory isasValue = [10, 8, 6, 4, 2];
-        uint isaSum = 0;
-        for (uint8 i = 0; i < isas.length; i++) {
-            uint isaIndex = isas[i][1];
-            isaSum += isasValue[isaIndex];      
-        }
-
-        return isaSum;
+        uint isaPoints = checkIsaPoints(isas);
+        return isaPoints;
     }
     
     /**
@@ -118,23 +91,29 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
      * @param inspectionId The id of the inspection to be realized
      * @param isas The uint[][] of categoryId and isaIndex. Ex: isas = [ [categoryId, isaIndex], [categoryId, isaIndex] ]
      */ 
-    function realizeInspection(uint inspectionId, uint[][] memory isas) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
-        if (inspections[inspectionId].status != InspectionStatus.ACCEPTED) return false;
-        if (inspections[inspectionId].activistWallet != msg.sender) return false;
+    function realizeInspection(uint inspectionId, uint[][] memory isas) public  requireActivist requireInspectionExists(inspectionId) returns(bool) {
+        if (!isAccepted(inspectionId)) return false;
+        if (!isActivistOwner(inspectionId)) return false;
 
-        // TODO
-        // add result calculateIsa in a variable
-        
-        inspections[inspectionId].isas = isas;
-        inspections[inspectionId].status = InspectionStatus.INSPECTED;
-        inspections[inspectionId].isaAverage = calculateIsa(inspections[inspectionId]);
+        Inspection memory inspection = inspections[inspectionId];
+
+        markAsRealized(inspection, isas);
         afterRealizeInspection(inspectionId);
-
-        inspectionsArray[inspections[inspectionId].index].isas = isas;
-        inspectionsArray[inspections[inspectionId].index].isaAverage = calculateIsa(inspections[inspectionId]);
-        inspectionsArray[inspections[inspectionId].index].status = InspectionStatus.INSPECTED;
-        
+        updateProducerIsa(inspectionId, inspection.isaPoints);
+        approveProducerNewTokens(inspection.producerWallet, 2000);  
         return true;
+    } 
+
+    function markAsRealized(Inspection memory inspection, uint[][] memory isas) internal {   
+        inspection.isas = isas;
+        inspection.status = InspectionStatus.INSPECTED;
+        inspection.isaPoints = calculateIsa(inspection);
+        inspections[inspection.id] = inspection;
+        inspectionsList[inspection.index] = inspection;
+    }
+
+    function updateProducerIsa(uint inspectionId, uint isaPoints) internal {
+        producers[inspections[inspectionId].producerWallet].isaPoints = isaPoints;
     }  
     
     /**
@@ -149,7 +128,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    * @dev Returns all requested inspections.
    */
     function getInspections() public view returns (Inspection[] memory) {
-        return inspectionsArray;
+        return inspectionsList;
     }
     
     /**
@@ -186,7 +165,29 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         userInspections[producerWallet].push(inspections[inspectionId]);
         userInspections[activistWallet].push(inspections[inspectionId]);
     }
+
+    /**
+   * @dev Sum the ISA points
+   * @param isas The isas values
+   */
+    function checkIsaPoints(uint[][] memory isas) internal pure returns(uint) {
+        uint isaPoints = 0;
+        for (uint8 i = 0; i < isas.length; i++) {
+            uint isaIndex = isas[i][1];
+            if (isaIndex <= 2) {
+                isaPoints++;
+            }
+        }
+        return isaPoints;
+    }
     
+    function isActivistOwner(uint inspectionId) internal view returns(bool) {
+        return inspections[inspectionId].activistWallet == msg.sender;
+    }
+ 
+    function isAccepted(uint inspectionId) internal view returns(bool) {
+        return inspections[inspectionId].status == InspectionStatus.ACCEPTED;
+    }
     
     // MODIFIERS
     modifier requireActivist() {
