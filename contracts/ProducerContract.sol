@@ -18,7 +18,7 @@ contract ProducerContract is UserContract {
         string documentType;
         bool recentInspection;
         uint totalRequests;
-        uint isaPoints;
+        int isaPoints;
         TokenApprove tokenApprove;
         PropertyAddress property_address;
     }

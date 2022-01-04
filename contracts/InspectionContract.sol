@@ -19,7 +19,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         address producerWallet;
         address activistWallet;
         uint[][] isas;
-        uint isaPoints;
+        int isaPoints;
         uint expiresIn;
         uint createdAt;
         uint updatedAt;
@@ -105,9 +105,9 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    * @dev Calculate the ISA of the inspection based in the category and the ISA level of the category
    * @param inspection Receive the inspected inspection with your isas levels
    */
-    function calculateIsa(Inspection memory inspection) internal pure returns(uint){ 
+    function calculateIsa(Inspection memory inspection) internal pure returns(int){ 
         uint[][] memory isas = inspection.isas;
-        uint isaPoints = sumIsaPoints(isas);
+        int isaPoints = sumIsaPoints(isas);
         return isaPoints;
     }
 
@@ -115,13 +115,13 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
    * @dev Sum the ISA points
    * @param isas The isas values as list of [[categoryId, isaIndex], [categoryId, isaIndex]]
    */
-    function sumIsaPoints(uint[][] memory isas) internal pure returns(uint) {
-        uint isaPoints = 0;
+    function sumIsaPoints(uint[][] memory isas) internal pure returns(int) {
+        int[5] memory points = [int(10), int(5), int(0), int(-5), int(-10)];
+        int isaPoints = 0;
+
         for (uint8 i = 0; i < isas.length; i++) {
             uint isaIndex = isas[i][1];
-            if (isaIndex <= 2) {
-                isaPoints++;
-            }
+            isaPoints += points[isaIndex];
         }
         return isaPoints;
     }
@@ -135,7 +135,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         inspectionsList[inspection.index] = inspection;
     }
 
-    function updateProducerIsa(uint inspectionId, uint isaPoints) internal {
+    function updateProducerIsa(uint inspectionId, int isaPoints) internal {
         address producerAddress = inspections[inspectionId].producerWallet;
         producers[producerAddress].isaPoints = isaPoints;
     }  
