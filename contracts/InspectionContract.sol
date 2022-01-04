@@ -22,6 +22,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         uint isaPoints;
         uint expiresIn;
         uint createdAt;
+        uint updatedAt;
         uint index;
     }
     Inspection[] inspectionsList;
@@ -54,7 +55,8 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         uint index = id - 1;
         uint[][] memory isas;
         uint expiresIn = block.timestamp + inspactionExpireIn;
-        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,  0, expiresIn,  block.timestamp, index);
+        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, 
+                                                  isas,  0, expiresIn,  block.timestamp, 0, index);
         inspectionsList.push(inspection);
         inspections[id] = inspection;
         inspectionsCount++;
@@ -69,22 +71,13 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         if (inspection.status != InspectionStatus.OPEN) return false;
 
         inspection.status = InspectionStatus.ACCEPTED;
+        inspection.updatedAt = block.timestamp;
         inspection.activistWallet = msg.sender;
         inspections[inspectionId] = inspection;
 
         inspectionsList[inspection.index] = inspection;
         return true;
     }  
-    
-    /**
-   * @dev Calculate the ISA of the inspection based in the category and the ISA level of the category
-   * @param inspection Receive the inspected inspection with your isas levels
-   */
-    function calculateIsa(Inspection memory inspection) internal pure returns(uint){ 
-        uint[][] memory isas = inspection.isas;
-        uint isaPoints = checkIsaPoints(isas);
-        return isaPoints;
-    }
     
     /**
      * @dev Allow a activist realize a inspection and mark as INSPECTED
@@ -98,22 +91,53 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         Inspection memory inspection = inspections[inspectionId];
 
         markAsRealized(inspection, isas);
+
         afterRealizeInspection(inspectionId);
+
         updateProducerIsa(inspectionId, inspection.isaPoints);
-        approveProducerNewTokens(inspection.producerWallet, 2000);  
+
+        approveProducerNewTokens(inspection.producerWallet, 2000); 
+
         return true;
-    } 
+    }
+
+  /**
+   * @dev Calculate the ISA of the inspection based in the category and the ISA level of the category
+   * @param inspection Receive the inspected inspection with your isas levels
+   */
+    function calculateIsa(Inspection memory inspection) internal pure returns(uint){ 
+        uint[][] memory isas = inspection.isas;
+        uint isaPoints = sumIsaPoints(isas);
+        return isaPoints;
+    }
+
+  /**
+   * @dev Sum the ISA points
+   * @param isas The isas values as list of [[categoryId, isaIndex], [categoryId, isaIndex]]
+   */
+    function sumIsaPoints(uint[][] memory isas) internal pure returns(uint) {
+        uint isaPoints = 0;
+        for (uint8 i = 0; i < isas.length; i++) {
+            uint isaIndex = isas[i][1];
+            if (isaIndex <= 2) {
+                isaPoints++;
+            }
+        }
+        return isaPoints;
+    }
 
     function markAsRealized(Inspection memory inspection, uint[][] memory isas) internal {   
         inspection.isas = isas;
         inspection.status = InspectionStatus.INSPECTED;
+        inspection.updatedAt = block.timestamp;
         inspection.isaPoints = calculateIsa(inspection);
         inspections[inspection.id] = inspection;
         inspectionsList[inspection.index] = inspection;
     }
 
     function updateProducerIsa(uint inspectionId, uint isaPoints) internal {
-        producers[inspections[inspectionId].producerWallet].isaPoints = isaPoints;
+        address producerAddress = inspections[inspectionId].producerWallet;
+        producers[producerAddress].isaPoints = isaPoints;
     }  
     
     /**
@@ -164,21 +188,6 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
         
         userInspections[producerWallet].push(inspections[inspectionId]);
         userInspections[activistWallet].push(inspections[inspectionId]);
-    }
-
-    /**
-   * @dev Sum the ISA points
-   * @param isas The isas values
-   */
-    function checkIsaPoints(uint[][] memory isas) internal pure returns(uint) {
-        uint isaPoints = 0;
-        for (uint8 i = 0; i < isas.length; i++) {
-            uint isaIndex = isas[i][1];
-            if (isaIndex <= 2) {
-                isaPoints++;
-            }
-        }
-        return isaPoints;
     }
     
     function isActivistOwner(uint inspectionId) internal view returns(bool) {
