@@ -1,20 +1,13 @@
 pragma solidity >=0.7.0 <=0.9.0;
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./PoolInterface.sol";
 
 interface SatTokenInterface {
     function allowance(address owner, address delegate) external view returns(uint);
     function approveWith(address delegate, uint numTokens) external returns(uint);
     function transferFrom(address owner, address to, uint numTokens) external returns(bool);
-}
-
-contract Ownable {
-
-  modifier onlyOwner {
-    _;
-  }
 }
 
 /**
@@ -24,56 +17,77 @@ contract Ownable {
 contract DeveloperPool is Ownable, PoolInterface {
     struct Developer {
         address _address;
-        uint8 level;
-        uint8 contributions;
-        uint tokens;
+        uint level;
+        uint8 currentEra;
+        uint createdAt;
     }
+
+    mapping(address => Developer) internal developers;
+
+    SatTokenInterface internal satToken;
+
     uint public developersCount;
 
-    mapping(address => Developer) developers;
+    uint public tokensDistribute;
 
-    SatTokenInterface satToken;
+    uint public deployed_at;
 
-    constructor(address satTokenAddress) {
+    uint public era = 3600;
+
+    uint public maxEras = 18;
+
+    uint public levelsSum;
+
+    constructor(address satTokenAddress, uint _tokensDistribute) {
         satToken = SatTokenInterface(satTokenAddress);
+        deployed_at = block.timestamp;
+        tokensDistribute = _tokensDistribute;
     }
     
-    // METHODS TO DEVELOPER MANAGE
+    // METHODS TO DEVELOPER MANAGER //
 
     function getDeveloper(address _developerAddress) public view returns (Developer memory) {
         return developers[_developerAddress];
     }
 
     function add(address _developerAddress) public onlyOwner {
-        Developer memory developer = Developer(_developerAddress, 1, 0, 0);
-        developers[_developerAddress] = developer;
+        developers[_developerAddress] = Developer(_developerAddress, 0, 1, block.timestamp);
         developersCount++;
-    }
-
-    function newContribuitions(address _developerAddress, uint8 _contributions) public onlyOwner {
-        developers[_developerAddress].contributions += _contributions;
     }
 
     function newLevel(address _developerAddress, uint8 _level) public onlyOwner {
         developers[_developerAddress].level += _level;
+        levelsSum += _level;
     }
 
-    function newTokens(address _developerAddress, uint8 _tokens) public onlyOwner {
-        developers[_developerAddress].tokens += _tokens;
-    }
-
-    // METHODS TO TOKEN POOL BELOW
-
-    function undoDeveloperTokens() internal {
-        developers[msg.sender].tokens = 0;
-    }
+    // METHODS TO TOKEN POOL //
 
     function approve() public override returns(bool){
-        satToken.approveWith(msg.sender, developers[msg.sender].tokens);
+        Developer memory developer = getDeveloper(msg.sender);
 
-        undoDeveloperTokens();
+        if (!canWithDraw(developer)) return false;
+
+        satToken.approveWith(msg.sender, calcTokens(developer.level));
+
+        developerNextEra();
 
         return true;
+    }
+
+    function canWithDraw(Developer memory developer) internal view returns(bool) {
+        return canWithDrawFromPresent(block.timestamp, developer.currentEra);
+    }
+
+    function canWithDrawFromPresent(uint _currentTime, uint _currentEra) internal view returns(bool) {
+        return deployed_at + (era * _currentEra) <= _currentTime;
+    }
+
+    function developerNextEra() internal { 
+        developers[msg.sender].currentEra++;
+    }
+
+    function calcTokens(uint level) internal view returns(uint) {
+        return level * (tokensDistribute / levelsSum);
     }
 
     function withDraw() public override returns(bool){

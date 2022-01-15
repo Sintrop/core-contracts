@@ -1,22 +1,24 @@
 pragma solidity >=0.5.0 <=0.9.0;
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-contract SatTokenERC20 {
-    string public constant name = "SUSTAINABLE AGRICULTURE TOKEN";
-    string public constant symbol = "SAT";
-    uint8 public constant decimals = 18;  
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract SatTokenERC20 is Ownable {
+    string public constant NAME = "SUSTAINABLE AGRICULTURE TOKEN";
+    string public constant SYMBOL = "SAT";
+    uint8 public constant DECIMALS = 18;  
 
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
     event Transfer(address indexed from, address indexed to, uint tokens);
 
-    mapping(address => uint256) balances;
-    mapping(address => mapping (address => uint256)) allowed;
+    mapping(address => uint256) internal balances;
+    mapping(address => mapping (address => uint256)) internal allowed;
 
-    uint256 totalSupply_;
+    uint256 internal totalSupply_;
 
     using SafeMath for uint256;
 
-    mapping( address => bool) contractsPools;
+    mapping( address => bool) internal contractsPools;
 
     constructor(uint256 total) {  
         totalSupply_ = total;
@@ -24,8 +26,7 @@ contract SatTokenERC20 {
     }
 
     // =====================================================
-    // Set this to onlyOwner
-    function addContractPool(address _fundAddress, uint _numTokens) public returns(bool) {
+    function addContractPool(address _fundAddress, uint _numTokens) public onlyOwner returns(bool) {
         contractsPools[_fundAddress] = true;
         setFunds(_fundAddress, _numTokens);
         return true;
@@ -38,7 +39,7 @@ contract SatTokenERC20 {
     function approveWith(address delegate, uint numTokens) public returns(uint) {
         require(isContractPool(msg.sender), "Not a contract pool");
 
-        allowed[msg.sender][delegate] = numTokens;
+        allowed[msg.sender][delegate] = numTokens + allowance(msg.sender, delegate);
         emit Approval(msg.sender, delegate, numTokens);
         return numTokens;
     }
