@@ -18,76 +18,88 @@ contract DeveloperPool is Ownable, PoolInterface {
     struct Developer {
         address _address;
         uint level;
-        uint8 currentEra;
+        uint currentEra;
         uint createdAt;
     }
 
+    struct Era {
+        uint era;
+        uint tokens;
+        uint developers;
+    }
+
     mapping(address => Developer) internal developers;
+    mapping(uint => Era) public eras;
 
     SatTokenInterface internal satToken;
 
     uint public developersCount;
 
-    uint public tokensDistribute;
-
-    uint public deployed_at;
-
-    uint public era = 3600;
-
-    uint public maxEras = 18;
-
     uint public levelsSum;
 
-    constructor(address satTokenAddress, uint _tokensDistribute) {
-        satToken = SatTokenInterface(satTokenAddress);
-        deployed_at = block.timestamp;
-        tokensDistribute = _tokensDistribute;
+    uint public deployedAt;
+
+    uint public tokensPerEra;
+
+    uint public blocksPerEra;
+
+    uint public eraMax;
+
+    constructor(address _satTokenAddress, uint _tokensPerEra, uint _blocksPerEra, uint _eraMax) {
+        satToken = SatTokenInterface(_satTokenAddress);
+        deployedAt = block.number;
+        tokensPerEra = _tokensPerEra;
+        blocksPerEra = _blocksPerEra;
+        eraMax = _eraMax;
     }
     
     // METHODS TO DEVELOPER MANAGER //
 
-    function getDeveloper(address _developerAddress) public view returns (Developer memory) {
-        return developers[_developerAddress];
+    function getDeveloper(address _address) public view returns (Developer memory) {
+        return developers[_address];
     }
 
-    function add(address _developerAddress) public onlyOwner {
-        developers[_developerAddress] = Developer(_developerAddress, 0, 1, block.timestamp);
+    function addDeveloper(address _address) public onlyOwner {
+        developers[_address] = Developer(_address, 1, 1, block.timestamp);
+        levelsSum++;
         developersCount++;
     }
 
-    function newLevel(address _developerAddress, uint8 _level) public onlyOwner {
-        developers[_developerAddress].level += _level;
-        levelsSum += _level;
+    function addLevel(address _address) public onlyOwner {
+        developers[_address].level++;
+        levelsSum++;
+    }
+
+    function undoLevel(address _address) public onlyOwner {
+        Developer memory developer = getDeveloper(msg.sender);
+
+        developers[_address].level = 0;
+
+        levelsSum -= developer.level;
     }
 
     // METHODS TO TOKEN POOL //
 
     function approve() public override returns(bool){
+        require(canWithDraw(), "You can't withdraw yet");
+
         Developer memory developer = getDeveloper(msg.sender);
 
-        if (!canWithDraw(developer)) return false;
+        uint tokens = calcTokens(developer.level);
 
-        satToken.approveWith(msg.sender, calcTokens(developer.level));
+        satToken.approveWith(msg.sender, tokens);
+
+        setEraMetrics(developer.currentEra, calcTokens(developer.level));
 
         developerNextEra();
 
         return true;
     }
 
-    function canWithDraw(Developer memory developer) internal view returns(bool) {
-        return canWithDrawFromPresent(block.timestamp, developer.currentEra);
-    }
+    function setEraMetrics(uint _era, uint _tokens) internal {
+        Era memory newEra = Era(_era, _tokens + eras[_era].tokens, 1 + eras[_era].developers);
 
-    function canWithDrawFromPresent(uint _currentTime, uint _currentEra) internal view returns(bool) {
-        return deployed_at + (era * _currentEra) <= _currentTime;
-    }
-
-    function developerNextEra() internal { 
-        developers[msg.sender].currentEra++;
-    }
-
-    function calcTokens(uint level) internal view returns(uint) {
-        return level * (tokensDistribute / levelsSum);
+        eras[_era] = newEra;
     }
 
     function withDraw() public override returns(bool){
@@ -98,4 +110,36 @@ contract DeveloperPool is Ownable, PoolInterface {
     function allowance() public override view returns (uint){
         return satToken.allowance(address(this), msg.sender);
     }
+
+    function canWithDraw() internal view returns(bool) {
+        Developer memory developer = getDeveloper(msg.sender);
+
+        if (developer.level == 0) return false;
+
+        return canWithDrawFromPresent(block.number, developer.currentEra) && eraLimit(developer.currentEra);
+    }
+
+    function eraLimit(uint _currentEra) internal view returns(bool) {
+        return _currentEra <= eraMax;
+    }
+
+    function canWithDrawFromPresent(uint _currentBlock, uint _currentEra) internal view returns(bool) {
+        return deployedAt + (blocksPerEra * _currentEra) <= _currentBlock;
+    }
+
+    function developerNextEra() internal { 
+        developers[msg.sender].currentEra++;
+    }
+
+    function calcTokens(uint _level) internal view returns(uint) {
+        if (levelsSum == 0) return 0;
+        return _level * (tokensPerEra / uint(levelsSum));
+    }
+
+    function nextWithdrawalTime() public view returns(int) {
+        Developer memory developer = getDeveloper(msg.sender);
+
+        return int(deployedAt) + (int(blocksPerEra) * int(developer.currentEra)) - int(block.number);
+    }
+
 }
