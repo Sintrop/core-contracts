@@ -47,7 +47,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     constructor(address _satTokenAddress, uint _tokensPerEra, uint _blocksPerEra, uint _eraMax) {
         satToken = SatTokenInterface(_satTokenAddress);
-        deployedAt = block.number;
+        deployedAt = currentBlockNumber();
         tokensPerEra = _tokensPerEra;
         blocksPerEra = _blocksPerEra;
         eraMax = _eraMax;
@@ -60,9 +60,15 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     function addDeveloper(address _address) public onlyOwner {
-        developers[_address] = Developer(_address, 1, 1, block.timestamp);
+        uint currentEra = currentEraToNewDev();
+
+        developers[_address] = Developer(_address, 1, currentEra, timestamp());
         levelsSum++;
         developersCount++;
+    }
+
+    function currentEraToNewDev() internal view returns(uint) {
+        return (currentBlockNumber() - deployedAt) / blocksPerEra + 1;
     }
 
     function addLevel(address _address) public onlyOwner {
@@ -89,7 +95,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
         satToken.approveWith(msg.sender, tokens);
 
-        setEraMetrics(developer.currentEra, calcTokens(developer.level));
+        setEraMetrics(developer.currentEra, tokens);
 
         developerNextEra();
 
@@ -116,7 +122,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
         if (developer.level == 0) return false;
 
-        return canWithDrawFromPresent(block.number, developer.currentEra) && eraLimit(developer.currentEra);
+        return canWithDrawFromPresent(currentBlockNumber(), developer.currentEra) && eraLimit(developer.currentEra);
     }
 
     function eraLimit(uint _currentEra) internal view returns(bool) {
@@ -139,7 +145,15 @@ contract DeveloperPool is Ownable, PoolInterface {
     function nextWithdrawalTime() public view returns(int) {
         Developer memory developer = getDeveloper(msg.sender);
 
-        return int(deployedAt) + (int(blocksPerEra) * int(developer.currentEra)) - int(block.number);
+        return int(deployedAt) + (int(blocksPerEra) * int(developer.currentEra)) - int(currentBlockNumber());
+    }
+
+    function timestamp() internal view returns(uint) {
+        return block.timestamp;
+    }
+
+    function currentBlockNumber() internal view returns(uint) {
+        return block.number;
     }
 
 }
