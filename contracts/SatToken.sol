@@ -22,29 +22,25 @@ contract SatTokenERC20 is Ownable {
 
     constructor(uint256 total) {  
         totalSupply_ = total;
-        balances[msg.sender] = totalSupply_/2;
+        balances[msg.sender] = totalSupply_;
     }
 
     // =====================================================
     function addContractPool(address _fundAddress, uint _numTokens) public onlyOwner returns(bool) {
         contractsPools[_fundAddress] = true;
-        setFunds(_fundAddress, _numTokens);
+        transfer(_fundAddress, _numTokens);
         return true;
     }
 
-    function setFunds(address _fundAddress, uint _numTokens) internal {
-        balances[_fundAddress] = _numTokens;
-    }
-
     function approveWith(address delegate, uint numTokens) public returns(uint) {
-        require(isContractPool(msg.sender), "Not a contract pool");
+        require(contractPool(msg.sender), "Not a contract pool");
 
         allowed[msg.sender][delegate] = numTokens + allowance(msg.sender, delegate);
         emit Approval(msg.sender, delegate, numTokens);
         return numTokens;
     }
 
-    function isContractPool(address contractFundsAddress) internal view returns(bool){
+    function contractPool(address contractFundsAddress) internal view returns(bool){
         return contractsPools[contractFundsAddress];
     }
     // ==================================
