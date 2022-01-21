@@ -99,6 +99,8 @@ contract DeveloperPool is Ownable, PoolInterface {
 
         developerNextEra();
 
+        if (canWithDraw()) approve();
+
         return true;
     }
 
