@@ -55,10 +55,19 @@ contract DeveloperPool is Ownable, PoolInterface {
         eraMax = _eraMax;
     }
 
+
+    /**
+   * @dev Return a specific developer
+   * @param _address the address of the developer
+   */
     function getDeveloper(address _address) public view returns (Developer memory) {
         return developers[_address];
     }
 
+    /**
+   * @dev Add a new develop to the pool
+   * @param _address the address of the developer
+   */
     function addDeveloper(address _address) public onlyOwner {
         uint currentEra = currentEraToNewDev();
 
@@ -67,21 +76,35 @@ contract DeveloperPool is Ownable, PoolInterface {
         developersCount++;
     }
 
+    /**
+   * @dev Set the current era of the develop. The current era of the develop is the current era of the pool
+   */
     function currentEraToNewDev() internal view returns(uint) {
         return currentBlockNumber().sub(deployedAt).div(blocksPerEra).add(1);
     }
 
+    /**
+   * @dev Increment the level of the develop
+   * @param _address the address of the developer
+   */
     function addLevel(address _address) public onlyOwner {
         developers[_address].level++;
         levelsSum++;
     }
 
+    /**
+   * @dev Set to zero the level of the develop
+   * @param _address the address of the developer
+   */
     function undoLevel(address _address) public onlyOwner {
         Developer memory developer = getDeveloper(_address);
         levelsSum -= developer.level;
         developers[_address].level = 0;
     }
 
+    /**
+   * @dev Allow the developer to approve tokens from DeveloperPool address. DeveloperPool address must have tokens in SAT TOKEN
+   */
     function approve() public override returns(bool){
         require(canWithDraw(), "You can't withdraw yet");
 
@@ -100,21 +123,35 @@ contract DeveloperPool is Ownable, PoolInterface {
         return true;
     }
 
+    /**
+   * @dev Add metrics actions to eras. The metrics are numbers of tokens and developers.
+   * @param _era The current era that the develop approve() tokens
+   * @param _tokens How much tokens the win to this era
+   */
     function setEraMetrics(uint _era, uint _tokens) internal {
         uint oneDev = 1;
         Era memory newEra = Era(_era, _tokens.add(eras[_era].tokens), oneDev.add(eras[_era].developers));
         eras[_era] = newEra;
     }
 
+    /**
+   * @dev Allow the dev withdraw tokens from DeveloperPool address to his address
+   */
     function withDraw() public override returns(bool){
         satToken.transferFrom(address(this), msg.sender, allowance()); 
         return true;
     }
 
+    /**
+   * @dev Show how much tokens the developer can withdraw from DeveloperPool address
+   */
     function allowance() public override view returns (uint){
         return satToken.allowance(address(this), msg.sender);
     }
 
+    /**
+   * @dev Check if the developer can approve tokens
+   */
     function canWithDraw() internal view returns(bool) {
         Developer memory developer = getDeveloper(msg.sender);
 
@@ -123,34 +160,56 @@ contract DeveloperPool is Ownable, PoolInterface {
         return canWithDrawFromPresent(currentBlockNumber(), developer.currentEra) && eraLimit(developer.currentEra);
     }
 
+    /**
+   * @dev Check if the limit of eras is the maximum. The state eraMax is the limit
+   */
     function eraLimit(uint _currentEra) internal view returns(bool) {
         return _currentEra <= eraMax;
     }
 
+    /**
+   * @dev Check if the developer can approve. This funcion check the initial block deploy with the current block
+   */
     function canWithDrawFromPresent(uint _currentBlock, uint _currentEra) internal view returns(bool) {
         return deployedAt.add(blocksPerEra.mul(_currentEra)) <= _currentBlock;
     }
 
+    /**
+   * @dev Increment a new era to a developer. This funcions called when the developer approve tokens
+   */
     function developerNextEra() internal { 
         developers[msg.sender].currentEra++;
     }
 
+    /**
+   * @dev Calc how much tokens the dev can approve
+   * @param _level The level of the developer
+   */
     function calcTokens(uint _level) internal view returns(uint) {
         uint _levelsSum = uint(levelsSum);
         if (_levelsSum == 0) return 0;
         return _level.mul((tokensPerEra.div(_levelsSum)));
     }
 
+    /**
+   * @dev Show how much block missing to approve new tokens
+   */
     function nextWithdrawalTime() public view returns(int) {
         Developer memory developer = getDeveloper(msg.sender);
 
         return int(deployedAt) + (int(blocksPerEra) * int(developer.currentEra)) - int(currentBlockNumber());
     }
 
+    /**
+   * @dev Returns the timestamp
+   */
     function timestamp() internal view returns(uint) {
         return block.timestamp;
     }
 
+    /**
+   * @dev Returns the current block number
+   */
     function currentBlockNumber() internal view returns(uint) {
         return block.number;
     }
