@@ -55,7 +55,6 @@ contract DeveloperPool is Ownable, PoolInterface {
         eraMax = _eraMax;
     }
 
-
     /**
    * @dev Return a specific developer
    * @param _address the address of the developer
