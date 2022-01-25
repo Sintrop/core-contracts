@@ -196,7 +196,7 @@ contract DeveloperPool is Ownable, PoolInterface {
     /**
    * @dev Show how much block missing to approve new tokens
    */
-    function nextWithdrawalTime() public view returns(int) {
+    function nextApproveTime() public view returns(int) {
         Developer memory developer = getDeveloper(msg.sender);
 
         return int(deployedAt) + (int(blocksPerEra) * int(developer.currentEra)) - int(currentBlockNumber());
