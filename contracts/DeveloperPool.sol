@@ -106,7 +106,7 @@ contract DeveloperPool is Ownable, PoolInterface {
    * @dev Allow the developer to approve tokens from DeveloperPool address. DeveloperPool address must have tokens in SAT TOKEN
    */
     function approve() public override returns(bool){
-        require(canWithDraw(), "You can't withdraw yet");
+        require(canApprove(), "You can't withdraw yet");
 
         Developer memory developer = getDeveloper(msg.sender);
 
@@ -118,7 +118,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
         developerNextEra();
 
-        if (canWithDraw()) approve();
+        if (canApprove()) approve();
 
         return true;
     }
@@ -152,12 +152,12 @@ contract DeveloperPool is Ownable, PoolInterface {
     /**
    * @dev Check if the developer can approve tokens
    */
-    function canWithDraw() internal view returns(bool) {
+    function canApprove() internal view returns(bool) {
         Developer memory developer = getDeveloper(msg.sender);
 
         if (developer.level == 0) return false;
 
-        return canWithDrawFromPresent(currentBlockNumber(), developer.currentEra) && eraLimit(developer.currentEra);
+        return canApproveFromPresent(currentBlockNumber(), developer.currentEra) && eraLimit(developer.currentEra);
     }
 
     /**
@@ -170,7 +170,7 @@ contract DeveloperPool is Ownable, PoolInterface {
     /**
    * @dev Check if the developer can approve. This funcion check the initial block deploy with the current block
    */
-    function canWithDrawFromPresent(uint _currentBlock, uint _currentEra) internal view returns(bool) {
+    function canApproveFromPresent(uint _currentBlock, uint _currentEra) internal view returns(bool) {
         return deployedAt.add(blocksPerEra.mul(_currentEra)) <= _currentBlock;
     }
 
