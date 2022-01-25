@@ -103,7 +103,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     /**
    * @dev Allow the developer to approve tokens from DeveloperPool address. DeveloperPool address must have tokens in SAT TOKEN
-   * @todo Check external code call - EXTCALL
+   * TODO Check external code call - EXTCALL
    */
     function approve() public override returns(bool){
         require(canApprove(), "You can't withdraw yet");
@@ -136,7 +136,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     /**
    * @dev Allow the dev withdraw tokens from DeveloperPool address to his address
-   * @todo Check external code call - EXTCALL
+   * TODO Check external code call - EXTCALL
    */
     function withDraw() public override returns(bool){
         satToken.transferFrom(address(this), msg.sender, allowance()); 
@@ -145,7 +145,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     /**
    * @dev Show how much tokens the developer can withdraw from DeveloperPool address
-   * @todo Check external code call - EXTCALL
+   * TODO Check external code call - EXTCALL
    */
     function allowance() public override view returns (uint){
         return satToken.allowance(address(this), msg.sender);
