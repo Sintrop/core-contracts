@@ -15,6 +15,8 @@ interface SatTokenInterface {
 * @dev DeveloperPool is a contract to reward developers
 */
 contract DeveloperPool is Ownable, PoolInterface {
+    using SafeMath for uint256;
+
     struct Developer {
         address _address;
         uint level;
@@ -52,8 +54,6 @@ contract DeveloperPool is Ownable, PoolInterface {
         blocksPerEra = _blocksPerEra;
         eraMax = _eraMax;
     }
-    
-    // METHODS TO DEVELOPER MANAGER //
 
     function getDeveloper(address _address) public view returns (Developer memory) {
         return developers[_address];
@@ -68,7 +68,7 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     function currentEraToNewDev() internal view returns(uint) {
-        return (currentBlockNumber() - deployedAt) / blocksPerEra + 1;
+        return currentBlockNumber().sub(deployedAt).div(blocksPerEra).add(1);
     }
 
     function addLevel(address _address) public onlyOwner {
@@ -77,14 +77,10 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     function undoLevel(address _address) public onlyOwner {
-        Developer memory developer = getDeveloper(msg.sender);
-
-        developers[_address].level = 0;
-
+        Developer memory developer = getDeveloper(_address);
         levelsSum -= developer.level;
+        developers[_address].level = 0;
     }
-
-    // METHODS TO TOKEN POOL //
 
     function approve() public override returns(bool){
         require(canWithDraw(), "You can't withdraw yet");
@@ -105,8 +101,8 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     function setEraMetrics(uint _era, uint _tokens) internal {
-        Era memory newEra = Era(_era, _tokens + eras[_era].tokens, 1 + eras[_era].developers);
-
+        uint oneDev = 1;
+        Era memory newEra = Era(_era, _tokens.add(eras[_era].tokens), oneDev.add(eras[_era].developers));
         eras[_era] = newEra;
     }
 
@@ -132,7 +128,7 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     function canWithDrawFromPresent(uint _currentBlock, uint _currentEra) internal view returns(bool) {
-        return deployedAt + (blocksPerEra * _currentEra) <= _currentBlock;
+        return deployedAt.add(blocksPerEra.mul(_currentEra)) <= _currentBlock;
     }
 
     function developerNextEra() internal { 
@@ -140,8 +136,9 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     function calcTokens(uint _level) internal view returns(uint) {
-        if (levelsSum == 0) return 0;
-        return _level * (tokensPerEra / uint(levelsSum));
+        uint _levelsSum = uint(levelsSum);
+        if (_levelsSum == 0) return 0;
+        return _level.mul((tokensPerEra.div(_levelsSum)));
     }
 
     function nextWithdrawalTime() public view returns(int) {
@@ -158,4 +155,57 @@ contract DeveloperPool is Ownable, PoolInterface {
         return block.number;
     }
 
+}
+
+library SafeMath {
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a, "SafeMath: addition overflow");
+
+        return c;
+    }
+
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        return sub(a, b, "SafeMath: subtraction overflow");
+    }
+
+    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b <= a, errorMessage);
+        uint256 c = a - b;
+
+        return c;
+    }
+
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a == 0) {
+            return 0;
+        }
+
+        uint256 c = a * b;
+        require(c / a == b, "SafeMath: multiplication overflow");
+
+        return c;
+    }
+
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return div(a, b, "SafeMath: division by zero");
+    }
+
+    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        // Solidity only automatically asserts when dividing by 0
+        require(b > 0, errorMessage);
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
+        return c;
+    }
+
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        return mod(a, b, "SafeMath: modulo by zero");
+    }
+
+    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b != 0, errorMessage);
+        return a % b;
+    }
 }
