@@ -205,6 +205,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     /**
    * @dev Show how much times the developer can approve tokens. How much eras passed.
+   * @return A uint with precision of blocksPrecision state. The real return can be get by return/blocksPrecision and Math.ceil
    */
     function canApproveTimes() public view returns(uint) {
         int approvesTimes = nextApproveTime();
