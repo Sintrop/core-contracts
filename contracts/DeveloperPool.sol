@@ -74,9 +74,7 @@ contract DeveloperPool is Ownable, PoolInterface {
    * @param _address the address of the developer
    */
     function addDeveloper(address _address) public onlyOwner {
-        uint currentEra = currentContractEra();
-
-        developers[_address] = Developer(_address, 1, currentEra, timestamp());
+        developers[_address] = Developer(_address, 1, currentContractEra(), timestamp());
         levelsSum++;
         developersCount++;
         developersAddress.push(_address);
