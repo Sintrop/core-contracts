@@ -4,12 +4,6 @@ pragma solidity >=0.7.0 <=0.9.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./PoolInterface.sol";
 
-interface SatTokenInterface {
-    function allowance(address owner, address delegate) external view returns(uint);
-    function approveWith(address delegate, uint numTokens) external returns(uint);
-    function transferFrom(address owner, address to, uint numTokens) external returns(bool);
-}
-
 /**
 * @author Everson B. Silva
 * @title DeveloperContract
@@ -239,6 +233,12 @@ contract DeveloperPool is Ownable, PoolInterface {
         return block.number;
     }
 
+}
+
+interface SatTokenInterface {
+    function allowance(address owner, address delegate) external view returns(uint);
+    function approveWith(address delegate, uint numTokens) external returns(uint);
+    function transferFrom(address owner, address to, uint numTokens) external returns(bool);
 }
 
 library SafeMath {
