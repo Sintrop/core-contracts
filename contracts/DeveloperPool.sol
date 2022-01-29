@@ -54,7 +54,7 @@ contract DeveloperPool is Ownable, PoolInterface {
     constructor(address _satTokenAddress, uint _tokensPerEra, uint _blocksPerEra, uint _eraMax) {
         satToken = SatTokenInterface(_satTokenAddress);
         deployedAt = currentBlockNumber();
-        tokensPerEra = _tokensPerEra;
+        tokensPerEra = _tokensPerEra.mul(10**18);
         blocksPerEra = _blocksPerEra;
         eraMax = _eraMax;
     }
