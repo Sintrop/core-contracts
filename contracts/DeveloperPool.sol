@@ -49,7 +49,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     uint public eraMax;
 
-    uint public blocksPrecision = 5;
+    uint public constant blocksPrecision = 5;
 
     constructor(address _satTokenAddress, uint _tokensPerEra, uint _blocksPerEra, uint _eraMax) {
         satToken = SatTokenInterface(_satTokenAddress);
