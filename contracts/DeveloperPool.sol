@@ -47,6 +47,8 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     uint public eraMax;
 
+    uint public blocksPrecision = 5;
+
     constructor(address _satTokenAddress, uint _tokensPerEra, uint _blocksPerEra, uint _eraMax) {
         satToken = SatTokenInterface(_satTokenAddress);
         deployedAt = currentBlockNumber();
@@ -68,7 +70,7 @@ contract DeveloperPool is Ownable, PoolInterface {
    * @param _address the address of the developer
    */
     function addDeveloper(address _address) public onlyOwner {
-        uint currentEra = currentEraToNewDev();
+        uint currentEra = currentContractEra();
 
         developers[_address] = Developer(_address, 1, currentEra, timestamp());
         levelsSum++;
@@ -76,9 +78,9 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     /**
-   * @dev Set the current era of the develop. The current era of the develop is the current era of the pool
+   * @dev Return the current era of the contract
    */
-    function currentEraToNewDev() internal view returns(uint) {
+    function currentContractEra() public view returns(uint) {
         return currentBlockNumber().sub(deployedAt).div(blocksPerEra).add(1);
     }
 
@@ -198,8 +200,17 @@ contract DeveloperPool is Ownable, PoolInterface {
    */
     function nextApproveTime() public view returns(int) {
         Developer memory developer = getDeveloper(msg.sender);
-
         return int(deployedAt) + (int(blocksPerEra) * int(developer.currentEra)) - int(currentBlockNumber());
+    }
+
+    /**
+   * @dev Show how much times the developer can approve tokens. How much eras passed.
+   */
+    function canApproveTimes() public view returns(uint) {
+        int approvesTimes = nextApproveTime();
+        if (approvesTimes > 0) return 0;
+
+        return uint(-approvesTimes).mul(10**blocksPrecision).div(blocksPerEra);
     }
 
     /**
