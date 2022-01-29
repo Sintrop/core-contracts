@@ -33,6 +33,8 @@ contract DeveloperPool is Ownable, PoolInterface {
     mapping(address => Developer) internal developers;
     mapping(uint => Era) public eras;
 
+    address[] internal developersAddress;
+
     SatTokenInterface internal satToken;
 
     uint public developersCount;
@@ -66,6 +68,13 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     /**
+   * @dev Return the developers address of the system
+   */
+    function getDevelopersAddress() public view returns(address[] memory) {
+        return developersAddress;
+    }
+
+    /**
    * @dev Add a new develop to the pool
    * @param _address the address of the developer
    */
@@ -75,6 +84,7 @@ contract DeveloperPool is Ownable, PoolInterface {
         developers[_address] = Developer(_address, 1, currentEra, timestamp());
         levelsSum++;
         developersCount++;
+        developersAddress.push(_address);
     }
 
     /**
