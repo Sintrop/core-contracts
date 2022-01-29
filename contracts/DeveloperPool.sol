@@ -11,6 +11,7 @@ interface SatTokenInterface {
 }
 
 /**
+* @author Everson B. Silva
 * @title DeveloperContract
 * @dev DeveloperPool is a contract to reward developers
 */
