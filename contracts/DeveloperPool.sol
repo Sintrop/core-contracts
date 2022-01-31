@@ -34,7 +34,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     uint public developersCount;
 
-    uint public levelsSum;
+    uint[18] public levelsSumPerEra;
 
     uint public deployedAt;
 
@@ -74,10 +74,41 @@ contract DeveloperPool is Ownable, PoolInterface {
    * @param _address the address of the developer
    */
     function addDeveloper(address _address) public onlyOwner {
-        developers[_address] = Developer(_address, 1, currentContractEra(), timestamp());
-        levelsSum++;
+        uint _currentEra = currentContractEra();
+        developers[_address] = Developer(_address, 1, _currentEra, timestamp());
+        upLevels(_currentEra);
         developersCount++;
         developersAddress.push(_address);
+    }
+
+    /**
+   * @dev Increment the levels + 1 per era always that a developer is added or the level is up
+   * @param _fromEra the era of developer
+   */
+    function upLevels(uint _fromEra) internal {
+        uint[18] memory _levels = levelsSumPerEra;
+        uint _eraMax = eraMax;
+
+        for(uint i = _fromEra - 1; i < _eraMax; i++) {
+            _levels[i]++;
+        }
+
+        levelsSumPerEra = _levels;
+    }
+
+    /**
+   * @dev Decrement the levels of the undo developer
+   * @param _fromEra the era of developer
+   */
+    function downLevels(uint _fromEra, Developer memory developer) internal {
+        uint[18] memory _levels = levelsSumPerEra;
+        uint _eraMax = eraMax;
+
+        for(uint i = _fromEra - 1; i < _eraMax; i++) {
+            _levels[i] -= developer.level;
+        }
+
+        levelsSumPerEra = _levels;
     }
 
     /**
@@ -92,8 +123,10 @@ contract DeveloperPool is Ownable, PoolInterface {
    * @param _address the address of the developer
    */
     function addLevel(address _address) public onlyOwner {
+        Developer memory developer = getDeveloper(_address);
+
         developers[_address].level++;
-        levelsSum++;
+        upLevels(developer.currentEra);
     }
 
     /**
@@ -102,7 +135,7 @@ contract DeveloperPool is Ownable, PoolInterface {
    */
     function undoLevel(address _address) public onlyOwner {
         Developer memory developer = getDeveloper(_address);
-        levelsSum -= developer.level;
+        downLevels(developer.currentEra, developer);
         developers[_address].level = 0;
     }
 
@@ -115,7 +148,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
         Developer memory developer = getDeveloper(msg.sender);
 
-        uint tokens = calcTokens(developer.level);
+        uint tokens = calcTokens(developer.level, developer.currentEra);
 
         satToken.approveWith(msg.sender, tokens);
 
@@ -189,11 +222,12 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     /**
-   * @dev Calc how much tokens the dev can approve
+   * @dev Calc how much tokens the dev can approve in some era
    * @param _level The level of the developer
+   * @param _era Era to calc in
    */
-    function calcTokens(uint _level) internal view returns(uint) {
-        uint _levelsSum = uint(levelsSum);
+    function calcTokens(uint _level, uint _era) internal view returns(uint) {
+        uint _levelsSum = levelsSumPerEra[_era - 1];
         if (_levelsSum == 0) return 0;
         return _level.mul((tokensPerEra.div(_levelsSum)));
     }
