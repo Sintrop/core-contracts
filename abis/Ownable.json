@@ -1,0 +1,177 @@
+{
+  "contractName": "Ownable",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.2+commit.661d1103\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Ownable.sol\":\"Ownable\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Ownable.sol\":{\"keccak256\":\"0xf131fba5e92d43cc47eb6c5952fca821c1585ef7823db61430ea688f1934ab38\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://077f1937855b4e65379148da320309f88c2c043514cf7ec4408b81e8b0e72f85\",\"dweb:/ipfs/QmUpymHG5rkHW62W4kJBQ3F1wfpPpXuwguZoLihx297YLE\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212208cad0d73104a087db498bc203ef37efb32f8d6222447a260e2229f1e89017ac564736f6c63430008020033",
+  "deployedBytecode": "0x6080604052600080fdfea26469706673582212208cad0d73104a087db498bc203ef37efb32f8d6222447a260e2229f1e89017ac564736f6c63430008020033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "70:54:4:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "70:54:4:-:0;;;;;",
+  "source": "// SPDX-License-Identifier: GPL-3.0\npragma solidity >=0.7.0 <=0.9.0;\n\ncontract Ownable {\n  modifier onlyOwner {\n    _;\n  }\n}\n",
+  "sourcePath": "/home/everson/projetos/afiliart/SAT-core-contracts/contracts/Ownable.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/Ownable.sol",
+    "exportedSymbols": {
+      "Ownable": [
+        1057
+      ]
+    },
+    "id": 1058,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1052,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.7",
+          ".0",
+          "<=",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "36:32:4"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 1057,
+        "linearizedBaseContracts": [
+          1057
+        ],
+        "name": "Ownable",
+        "nameLocation": "79:7:4",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 1055,
+              "nodeType": "Block",
+              "src": "110:12:4",
+              "statements": [
+                {
+                  "id": 1054,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "116:1:4"
+                }
+              ]
+            },
+            "id": 1056,
+            "name": "onlyOwner",
+            "nameLocation": "100:9:4",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 1053,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "110:0:4"
+            },
+            "src": "91:31:4",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 1058,
+        "src": "70:54:4"
+      }
+    ],
+    "src": "36:89:4"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/Ownable.sol",
+    "exportedSymbols": {
+      "Ownable": [
+        1057
+      ]
+    },
+    "id": 1058,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1052,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.7",
+          ".0",
+          "<=",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "36:32:4"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 1057,
+        "linearizedBaseContracts": [
+          1057
+        ],
+        "name": "Ownable",
+        "nameLocation": "79:7:4",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 1055,
+              "nodeType": "Block",
+              "src": "110:12:4",
+              "statements": [
+                {
+                  "id": 1054,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "116:1:4"
+                }
+              ]
+            },
+            "id": 1056,
+            "name": "onlyOwner",
+            "nameLocation": "100:9:4",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 1053,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "110:0:4"
+            },
+            "src": "91:31:4",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 1058,
+        "src": "70:54:4"
+      }
+    ],
+    "src": "36:89:4"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.2+commit.661d1103.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.4",
+  "updatedAt": "2022-02-04T00:33:35.123Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
