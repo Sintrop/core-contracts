@@ -1,9 +1,11 @@
-pragma solidity >=0.5.0 <=0.9.0;
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.7.0 <=0.9.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./Ownable.sol";
 
-contract SatTokenERC20 is Ownable {
+import "./SafeMath.sol";
+
+contract SatToken is Ownable {
     string public constant NAME = "SUSTAINABLE AGRICULTURE TOKEN";
     string public constant SYMBOL = "SAT";
     uint8 public constant DECIMALS = 18;  
@@ -80,18 +82,5 @@ contract SatTokenERC20 is Ownable {
         balances[buyer] = balances[buyer].add(numTokens);
         emit Transfer(owner, buyer, numTokens);
         return true;
-    }
-}
-
-library SafeMath { 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-      assert(b <= a);
-      return a - b;
-    }
-    
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-      uint256 c = a + b;
-      assert(c >= a);
-      return c;
     }
 }

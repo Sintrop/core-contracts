@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.7.0 <=0.9.0;
 
 import './UserContract.sol';
 
@@ -80,7 +79,7 @@ contract ProducerContract is UserContract {
     function getProducers() public view returns(Producer[] memory) {
         return producersList;
     }
-    
+
     /**
    * @dev Return a specific producer
    * @param addr the address of the producer.

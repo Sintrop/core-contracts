@@ -1,17 +1,17 @@
-pragma solidity >=0.5.0 <=0.9.0;
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.7.0 <=0.9.0;
 
 import './ProducerContract.sol';
 import './ActivistContract.sol';
 import './CategoryContract.sol';
 
 /**
-* @title InspectionContract
-* @dev Inpection action core
+* @title SintropContract
+* @dev Sintrop application to certificated a rural producer
 */
-contract InspectionContract is ProducerContract, ActivistContract, CategoryContract {
+contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
     enum InspectionStatus { OPEN, EXPIRED, INSPECTED, ACCEPTED } 
-    uint inspactionExpireIn = 604800; // Seven days
+    uint inspactionExpireIn = 604800;
     
     struct Inspection {
         uint id;
@@ -138,8 +138,8 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     function updateProducerIsa(uint inspectionId, int isaPoints) internal {
         address producerAddress = inspections[inspectionId].producerWallet;
         producers[producerAddress].isaPoints = isaPoints;
-    }  
-    
+    }
+
     /**
    * @dev Returns a inspection by id if that exists.
    * @param id The id of the inspection to return.
@@ -154,7 +154,7 @@ contract InspectionContract is ProducerContract, ActivistContract, CategoryContr
     function getInspections() public view returns (Inspection[] memory) {
         return inspectionsList;
     }
-    
+
     /**
    * @dev Returns all inpections status string.
    */
