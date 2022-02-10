@@ -269,5 +269,4 @@ contract DeveloperPool is Ownable, PoolInterface {
     function currentBlockNumber() internal view returns(uint) {
         return block.number;
     }
-
 }

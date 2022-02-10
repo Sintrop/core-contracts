@@ -128,7 +128,8 @@ contract('DeveloperPool', (accounts) => {
       assert.equal(levelsSum, 5);
     })
 
-    it("should add +1 level in levelsSumPerEra just for the era that the dev is it forward add new developer", async () => {
+    it(`should add +1 level in levelsSumPerEra just for the era that the
+     dev is it forward add new developer`, async () => {
       await addDeveloper(dev1Address);
       await advanceBlock(args.blocksPerEra);
       await addDeveloper(dev2Address);
@@ -147,7 +148,8 @@ contract('DeveloperPool', (accounts) => {
       assert.equal(levelsSum, 10);
     })
 
-    it("should add +1 level in levelsSumPerEra just for the era that the dev is it forward after add level", async () => {
+    it(`should add +1 level in levelsSumPerEra just for the era that the
+     dev is it forward after add level`, async () => {
       await addDeveloper(dev1Address);
       await advanceBlock(args.blocksPerEra);
       await addDeveloper(dev2Address);
@@ -217,12 +219,16 @@ contract('DeveloperPool', (accounts) => {
       assert.equal(canApproveTimes, 0);
     })
 
-    it("should return 2 times to approve when the dev is in second era and did not approve tokens yet", async () => {
+    it(`should return integer with fixed point that represent 2 times to approve
+     when the dev is in second era and did not approve tokens yet`, async () => {
       await addDeveloper(dev1Address);
       await advanceBlock(args.blocksPerEra * 2);
 
       const canApproveTimes = await instance.canApproveTimes({ from: dev1Address });
+      const blocksPrecision = await instance.blocksPrecision();
 
-      assert.equal(Math.ceil(canApproveTimes/100000), 2);
+      const fixedPoint = canApproveTimes/(10**blocksPrecision)
+
+      assert.equal(Math.ceil(fixedPoint), 2);
     })
 })
