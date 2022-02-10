@@ -4,8 +4,8 @@ const Sintrop = artifacts.require("Sintrop");
 
 module.exports = function(deployer) {
   const args = {
-    totalTokens: "25000000000000000000000000",
-    tokensPerEra: 5000,
+    totalTokens: "1500000000000000000000000000",
+    tokensPerEra: "833333333333333333333333",
     blocksPerEra: 10,
     eraMax: 18
   }
