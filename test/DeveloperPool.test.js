@@ -47,13 +47,15 @@ contract('DeveloperPool', (accounts) => {
     }
 
     beforeEach(async () => {
-      const satToken = await SatToken.new("25000000000000000000000000");
+      const satToken = await SatToken.new("1500000000000000000000000000");
       instance = await DeveloperPool.new(
         satToken.address, 
         args.tokensPerEra,
         args.blocksPerEra,
         args.eraMax
       )
+
+      satToken.addContractPool(instance.address, "15000000000000000000000000")
     })
 
     it('should tokenPerEra be equal the deployed value with decimals', async () => {
@@ -230,5 +232,94 @@ contract('DeveloperPool', (accounts) => {
       const fixedPoint = canApproveTimes/(10**blocksPrecision)
 
       assert.equal(Math.ceil(fixedPoint), 2);
+    })
+
+    it(`should add amount of approved tokens in eras metrics after approve tokens`, async () => {
+      await addDeveloper(dev1Address);
+      await addDeveloper(dev2Address);
+      await advanceBlock(args.blocksPerEra);
+      await instance.approve({ from: dev1Address });
+
+      const era = await instance.eras(1);
+      const allowance = await instance.allowance({ from: dev1Address });
+
+      assert.equal(era.tokens.toString(), allowance);
+    })
+
+    it(`should add amount of developers who approved tokens in eras metrics after approve tokens`, async () => {
+      await addDeveloper(dev1Address);
+      await addDeveloper(dev2Address);
+      await advanceBlock(args.blocksPerEra);
+
+      await instance.approve({ from: dev1Address });
+      await instance.approve({ from: dev2Address });
+
+      const era = await instance.eras(1);
+
+      assert.equal(era.developers.toString(), 2);
+    })
+
+    it(`should update the current era that the dev is after approve tokens`, async () => {
+      await addDeveloper(dev1Address);
+      await advanceBlock(args.blocksPerEra);
+
+      const developer = await instance.getDeveloper(dev1Address);
+      await instance.approve({ from: dev1Address });
+
+      const era = await instance.eras(1);
+
+      assert.equal(era.era.toString(), developer.currentEra);
+    })
+
+    it("shoud approve tokens proportional to the level 2 when the total of levels in era is 3", async () => {
+      await addDeveloper(dev1Address);
+      await addDeveloper(dev2Address);
+      await instance.addLevel(dev1Address);
+      await advanceBlock(args.blocksPerEra);
+
+      await instance.approve({ from: dev1Address });
+      const allowance = await instance.allowance({ from: dev1Address });
+
+      assert.equal(allowance, "3333333333333333333332");
+    })
+
+    it("should approve tokens past eras the dev hasn't approved yet", async () => {
+      await addDeveloper(dev1Address);
+      await addDeveloper(dev2Address);
+      await instance.addLevel(dev1Address);
+      await advanceBlock(args.blocksPerEra * 3);
+
+      await instance.approve({ from: dev1Address });
+      const developer = await instance.getDeveloper(dev1Address);
+
+      assert.equal(developer.currentEra, 4);
+    })
+
+    it("should not approve when the dev is in the eraMax of the contract", async () => {
+      await addDeveloper(dev1Address);
+      await advanceBlock(args.blocksPerEra * 10);
+
+      await instance.approve({ from: dev1Address });
+      const developer = await instance.getDeveloper(dev1Address);
+
+      assert.equal(developer.currentEra, 6);
+    })
+
+    it("should increment era of the dev in 1 when approve tokens", async () => {
+      await addDeveloper(dev1Address);
+      await advanceBlock(args.blocksPerEra);
+      await instance.approve({ from: dev1Address });
+      const developer = await instance.getDeveloper(dev1Address);
+
+      assert.equal(developer.currentEra, 2);
+    })
+
+    it("should return error when the dev try approve tokens and can't yet", async () => {
+      await addDeveloper(dev1Address);
+      instance.approve({ from: dev1Address })
+      .then(assert.fail)
+      .catch(function(error) {
+        assert.equal(error.message, "You can't withdraw yet")
+      })
     })
 })
