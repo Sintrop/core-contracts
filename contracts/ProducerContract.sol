@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <=0.9.0;
 
-import './UserContract.sol';
+import "./UserContract.sol";
 
 /**
 * @title ProducerContract
@@ -48,28 +48,26 @@ contract ProducerContract is UserContract {
    * @param city the of the producer
    * @param cep the cep of the producer
    */
-    function addProducer( 
-        string memory name, 
-        string memory document, 
-        string memory documentType, 
-        string memory country, 
-        string memory state, 
-        string memory city, 
+    function addProducer(
+        string memory name,
+        string memory document,
+        string memory documentType,
+        string memory country,
+        string memory state,
+        string memory city,
         string memory cep) public returns(bool) {
-            
-            uint id = producersCount + 1;
-            UserType userType = UserType.PRODUCER;
-            
-            PropertyAddress memory property_address = PropertyAddress(country, state, city, cep);
-            TokenApprove memory tokenApprove = TokenApprove(0, false);
-            Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, 0, tokenApprove, property_address);
-            
-            producersList.push(producer);
-            producers[msg.sender] = producer;
-            producersCount++;
-            addUser(msg.sender, userType);
-            
-            return true;
+        require(!producerExists(msg.sender), "This producer already exist");
+
+        uint id = producersCount + 1;
+        UserType userType = UserType.PRODUCER;
+        PropertyAddress memory property_address = PropertyAddress(country, state, city, cep);
+        TokenApprove memory tokenApprove = TokenApprove(0, false);
+        Producer memory producer = Producer(id, msg.sender, userType, name, document, documentType, false, 0, 0, tokenApprove, property_address);
+        producersList.push(producer);
+        producers[msg.sender] = producer;
+        producersCount++;
+        addUser(msg.sender, userType);
+        return true;
     }
     
     /**
