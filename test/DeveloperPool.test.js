@@ -305,6 +305,15 @@ contract('DeveloperPool', (accounts) => {
       assert.equal(developer.currentEra, 6);
     })
 
+    it("should return error when the dev try approve tokens and can't yet", async () => {
+      await addDeveloper(dev1Address);
+      instance.approve({ from: dev1Address })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "You can't withdraw yet")
+      })
+    })
+
     it("should increment era of the dev in 1 when approve tokens", async () => {
       await addDeveloper(dev1Address);
       await advanceBlock(args.blocksPerEra);
@@ -312,14 +321,5 @@ contract('DeveloperPool', (accounts) => {
       const developer = await instance.getDeveloper(dev1Address);
 
       assert.equal(developer.currentEra, 2);
-    })
-
-    it("should return error when the dev try approve tokens and can't yet", async () => {
-      await addDeveloper(dev1Address);
-      instance.approve({ from: dev1Address })
-      .then(assert.fail)
-      .catch(function(error) {
-        assert.equal(error.message, "You can't withdraw yet")
-      })
     })
 })
