@@ -45,7 +45,8 @@ contract ActivistContract is UserContract {
         string memory country, 
         string memory state, 
         string memory city, 
-        string memory cep) public returns(Activist memory) {           
+        string memory cep) public returns(Activist memory) {   
+            require(!activistExists(msg.sender), "This activist already exist");        
             uint id = activistsCount + 1;
             UserType userType = UserType.ACTIVIST;
             
