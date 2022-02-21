@@ -10,7 +10,7 @@ import './CategoryContract.sol';
 * @dev Sintrop application to certificated a rural producer
 */
 contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
-    enum InspectionStatus { OPEN, EXPIRED, INSPECTED, ACCEPTED } 
+    enum InspectionStatus { OPEN, EXPIRED, INSPECTED, ACCEPTED }
     uint inspactionExpireIn = 604800;
     
     struct Inspection {
@@ -28,7 +28,7 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
     Inspection[] inspectionsList;
     mapping(address => Inspection[]) userInspections;
     mapping(uint256 => Inspection) inspections;
-    uint256 inspectionsCount;
+    uint256 public inspectionsCount;
 
     /**
    * @dev Allows the current user producer/activist get all yours inspections with status INSPECTED
@@ -41,8 +41,8 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
    * @dev Allows the current user (producer) request a inspection.
    */
     function requestInspection() public returns(bool) {
-        require(producerExists(msg.sender), "You are not a producer! Please register as one");
-        require(producers[msg.sender].recentInspection == false, "You have a inspection request OPEN or ACCEPTED! Wait a activist realize inspection or you can close it");
+        require(producerExists(msg.sender), "Please register as producer");
+        require(producers[msg.sender].recentInspection == false, "You have a inspection request OPEN or ACCEPTED");
         
         createRequest();
         producers[msg.sender].recentInspection = true;
