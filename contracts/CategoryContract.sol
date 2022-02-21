@@ -6,7 +6,7 @@ pragma solidity >=0.7.0 <=0.9.0;
     * @title CategoryContract
    * @dev Category resource that is a part of Sintrop business
    */
-   contract CategoryContract {
+contract CategoryContract {
     enum isas { TOTALLY_SUSTAINABLE, PARTIAL_SUSTAINABLE, NEUTRO, PARTIAL_NOT_SUSTAINABLE, TOTALLY_NOT_SUSTAINABLE }
        
     struct Category {
@@ -25,7 +25,7 @@ pragma solidity >=0.7.0 <=0.9.0;
     Category public category;
     uint public categoryCounts;
     Category[] categoriesList;
-    mapping(uint => Category) categories;
+    mapping(uint => Category) public categories;
 
     
     /**
