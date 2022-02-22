@@ -42,7 +42,7 @@ contract('Sintrop', (accounts) => {
     await addActivist("Activist A", activistAddress);
   })
 
-  it("should request inspection when is producer and don't has request OPEN", async () => {
+  it("should request inspection when is producer and don't has request OPEN or ACCEPTED", async () => {
     await instance.requestInspection({ from: producerAddress });
     const inspection = await instance.getInspection(1);
 
@@ -87,7 +87,6 @@ contract('Sintrop', (accounts) => {
     assert.equal(inspection.id, 1);
   })
 
-
   it("should create request inspection with initial isas equal empty arrayo", async () => {
     await instance.requestInspection({ from: producerAddress });
     const inspection = await instance.getInspection(1);
@@ -118,4 +117,58 @@ contract('Sintrop', (accounts) => {
     assert.equal(inspectionsList[0].index, inspection.index)
   })
 
+  it("should accept inspection with success when is OPEN and is Activist", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.status, STATUS.accepted);
+  })
+
+  it("should set address of activist after accept inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.activistWallet, activistAddress);
+  })
+
+  it("should update inspectionsList after accept inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    const inspections = await instance.getInspections();
+
+    assert.equal(inspections[0].status, STATUS.accepted);
+  })
+
+  it("should return error message when is not activist and try accepet inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: producerAddress })
+    .then(assert.fail)
+    .catch((error) => {
+      assert.equal(error.reason, "Please register as activist")
+    })
+  })
+
+  it("should return error message when inspection don't exists", async () => {
+    await instance.acceptInspection(1, { from: activistAddress })
+    .then(assert.fail)
+    .catch((error) => {
+      assert.equal(error.reason, "This inspection don't exists")
+    })
+  })
+
+  it("should return error message when inspection is not OPEN", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await instance.acceptInspection(1, { from: activistAddress })
+    .then(assert.fail)
+    .catch((error) => {
+      assert.equal(error.reason, "This inspection is not OPEN")
+    })
+  })
 })

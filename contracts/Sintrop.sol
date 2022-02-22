@@ -42,7 +42,7 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
    */
     function requestInspection() public returns(bool) {
         require(producerExists(msg.sender), "Please register as producer");
-        require(producers[msg.sender].recentInspection == false, "You have a inspection request OPEN or ACCEPTED");
+        require(!producers[msg.sender].recentInspection, "You have a inspection request OPEN or ACCEPTED");
         
         createRequest();
         producers[msg.sender].recentInspection = true;
@@ -66,9 +66,11 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
    * @dev Allows the current user (activist) accept a inspection.
    * @param inspectionId The id of the inspection that the activist want accept.
    */
-    function acceptInspection(uint inspectionId) public requireActivist requireInspectionExists(inspectionId) returns(bool) {
+    function acceptInspection(uint inspectionId) public 
+    requireActivist requireInspectionExists(inspectionId) returns(bool) {
         Inspection memory inspection = inspections[inspectionId];
-        if (inspection.status != InspectionStatus.OPEN) return false;
+
+        require(inspection.status == InspectionStatus.OPEN, "This inspection is not OPEN");
 
         inspection.status = InspectionStatus.ACCEPTED;
         inspection.updatedAt = block.timestamp;
@@ -200,7 +202,7 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
     
     // MODIFIERS
     modifier requireActivist() {
-        require(activistExists(msg.sender), "You must be an activist! Please register as one");
+        require(activistExists(msg.sender), "Please register as activist");
         _;
     }
     
@@ -208,5 +210,4 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
         require(inspectionExists(inspectionId), "This inspection don't exists");
         _;
     }
-    
 }
