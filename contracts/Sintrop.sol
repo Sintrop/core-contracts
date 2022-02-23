@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <=0.9.0;
 
-import './ProducerContract.sol';
-import './ActivistContract.sol';
-import './CategoryContract.sol';
+import "./ProducerContract.sol";
+import "./ActivistContract.sol";
+import "./CategoryContract.sol";
 
 /**
 * @title SintropContract
@@ -12,7 +12,7 @@ import './CategoryContract.sol';
 contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
     enum InspectionStatus { OPEN, EXPIRED, INSPECTED, ACCEPTED }
     uint inspactionExpireIn = 604800;
-    
+
     struct Inspection {
         uint id;
         InspectionStatus status;
@@ -43,30 +43,30 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
     function requestInspection() public returns(bool) {
         require(producerExists(msg.sender), "Please register as producer");
         require(!producers[msg.sender].recentInspection, "You have a inspection request OPEN or ACCEPTED");
-        
+
         createRequest();
         producers[msg.sender].recentInspection = true;
-        
+
         return true;
-    }     
-    
+    }
+
     function createRequest() internal{
         uint id = inspectionsCount + 1;
         uint index = id - 1;
         uint[][] memory isas;
         uint expiresIn = block.timestamp + inspactionExpireIn;
-        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, 
-                                                  isas,  0, expiresIn,  block.timestamp, 0, index);
+        Inspection memory inspection = Inspection(id, InspectionStatus.OPEN, msg.sender, msg.sender, isas,
+        0, expiresIn,  block.timestamp, 0, index);
         inspectionsList.push(inspection);
         inspections[id] = inspection;
         inspectionsCount++;
     }
-    
+
     /**
    * @dev Allows the current user (activist) accept a inspection.
    * @param inspectionId The id of the inspection that the activist want accept.
    */
-    function acceptInspection(uint inspectionId) public 
+    function acceptInspection(uint inspectionId) public
     requireActivist requireInspectionExists(inspectionId) returns(bool) {
         Inspection memory inspection = inspections[inspectionId];
 
@@ -77,28 +77,31 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
         inspection.activistWallet = msg.sender;
         inspections[inspectionId] = inspection;
 
+        activists[msg.sender].recentInspection = true;
+
         inspectionsList[inspection.index] = inspection;
         return true;
-    }  
-    
+    }
+
     /**
      * @dev Allow a activist realize a inspection and mark as INSPECTED
      * @param inspectionId The id of the inspection to be realized
      * @param isas The uint[][] of categoryId and isaIndex. Ex: isas = [ [categoryId, isaIndex], [categoryId, isaIndex] ]
-     */ 
-    function realizeInspection(uint inspectionId, uint[][] memory isas) public  requireActivist requireInspectionExists(inspectionId) returns(bool) {
-        if (!isAccepted(inspectionId)) return false;
-        if (!isActivistOwner(inspectionId)) return false;
+     */
+    function realizeInspection(uint inspectionId, uint[][] memory isas)
+      public  requireActivist requireInspectionExists(inspectionId) returns(bool) {
+        require(isAccepted(inspectionId), "Accept this inspection before");
+        require(isActivistOwner(inspectionId), "You not accepted this inspection");
 
         Inspection memory inspection = inspections[inspectionId];
 
         markAsRealized(inspection, isas);
 
-        afterRealizeInspection(inspectionId);
+        afterRealizeInspection(inspection);
 
-        updateProducerIsa(inspectionId, inspection.isaPoints);
+        updateProducerIsa(inspection);
 
-        approveProducerNewTokens(inspection.producerWallet, 2000); 
+        approveProducerNewTokens(inspection.producerWallet, 2000);
 
         return true;
     }
@@ -107,7 +110,7 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
    * @dev Calculate the ISA of the inspection based in the category and the ISA level of the category
    * @param inspection Receive the inspected inspection with your isas levels
    */
-    function calculateIsa(Inspection memory inspection) internal pure returns(int){ 
+    function calculateIsa(Inspection memory inspection) internal pure returns(int){
         uint[][] memory isas = inspection.isas;
         int isaPoints = sumIsaPoints(isas);
         return isaPoints;
@@ -128,7 +131,7 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
         return isaPoints;
     }
 
-    function markAsRealized(Inspection memory inspection, uint[][] memory isas) internal {   
+    function markAsRealized(Inspection memory inspection, uint[][] memory isas) internal {
         inspection.isas = isas;
         inspection.status = InspectionStatus.INSPECTED;
         inspection.updatedAt = block.timestamp;
@@ -137,9 +140,8 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
         inspectionsList[inspection.index] = inspection;
     }
 
-    function updateProducerIsa(uint inspectionId, int isaPoints) internal {
-        address producerAddress = inspections[inspectionId].producerWallet;
-        producers[producerAddress].isaPoints = isaPoints;
+    function updateProducerIsa(Inspection memory inspection) internal {
+        producers[inspection.producerWallet].isaPoints = inspection.isaPoints;
     }
 
     /**
@@ -149,7 +151,7 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
     function getInspection(uint256 id) public view returns(Inspection memory) {
         return inspections[id];
     }
-    
+
     /**
    * @dev Returns all requested inspections.
    */
@@ -163,7 +165,7 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
     function getInspectionsStatus() public pure returns(string memory, string memory, string memory, string memory) {
         return ("OPEN", "EXPIRED", "INSPECTED", "ACCEPTED");
     }
-    
+
     /**
    * @dev Check if an inspections exists in mapping.
    * @param id The id of the inspection that the activist want accept.
@@ -171,41 +173,41 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
     function inspectionExists(uint256 id) public view returns(bool) {
         return inspections[id].id >= 1;
     }
-    
+
     /**
    * @dev Inscrement producer and activist request action and mark both as no recent open requests and inspection
-   * @param inspectionId The id of the inspection
+   * @param inspection the inspected inspection
    */
-    function afterRealizeInspection(uint inspectionId) internal {
-        address producerWallet = inspections[inspectionId].producerWallet;
-        address activistWallet = inspections[inspectionId].activistWallet;
-        
+    function afterRealizeInspection(Inspection memory inspection) internal {
+        address producerWallet = inspection.producerWallet;
+        address activistWallet = inspection.activistWallet;
+
         // Increment actvist inspections and release to carry out new inspections
         activists[activistWallet].recentInspection = false;
         activists[activistWallet].totalInspections++;
-        
+
         // Increment producer requests and release to carry out new requests
         producers[producerWallet].recentInspection = false;
         producers[producerWallet].totalRequests++;
-        
-        userInspections[producerWallet].push(inspections[inspectionId]);
-        userInspections[activistWallet].push(inspections[inspectionId]);
+
+        userInspections[producerWallet].push(inspection);
+        userInspections[activistWallet].push(inspection);
     }
-    
+
     function isActivistOwner(uint inspectionId) internal view returns(bool) {
         return inspections[inspectionId].activistWallet == msg.sender;
     }
- 
+
     function isAccepted(uint inspectionId) internal view returns(bool) {
         return inspections[inspectionId].status == InspectionStatus.ACCEPTED;
     }
-    
+
     // MODIFIERS
     modifier requireActivist() {
         require(activistExists(msg.sender), "Please register as activist");
         _;
     }
-    
+
     modifier requireInspectionExists(uint inspectionId) {
         require(inspectionExists(inspectionId), "This inspection don't exists");
         _;

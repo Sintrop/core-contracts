@@ -36,6 +36,18 @@ contract('Sintrop', (accounts) => {
     )
   }
 
+  const addCategory = async (name) => {
+    await instance.addCategory(
+      name,
+      `Está categoria visa avaliar as qualidades do ${name}`,
+      `${name} totalmente sustentável`,
+      `${name} parcialmente sustentável`,
+      `${name} neutro`,
+      `${name} parcialmente não sustentável`,
+      `${name} totalmente não sustentável`
+    )
+  }
+
   beforeEach(async () => {
     instance = await Sintrop.new();
     await addProducer("Producer A", producerAddress);
@@ -135,6 +147,15 @@ contract('Sintrop', (accounts) => {
     assert.equal(inspection.activistWallet, activistAddress);
   })
 
+  it("should set activist recentInspection to true after accept inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    const activist = await instance.getActivist(activistAddress);
+
+    assert.equal(activist.recentInspection, true);
+  })
+
   it("should update inspectionsList after accept inspection", async () => {
     await instance.requestInspection({ from: producerAddress });
     await instance.acceptInspection(1, { from: activistAddress });
@@ -153,7 +174,7 @@ contract('Sintrop', (accounts) => {
     })
   })
 
-  it("should return error message when inspection don't exists", async () => {
+  it("should return error message when inspection don't exists and try accept", async () => {
     await instance.acceptInspection(1, { from: activistAddress })
     .then(assert.fail)
     .catch((error) => {
@@ -161,7 +182,7 @@ contract('Sintrop', (accounts) => {
     })
   })
 
-  it("should return error message when inspection is not OPEN", async () => {
+  it("should return error message when inspection is not OPEN and try accept", async () => {
     await instance.requestInspection({ from: producerAddress });
     await instance.acceptInspection(1, { from: activistAddress });
 
@@ -170,5 +191,281 @@ contract('Sintrop', (accounts) => {
     .catch((error) => {
       assert.equal(error.reason, "This inspection is not OPEN")
     })
+  })
+
+  it("should realize Inspection when is activist owner to a accepted inspection and try realize", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+    await addCategory("Solo B");
+    await addCategory("Solo C");
+
+    const isas = [[1,0],[2,0], [3,1]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.status, STATUS.inspected);
+  })
+
+  it("should return error message when inspection is not accepted and try realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+
+    await instance.realizeInspection(1, [], { from: activistAddress })
+    .then(assert.fail)
+    .catch((error) => {
+      assert.equal(error.reason, "Accept this inspection before")
+    })
+  })
+
+  it("should return error message when is not inspection owner and try realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    const [, , , otherActivistAddress] = accounts;
+    await addActivist("Activist B", otherActivistAddress);
+
+    await instance.realizeInspection(1, [], { from: otherActivistAddress })
+    .then(assert.fail)
+    .catch((error) => {
+      assert.equal(error.reason, "You not accepted this inspection")
+    })
+  })
+
+  it("should return error message when is not activist and try realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await instance.realizeInspection(1, [], { from: producerAddress })
+    .then(assert.fail)
+    .catch((error) => {
+      assert.equal(error.reason, "Please register as activist")
+    })
+  })
+
+  it("should return error message when inspection don't exists and try realize inspection", async () => {
+    await instance.realizeInspection(1, [], { from: activistAddress })
+    .then(assert.fail)
+    .catch((error) => {
+      assert.equal(error.reason, "This inspection don't exists")
+    })
+  })
+
+  it("should update inspectionList when realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+    await addCategory("Solo B");
+    await addCategory("Solo C");
+
+    const isas = [[1,0],[2,0], [3,1]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const inspections = await instance.getInspections();
+
+    assert.equal(inspections[0].status, STATUS.inspected);
+  })
+
+  it("should update inspection isas after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+    await addCategory("Solo B");
+    await addCategory("Solo C");
+
+    const isas = [[1,0],[2,0], [3,1]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.isas.length, isas.length);
+  })
+
+  it("should add 10 isaPoints when select totallySustainable after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,0]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.isaPoints, 10);
+  })
+
+  it("should add 5 isaPoints when select partiallySustainable after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,1]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.isaPoints, 5);
+  })
+
+  it("should add 0 isaPoints when select neutro after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,2]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.isaPoints, 0);
+  })
+
+  it("should remove 5 isaPoints when select partiallyNotSustainable after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,3]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.isaPoints, -5);
+  })
+
+  it("should remove 10 isaPoints when select totallyNotSustainable after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,4]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.isaPoints, -10);
+  })
+
+  it("should add isaPoints in producer after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,4]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+    
+    const inspection = await instance.getInspection(1);
+    const producer = await instance.getProducer(producerAddress);
+
+    assert.equal(inspection.isaPoints, producer.isaPoints);
+  })
+
+  it("should calc isa points and update inspection isaPoints after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+    await addCategory("Solo B");
+    await addCategory("Solo C");
+
+    const isas = [[1,0],[2,0], [3,1]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const inspection = await instance.getInspection(1);
+
+    assert.equal(inspection.isaPoints, 25);
+  })
+
+  it("should set producer recentInspection to false after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,0]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const producer = await instance.getProducer(producerAddress);
+
+    assert.equal(producer.recentInspection, false);
+  })
+
+  it("should set activist recentInspection to false after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,0]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const activist = await instance.getActivist(activistAddress);
+
+    assert.equal(activist.recentInspection, false);
+  })
+
+  it("should increment producer totalRequests after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,0]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const producer = await instance.getProducer(producerAddress);
+
+    assert.equal(producer.totalRequests, 1);
+  })
+
+  it("should increment activist totalInspections after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,0]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const activist = await instance.getActivist(activistAddress);
+
+    assert.equal(activist.totalInspections, 1);
+  })
+
+  it("should add inspection to activist in userInspections after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,0]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const userInspections = await instance.getInspectionsHistory({ from: activistAddress });
+
+    assert.equal(userInspections.length, 1);
+  })
+
+  it("should add inspection to producer in userInspections after realize inspection", async () => {
+    await instance.requestInspection({ from: producerAddress });
+    await instance.acceptInspection(1, { from: activistAddress });
+
+    await addCategory("Solo A");
+
+    const isas = [[1,0]];
+    await instance.realizeInspection(1, isas, { from: activistAddress });
+
+    const userInspections = await instance.getInspectionsHistory({ from: producerAddress });
+
+    assert.equal(userInspections.length, 1);
   })
 })
