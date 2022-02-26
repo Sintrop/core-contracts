@@ -35,15 +35,15 @@
     "absolutePath": "project:/contracts/SintropInterface.sol",
     "exportedSymbols": {
       "SintropInterface": [
-        2665
+        2796
       ]
     },
-    "id": 2666,
+    "id": 2797,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2657,
+        "id": 2788,
         "literals": [
           "solidity",
           ">=",
@@ -54,7 +54,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "36:32:12"
+        "src": "36:32:13"
       },
       {
         "abstract": false,
@@ -62,36 +62,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 2665,
+        "id": 2796,
         "linearizedBaseContracts": [
-          2665
+          2796
         ],
         "name": "SintropInterface",
-        "nameLocation": "80:16:12",
+        "nameLocation": "80:16:13",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "8cf05442",
-            "id": 2664,
+            "id": 2795,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getProducerApprove",
-            "nameLocation": "112:18:12",
+            "nameLocation": "112:18:13",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2660,
+              "id": 2791,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2659,
+                  "id": 2790,
                   "mutability": "mutable",
                   "name": "delegate",
-                  "nameLocation": "139:8:12",
+                  "nameLocation": "139:8:13",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2664,
-                  "src": "131:16:12",
+                  "scope": 2795,
+                  "src": "131:16:13",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -99,10 +99,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2658,
+                    "id": 2789,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "131:7:12",
+                    "src": "131:7:13",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -112,21 +112,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "130:18:12"
+              "src": "130:18:13"
             },
             "returnParameters": {
-              "id": 2663,
+              "id": 2794,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2662,
+                  "id": 2793,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2664,
-                  "src": "171:4:12",
+                  "scope": 2795,
+                  "src": "171:4:13",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -134,10 +134,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2661,
+                    "id": 2792,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "171:4:12",
+                    "src": "171:4:13",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -146,34 +146,34 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "170:6:12"
+              "src": "170:6:13"
             },
-            "scope": 2665,
-            "src": "103:74:12",
+            "scope": 2796,
+            "src": "103:74:13",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2666,
-        "src": "70:109:12"
+        "scope": 2797,
+        "src": "70:109:13"
       }
     ],
-    "src": "36:144:12"
+    "src": "36:144:13"
   },
   "legacyAST": {
     "absolutePath": "project:/contracts/SintropInterface.sol",
     "exportedSymbols": {
       "SintropInterface": [
-        2665
+        2796
       ]
     },
-    "id": 2666,
+    "id": 2797,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2657,
+        "id": 2788,
         "literals": [
           "solidity",
           ">=",
@@ -184,7 +184,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "36:32:12"
+        "src": "36:32:13"
       },
       {
         "abstract": false,
@@ -192,36 +192,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 2665,
+        "id": 2796,
         "linearizedBaseContracts": [
-          2665
+          2796
         ],
         "name": "SintropInterface",
-        "nameLocation": "80:16:12",
+        "nameLocation": "80:16:13",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "8cf05442",
-            "id": 2664,
+            "id": 2795,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getProducerApprove",
-            "nameLocation": "112:18:12",
+            "nameLocation": "112:18:13",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2660,
+              "id": 2791,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2659,
+                  "id": 2790,
                   "mutability": "mutable",
                   "name": "delegate",
-                  "nameLocation": "139:8:12",
+                  "nameLocation": "139:8:13",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2664,
-                  "src": "131:16:12",
+                  "scope": 2795,
+                  "src": "131:16:13",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -229,10 +229,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2658,
+                    "id": 2789,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "131:7:12",
+                    "src": "131:7:13",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -242,21 +242,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "130:18:12"
+              "src": "130:18:13"
             },
             "returnParameters": {
-              "id": 2663,
+              "id": 2794,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2662,
+                  "id": 2793,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2664,
-                  "src": "171:4:12",
+                  "scope": 2795,
+                  "src": "171:4:13",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -264,10 +264,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2661,
+                    "id": 2792,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "171:4:12",
+                    "src": "171:4:13",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -276,20 +276,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "170:6:12"
+              "src": "170:6:13"
             },
-            "scope": 2665,
-            "src": "103:74:12",
+            "scope": 2796,
+            "src": "103:74:13",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2666,
-        "src": "70:109:12"
+        "scope": 2797,
+        "src": "70:109:13"
       }
     ],
-    "src": "36:144:12"
+    "src": "36:144:13"
   },
   "compiler": {
     "name": "solc",
@@ -297,7 +297,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.4",
-  "updatedAt": "2022-02-04T00:33:35.146Z",
+  "updatedAt": "2022-02-26T13:04:56.756Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
