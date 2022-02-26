@@ -77,11 +77,19 @@ contract('DeveloperPool', (accounts) => {
       assert.equal(eraMax, args.eraMax);
     })
 
-    it('should create developer', async () => {
+    it('should create developer when is the owner', async () => {
       await addDeveloper(dev1Address);
       const developersCount = await instance.developersCount();
 
       assert.equal(developersCount, 1);
+    })
+
+    it('should return error message when is not the owner trying create developer', async () => {
+      await instance.addDeveloper(dev1Address, { from: dev1Address })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "Ownable: caller is not the owner")
+      })
     })
 
     it("should return the developer", async () => {
