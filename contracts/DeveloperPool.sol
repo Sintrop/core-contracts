@@ -181,7 +181,7 @@ contract DeveloperPool is Ownable, PoolInterface {
    * TODO Check external code call - EXTCALL
    */
     function withDraw() public override returns(bool){
-        satToken.transferFrom(address(this), msg.sender, allowance()); 
+        satToken.transferFrom(address(this), msg.sender, allowance());
         return true;
     }
 
@@ -221,7 +221,7 @@ contract DeveloperPool is Ownable, PoolInterface {
     /**
    * @dev Increment a new era to a developer. This funcions called when the developer approve tokens
    */
-    function developerNextEra() internal { 
+    function developerNextEra() internal {
         developers[msg.sender].currentEra++;
     }
 
