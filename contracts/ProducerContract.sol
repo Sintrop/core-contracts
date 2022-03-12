@@ -34,8 +34,8 @@ contract ProducerContract is UserContract {
         string cep;
     }
 
-    Producer[] public producersList;
     mapping(address => Producer) producers;
+    address[] internal producersAddress;
     uint256 public producersCount;
 
     /**
@@ -58,8 +58,6 @@ contract ProducerContract is UserContract {
         string memory cep
     ) public returns (bool) {
         require(!producerExists(msg.sender), "This producer already exist");
-
-        uint256 id = producersCount + 1;
         UserType userType = UserType.PRODUCER;
         PropertyAddress memory property_address = PropertyAddress(
             country,
@@ -69,7 +67,7 @@ contract ProducerContract is UserContract {
         );
         TokenApprove memory tokenApprove = TokenApprove(0, false);
         Producer memory producer = Producer(
-            id,
+            producersCount + 1,
             msg.sender,
             userType,
             name,
@@ -81,8 +79,9 @@ contract ProducerContract is UserContract {
             tokenApprove,
             property_address
         );
-        producersList.push(producer);
+
         producers[msg.sender] = producer;
+        producersAddress.push(msg.sender);
         producersCount++;
         addUser(msg.sender, userType);
         return true;
@@ -93,7 +92,14 @@ contract ProducerContract is UserContract {
      * @return Producer struct array
      */
     function getProducers() public view returns (Producer[] memory) {
-        return producersList;
+        Producer[] memory activistList = new Producer[](producersCount);
+
+        for(uint i = 0; i < producersCount; i++){
+            address acAddress = producersAddress[i];
+            activistList[i]= producers[acAddress];
+        }
+
+        return activistList;
     }
 
     /**
