@@ -44,17 +44,6 @@ contract('CategoryContract', (accounts) => {
     assert.equal(categories[1].id, 2)
   })
 
-  it("should add correct index of created category", async () => {
-    await addCategory("Solo");
-    await addCategory("Solo 2");
-    await addCategory("Solo 3");
-    await addCategory("Solo 4");
-
-    const categories = await instance.getCategories();
-
-    assert.equal(categories[2].index, 2)
-  })
-
   it("should increment total of categories after a new is added", async () => {
     await addCategory("Solo");
     await addCategory("Solo 2");
@@ -63,20 +52,21 @@ contract('CategoryContract', (accounts) => {
     assert.equal(categoryCounts, 2)
   })
 
-  it("should add category in category list after create", async () => {
+  it("should return category list after when call getCategories", async () => {
     await addCategory("Solo");
+    await addCategory("Solo2");
     const categories = await instance.getCategories();
 
-    assert.equal(categories.length, 1)
+    assert.equal(categories.length, 2)
   })
 
-  it("should add same category in mapping and array position based on index attr", async () => {
+  it("should be the same category in category and category list based on position", async () => {
     await addCategory("Solo");
     await addCategory("Solo 2");
     const categoriesList = await instance.getCategories();
     const category = await instance.categories(2);
 
-    assert.equal(categoriesList[1].index, category.index)
+    assert.equal(categoriesList[1].id, category.id)
   })
 
   it("should create category with votes equal 0", async () => {
