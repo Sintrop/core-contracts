@@ -28,9 +28,7 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
         uint256 expiresIn;
         uint256 createdAt;
         uint256 updatedAt;
-        uint256 index;
     }
-    Inspection[] inspectionsList;
     mapping(address => Inspection[]) userInspections;
     mapping(uint256 => Inspection) inspections;
     uint256 public inspectionsCount;
@@ -59,12 +57,10 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
     }
 
     function createRequest() internal {
-        uint256 id = inspectionsCount + 1;
-        uint256 index = id - 1;
         uint256[][] memory isas;
         uint256 expiresIn = block.timestamp + inspactionExpireIn;
         Inspection memory inspection = Inspection(
-            id,
+            inspectionsCount + 1,
             InspectionStatus.OPEN,
             msg.sender,
             msg.sender,
@@ -72,11 +68,9 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
             0,
             expiresIn,
             block.timestamp,
-            0,
-            index
+            0
         );
-        inspectionsList.push(inspection);
-        inspections[id] = inspection;
+        inspections[inspection.id] = inspection;
         inspectionsCount++;
     }
 
@@ -104,7 +98,6 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
 
         activists[msg.sender].recentInspection = true;
 
-        inspectionsList[inspection.index] = inspection;
         return true;
     }
 
@@ -186,7 +179,6 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
         inspection.updatedAt = block.timestamp;
         inspection.isaPoints = calculateIsa(inspection);
         inspections[inspection.id] = inspection;
-        inspectionsList[inspection.index] = inspection;
     }
 
     function updateProducerIsa(Inspection memory inspection) internal {
@@ -205,6 +197,12 @@ contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
      * @dev Returns all requested inspections.
      */
     function getInspections() public view returns (Inspection[] memory) {
+        Inspection[] memory inspectionsList = new Inspection[](inspectionsCount);
+
+        for(uint i = 0; i < inspectionsCount; i++){
+            inspectionsList[i]= inspections[i+1];
+        }
+
         return inspectionsList;
     }
 

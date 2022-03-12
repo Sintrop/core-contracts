@@ -2,7 +2,7 @@ const Sintrop = artifacts.require("Sintrop");
 
 contract('Sintrop', (accounts) => {
   let instance;
-  let [ownerAddress, producerAddress, activistAddress] = accounts;
+  let [ownerAddress, producerAddress, producer2Address, activistAddress, activist2Address] = accounts;
   const STATUS = {
     open: 0,
     expired: 1,
@@ -61,7 +61,7 @@ contract('Sintrop', (accounts) => {
     assert.equal(inspection.producerWallet, producerAddress);
   })
 
-  it("should return message error when is not an producer", async () => {
+  it("should return message error when is not an producer and try request inspection", async () => {
     await instance.requestInspection()
     .then(assert.fail)
     .catch((error) => {
@@ -69,7 +69,7 @@ contract('Sintrop', (accounts) => {
     })
   })
 
-  it("should return message error when has inspection OPEN o ACCEPTED", async () => {
+  it("should return message error when has inspection OPEN o ACCEPTED and try request inspection", async () => {
     await instance.requestInspection({ from: producerAddress })
     await instance.requestInspection({ from: producerAddress })
     .then(assert.fail)
@@ -99,7 +99,7 @@ contract('Sintrop', (accounts) => {
     assert.equal(inspection.id, 1);
   })
 
-  it("should create request inspection with initial isas equal empty arrayo", async () => {
+  it("should create request inspection with initial isas equal empty array", async () => {
     await instance.requestInspection({ from: producerAddress });
     const inspection = await instance.getInspection(1);
 
@@ -113,20 +113,38 @@ contract('Sintrop', (accounts) => {
     assert.equal(inspectionsCount, 1);
   })
 
-  it("should set to true producer recentInspection", async () => {
+  it("should set to true producer recentInspection when request inspection", async () => {
     await instance.requestInspection({ from: producerAddress });
     const producer = await instance.getProducer(producerAddress);
 
     assert.equal(producer.recentInspection, true);
   })
 
-  it("should add inspection in inspectionList after create new inspection", async () => {
+  it("should return inspections when call getInspections and has it", async () => {
     await instance.requestInspection({ from: producerAddress });
 
     const inspectionsList = await instance.getInspections();
-    const inspection = await instance.getInspection(1);
 
-    assert.equal(inspectionsList[0].index, inspection.index)
+    assert.equal(inspectionsList.length, 1)
+  })
+
+  it("should return zero inspections when call getInspections and dont has it", async () => {
+    const inspectionsList = await instance.getInspections();
+    assert.equal(inspectionsList.length, 0)
+  })
+  
+  it("should be same inspection in array of mapping when call getInspections and dont has it", async () => {
+    await addProducer("Producer B", producer2Address);
+
+    await instance.requestInspection({ from: producerAddress });
+    await instance.requestInspection({ from: producer2Address });
+
+    const inspectionsList = await instance.getInspections();
+    const inspection1 = await instance.getInspection(1);
+    const inspection2 = await instance.getInspection(2);
+
+    assert.equal(inspectionsList[0].id, inspection1.id);
+    assert.equal(inspectionsList[1].id, inspection2.id);
   })
 
   it("should accept inspection with success when is OPEN and is Activist", async () => {
@@ -154,15 +172,6 @@ contract('Sintrop', (accounts) => {
     const activist = await instance.getActivist(activistAddress);
 
     assert.equal(activist.recentInspection, true);
-  })
-
-  it("should update inspectionsList after accept inspection", async () => {
-    await instance.requestInspection({ from: producerAddress });
-    await instance.acceptInspection(1, { from: activistAddress });
-
-    const inspections = await instance.getInspections();
-
-    assert.equal(inspections[0].status, STATUS.accepted);
   })
 
   it("should return error message when is not activist and try accepet inspection", async () => {
@@ -223,10 +232,9 @@ contract('Sintrop', (accounts) => {
     await instance.requestInspection({ from: producerAddress });
     await instance.acceptInspection(1, { from: activistAddress });
 
-    const [, , , otherActivistAddress] = accounts;
-    await addActivist("Activist B", otherActivistAddress);
+    await addActivist("Activist B", activist2Address);
 
-    await instance.realizeInspection(1, [], { from: otherActivistAddress })
+    await instance.realizeInspection(1, [], { from: activist2Address })
     .then(assert.fail)
     .catch((error) => {
       assert.equal(error.reason, "You not accepted this inspection")
