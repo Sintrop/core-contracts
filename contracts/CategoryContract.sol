@@ -29,6 +29,8 @@ contract CategoryContract {
     Category public category;
     uint256 public categoryCounts;
     mapping(uint256 => Category) public categories;
+    mapping(uint256 => uint256) public votes;
+    mapping(address => mapping(uint256 => uint256)) public voted;
 
     /**
      * @dev add a new category
@@ -84,11 +86,15 @@ contract CategoryContract {
     }
 
     /**
-     * @dev Allow a user vote in a category
+     * @dev Allow a user vote in a category sending tokens amount to this
      * @param id the id of a category that receives a vote.
-     * @return category struc array
+     * @param tokens the tokens amount that the use want use to vote.
+     * @return boolean
      */
-    function vote(uint256 id) public categoryMustExists(id) returns (bool) {
+    function vote(uint256 id, uint256 tokens) public categoryMustExists(id) returns (bool) {
+        votes[id]+=tokens;
+        voted[msg.sender][id]+=tokens;
+
         categories[id].votesCount++;
         return true;
     }
