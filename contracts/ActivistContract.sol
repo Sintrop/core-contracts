@@ -23,8 +23,8 @@ contract ActivistContract is UserContract {
         string cep;
     }
 
-    Activist[] internal activistsList;
     mapping(address => Activist) internal activists;
+    address[] internal activistsAddress;
     uint256 public activistsCount;
 
     /**
@@ -69,8 +69,8 @@ contract ActivistContract is UserContract {
             activistAddress
         );
 
-        activistsList.push(activist);
         activists[msg.sender] = activist;
+        activistsAddress.push(msg.sender);
         activistsCount++;
         addUser(msg.sender, userType);
 
@@ -82,7 +82,14 @@ contract ActivistContract is UserContract {
      * @return Activist struct array
      */
     function getActivists() public view returns (Activist[] memory) {
-        return activistsList;
+        Activist[] memory activistList = new Activist[](activistsCount);
+
+        for(uint i = 0; i < activistsCount; i++){
+            address acAddress = activistsAddress[i];
+            activistList[i]= activists[acAddress];
+        }
+
+        return activistList;
     }
 
     /**

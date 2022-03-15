@@ -25,20 +25,10 @@ contract CategoryContract {
         string partiallyNotSustainable;
         string totallyNotSustainable;
         uint256 votesCount;
-        uint256 index;
     }
     Category public category;
     uint256 public categoryCounts;
-    Category[] categoriesList;
     mapping(uint256 => Category) public categories;
-
-    /**
-     * @dev Returns all added categories
-     * @return category struc array
-     */
-    function getCategories() public view returns (Category[] memory) {
-        return categoriesList;
-    }
 
     /**
      * @dev add a new category
@@ -60,11 +50,8 @@ contract CategoryContract {
         string memory partiallyNotSustainable,
         string memory totallyNotSustainable
     ) public returns (bool) {
-        uint256 id = categoryCounts + 1;
-        uint256 index = id - 1;
-
         category = Category(
-            id,
+            categoryCounts + 1,
             msg.sender,
             name,
             description,
@@ -73,15 +60,27 @@ contract CategoryContract {
             neutro,
             partiallyNotSustainable,
             totallyNotSustainable,
-            0,
-            index
+            0
         );
 
-        categoriesList.push(category);
-        categories[id] = category;
+        categories[category.id] = category;
         categoryCounts++;
 
         return true;
+    }
+
+    /**
+     * @dev Returns all added categories
+     * @return category struc array
+     */
+    function getCategories() public view returns (Category[] memory) {
+        Category[] memory categoriesList = new Category[](categoryCounts);
+
+        for(uint i = 0; i < categoryCounts; i++){
+            categoriesList[i]= categories[i+1];
+        }
+
+        return categoriesList;
     }
 
     /**
@@ -91,8 +90,6 @@ contract CategoryContract {
      */
     function vote(uint256 id) public categoryMustExists(id) returns (bool) {
         categories[id].votesCount++;
-        categoriesList[categories[id].index].votesCount++;
-
         return true;
     }
 

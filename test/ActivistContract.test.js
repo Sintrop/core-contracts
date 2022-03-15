@@ -29,6 +29,21 @@ contract('ActivistContract', (accounts) => {
     assert.equal(activist.activistWallet, activ1Address);
   })
 
+  it("should return activists when call getActivists and has activists", async () => {
+    await addActivist("Activist A", activ1Address);
+    await addActivist("Activist B", activ2Address);
+
+    const activists = await instance.getActivists();
+
+    assert.equal(activists.length, 2);
+  })
+
+  it("should return activists equal zero when call getActivists and dont has it", async () => {
+    const activists = await instance.getActivists();
+
+    assert.equal(activists.length, 0);
+  })
+
   it("should return error when try create same activist", async () => {
     await addActivist("Activist A", activ1Address);
 

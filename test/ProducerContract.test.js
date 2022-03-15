@@ -45,6 +45,15 @@ contract('ProducerContract', (accounts) => {
     assert.equal(producerExists, false);
   })
 
+  it("should return true when producer exists", async () => {
+    await addProducer("Producer A", prod1Address);
+
+    const producerExists = await instance.producerExists(prod1Address);
+
+    assert.equal(producerExists, true);
+  })
+
+
   it("should be created with totalRequest equal zero", async () => {
     await addProducer("Producer A", prod1Address);
 
@@ -77,13 +86,31 @@ contract('ProducerContract', (accounts) => {
     assert.equal(producersCount, 2);
   })
 
-  it("should add created producer in producerList (array)", async () => {
+  it("should return same producer in mapping and array list", async () => {
+    await addProducer("Producer A", prod1Address);
+    await addProducer("Producer A", prod2Address);
+
+    const producers = await instance.getProducers();
+    const producer1 = await instance.getProducer(prod1Address);
+    const producer2 = await instance.getProducer(prod2Address);
+
+    assert.equal(producers[0].producer_wallet, producer1.producer_wallet);
+    assert.equal(producers[1].producer_wallet, producer2.producer_wallet);
+  })
+
+  it("should return producers when call getProducers and has it", async () => {
     await addProducer("Producer A", prod1Address);
     await addProducer("Producer A", prod2Address);
 
     const producers = await instance.getProducers();
 
-    assert.equal(producers[0].producer_wallet, prod1Address);
+    assert.equal(producers.length, 2);
+  })
+
+  it("should return producers zero when call getProducers and dont has it", async () => {
+    const producers = await instance.getProducers();
+
+    assert.equal(producers.length, 0);
   })
 
   it("should add created producer in userType contract as a PRODUCER", async () => {
