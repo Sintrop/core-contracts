@@ -99,6 +99,15 @@ contract CategoryContract {
         return true;
     }
 
+    function unvote(uint256 id) public categoryMustExists(id) returns(uint256)  {
+        uint256 tokens = voted[msg.sender][id];
+
+        votes[id]-=tokens;
+        voted[msg.sender][id] = 0;
+
+        return tokens;
+    }
+
     // Modifiers
     modifier categoryMustExists(uint256 id) {
         require(categories[id].id > 0, "This category don't exists");
