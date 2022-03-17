@@ -173,4 +173,55 @@ contract('CategoryContract', (accounts) => {
     assert.equal(votes1, 100);
     assert.equal(votes2, 100);
   })
+
+  it("when user try unvote and category dont exists should return error message", async () => {
+    await instance.unvote(1)
+    .then(assert.fail)
+    .catch((error) => {
+      assert.equal(error.reason, "This category don't exists")
+    })
+  })   
+  
+  it("should return zero tokens when user unvote in a category he didn't vote for", async () => {
+    await addCategory("Solo 1");
+
+    const unvote = await instance.unvote.call(1);
+
+    assert.equal(unvote, 0);
+  })  
+
+  it("dont should remove votes when user try unvote and dont voted yet", async () => {
+    await addCategory("Solo 1");
+
+    await instance.vote(1, 100);
+
+    const unvote = await instance.unvote.call(1, { from: user1Address });
+    const votes = await instance.votes(1);
+
+    assert.equal(unvote, 0);
+    assert.equal(votes, 100);
+  }) 
+
+  it("should return 100 tokens when user unvote and already voted with 100 tokens", async () => {
+    await addCategory("Solo 1");
+
+    await instance.vote(1, 100);
+    const unvote = await instance.unvote.call(1);
+
+    assert.equal(unvote, 100);
+  })
+
+  it("when a user unvoted with success should remove votes from category and from user voted mapping", async () => {
+    await addCategory("Solo 1");
+
+    await instance.vote(1, 5000);
+    await instance.vote(1, 150, { from: user1Address });
+
+    await instance.unvote(1);
+    const votes = await instance.votes(1);
+    const voted = await instance.voted(msgSender, 1)
+
+    assert.equal(votes, 150);
+    assert.equal(voted, 0);
+  })
 })
