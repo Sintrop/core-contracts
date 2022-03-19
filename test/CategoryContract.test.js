@@ -85,6 +85,14 @@ contract('CategoryContract', (accounts) => {
     assert.equal(category.votesCount, 1);
   })
 
+  it("when user try vote and category dont exists should return error message", async () => {
+    await instance.vote(1, 0)
+    .then(assert.fail)
+    .catch((error) => {
+      assert.equal(error.reason, "This category don't exists")
+    })
+  }) 
+
   it("should vote and send tokens only to the passed id", async () => {
     await addCategory("Solo");
     await instance.vote(1, 100);
