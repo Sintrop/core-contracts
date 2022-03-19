@@ -99,6 +99,11 @@ contract CategoryContract {
         return true;
     }
 
+    /**
+     * @dev Allow a user unvote in a category and get your tokens again
+     * @param id the id of a category that receives a vote.
+     * @return uint256
+     */
     function unvote(uint256 id) public categoryMustExists(id) returns(uint256)  {
         uint256 tokens = voted[msg.sender][id];
 
