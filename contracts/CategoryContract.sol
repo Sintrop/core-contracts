@@ -78,8 +78,8 @@ contract CategoryContract {
     function getCategories() public view returns (Category[] memory) {
         Category[] memory categoriesList = new Category[](categoryCounts);
 
-        for(uint i = 0; i < categoryCounts; i++){
-            categoriesList[i]= categories[i+1];
+        for (uint i = 0; i < categoryCounts; i++) {
+            categoriesList[i] = categories[i + 1];
         }
 
         return categoriesList;
@@ -91,9 +91,13 @@ contract CategoryContract {
      * @param tokens the tokens amount that the use want use to vote.
      * @return boolean
      */
-    function vote(uint256 id, uint256 tokens) public categoryMustExists(id) returns (bool) {
-        votes[id]+=tokens;
-        voted[msg.sender][id]+=tokens;
+    function vote(uint256 id, uint256 tokens)
+        public
+        categoryMustExists(id)
+        returns (bool)
+    {
+        votes[id] += tokens;
+        voted[msg.sender][id] += tokens;
 
         categories[id].votesCount++;
         return true;
@@ -104,10 +108,14 @@ contract CategoryContract {
      * @param id the id of a category that receives a vote.
      * @return uint256
      */
-    function unvote(uint256 id) public categoryMustExists(id) returns(uint256)  {
+    function unvote(uint256 id)
+        public
+        categoryMustExists(id)
+        returns (uint256)
+    {
         uint256 tokens = voted[msg.sender][id];
 
-        votes[id]-=tokens;
+        votes[id] -= tokens;
         voted[msg.sender][id] = 0;
 
         return tokens;
