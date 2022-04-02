@@ -9,7 +9,7 @@ import "./CategoryContract.sol";
  * @title SintropContract
  * @dev Sintrop application to certificated a rural producer
  */
-contract Sintrop is ProducerContract, ActivistContract, CategoryContract {
+contract Sintrop is ProducerContract, ActivistContract {
     enum InspectionStatus {
         OPEN,
         EXPIRED,
