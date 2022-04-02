@@ -1,4 +1,7 @@
 const Sintrop = artifacts.require("Sintrop");
+const CategoryContract = artifacts.require("CategoryContract");
+const IsaPool = artifacts.require("IsaPool");
+const SatToken = artifacts.require("SatToken");
 
 contract('Sintrop', (accounts) => {
   let instance;
@@ -37,7 +40,7 @@ contract('Sintrop', (accounts) => {
   }
 
   const addCategory = async (name) => {
-    await instance.addCategory(
+    await categoryContract.addCategory(
       name,
       `Está categoria visa avaliar as qualidades do ${name}`,
       `${name} totalmente sustentável`,
@@ -49,6 +52,10 @@ contract('Sintrop', (accounts) => {
   }
 
   beforeEach(async () => {
+    satToken = await SatToken.new("1500000000000000000000000000");
+    isaPool = await IsaPool.new(satToken.address);
+
+    categoryContract = await CategoryContract.new(isaPool.address);
     instance = await Sintrop.new();
     await addProducer("Producer A", producerAddress);
     await addActivist("Activist A", activistAddress);
