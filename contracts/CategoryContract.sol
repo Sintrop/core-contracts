@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <=0.9.0;
 
+import "./PoolPassiveInterface.sol";
+
 /**
+ * @author Sintrop
  * @title CategoryContract
  * @dev Category resource that is a part of Sintrop business
  */
@@ -31,6 +34,12 @@ contract CategoryContract {
     mapping(uint256 => Category) public categories;
     mapping(uint256 => uint256) public votes;
     mapping(address => mapping(uint256 => uint256)) public voted;
+
+    PoolPassiveInterface internal isaPool;
+
+    constructor(address _isaPoolAddress) {
+        isaPool = PoolPassiveInterface(_isaPoolAddress);
+    }
 
     /**
      * @dev add a new category
@@ -94,8 +103,12 @@ contract CategoryContract {
     function vote(uint256 id, uint256 tokens)
         public
         categoryMustExists(id)
+        mustHaveSacToken(tokens)
+        mustSendSomeSacToken(tokens)
         returns (bool)
     {
+        isaPool.transferWith(msg.sender, tokens);
+
         votes[id] += tokens;
         voted[msg.sender][id] += tokens;
 
@@ -111,12 +124,16 @@ contract CategoryContract {
     function unvote(uint256 id)
         public
         categoryMustExists(id)
+        mustHaveVoted(id)
         returns (uint256)
     {
         uint256 tokens = voted[msg.sender][id];
 
+        isaPool.approveWith(msg.sender, tokens);
+
         votes[id] -= tokens;
         voted[msg.sender][id] = 0;
+        categories[id].votesCount--;
 
         return tokens;
     }
@@ -124,6 +141,21 @@ contract CategoryContract {
     // Modifiers
     modifier categoryMustExists(uint256 id) {
         require(categories[id].id > 0, "This category don't exists");
+        _;
+    }
+
+    modifier mustHaveSacToken(uint256 tokens) {
+        require(isaPool.balanceOf(msg.sender) > tokens, "You don't have tokens to vote");
+        _;
+    }
+
+    modifier mustSendSomeSacToken(uint256 tokens) {
+        require(tokens > 0, "You must send at least 1 SAC Token");
+        _;
+    }
+
+    modifier mustHaveVoted(uint256 id) {
+        require(voted[msg.sender][id] > 0, "You don't voted to this category");
         _;
     }
 }
