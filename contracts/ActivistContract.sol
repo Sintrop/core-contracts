@@ -84,9 +84,9 @@ contract ActivistContract is UserContract {
     function getActivists() public view returns (Activist[] memory) {
         Activist[] memory activistList = new Activist[](activistsCount);
 
-        for(uint i = 0; i < activistsCount; i++){
+        for (uint256 i = 0; i < activistsCount; i++) {
             address acAddress = activistsAddress[i];
-            activistList[i]= activists[acAddress];
+            activistList[i] = activists[acAddress];
         }
 
         return activistList;

@@ -197,10 +197,12 @@ contract Sintrop is ProducerContract, ActivistContract {
      * @dev Returns all requested inspections.
      */
     function getInspections() public view returns (Inspection[] memory) {
-        Inspection[] memory inspectionsList = new Inspection[](inspectionsCount);
+        Inspection[] memory inspectionsList = new Inspection[](
+            inspectionsCount
+        );
 
-        for(uint i = 0; i < inspectionsCount; i++){
-            inspectionsList[i]= inspections[i+1];
+        for (uint256 i = 0; i < inspectionsCount; i++) {
+            inspectionsList[i] = inspections[i + 1];
         }
 
         return inspectionsList;

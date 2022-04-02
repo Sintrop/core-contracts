@@ -40,7 +40,7 @@ contract SatToken is Ownable {
         transfer(_fundAddress, _numTokens);
         return true;
     }
-    
+
     function removeContractPool(address _fundAddress)
         public
         onlyOwner
@@ -52,7 +52,7 @@ contract SatToken is Ownable {
 
     function approveWith(address delegate, uint256 numTokens)
         public
-        mustBeContractPool()
+        mustBeContractPool
         returns (uint256)
     {
         allowed[msg.sender][delegate] =
@@ -64,7 +64,7 @@ contract SatToken is Ownable {
 
     function transferWith(address tokenOwner, uint256 numTokens)
         public
-        mustBeContractPool()
+        mustBeContractPool
         mustHaveSacTokens(tokenOwner, numTokens)
         returns (bool)
     {
@@ -134,8 +134,7 @@ contract SatToken is Ownable {
         return true;
     }
 
-
-    modifier mustBeContractPool {
+    modifier mustBeContractPool() {
         require(contractPool(msg.sender), "Not a contract pool");
         _;
     }

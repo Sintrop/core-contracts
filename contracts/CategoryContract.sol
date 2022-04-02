@@ -87,7 +87,7 @@ contract CategoryContract {
     function getCategories() public view returns (Category[] memory) {
         Category[] memory categoriesList = new Category[](categoryCounts);
 
-        for (uint i = 0; i < categoryCounts; i++) {
+        for (uint256 i = 0; i < categoryCounts; i++) {
             categoriesList[i] = categories[i + 1];
         }
 
@@ -145,7 +145,10 @@ contract CategoryContract {
     }
 
     modifier mustHaveSacToken(uint256 tokens) {
-        require(isaPool.balanceOf(msg.sender) > tokens, "You don't have tokens to vote");
+        require(
+            isaPool.balanceOf(msg.sender) > tokens,
+            "You don't have tokens to vote"
+        );
         _;
     }
 

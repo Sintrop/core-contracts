@@ -13,7 +13,7 @@ contract('ProducerContract', (accounts) => {
       "SP",
       "Jundiai",
       "135465-005",
-      {from: address}
+      { from: address }
     )
   }
 
@@ -33,10 +33,10 @@ contract('ProducerContract', (accounts) => {
     await addProducer("Producer A", prod1Address);
 
     addProducer("Producer A", prod1Address)
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "This producer already exist")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "This producer already exist")
+      })
   })
 
   it("should return false when producer don't exists", async () => {

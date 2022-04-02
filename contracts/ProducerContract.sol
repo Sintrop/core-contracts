@@ -94,9 +94,9 @@ contract ProducerContract is UserContract {
     function getProducers() public view returns (Producer[] memory) {
         Producer[] memory activistList = new Producer[](producersCount);
 
-        for(uint i = 0; i < producersCount; i++){
+        for (uint256 i = 0; i < producersCount; i++) {
             address acAddress = producersAddress[i];
-            activistList[i]= producers[acAddress];
+            activistList[i] = producers[acAddress];
         }
 
         return activistList;

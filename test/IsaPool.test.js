@@ -50,20 +50,20 @@ contract('IsaPool', (accounts) => {
     it("when call transferWith and dont is a contract pool should return error message", async () => {
         await satToken.removeContractPool(instance.address);
         await instance.transferWith(user2Address, "1000000000000000000000")
-        .then(assert.fail)
-        .catch((error) => {
-            assert.equal(error.reason, "Not a contract pool");
-        })
+            .then(assert.fail)
+            .catch((error) => {
+                assert.equal(error.reason, "Not a contract pool");
+            })
     });
-    
+
     it("when call transferWith and dont has tokens should return error message", async () => {
         await instance.transferWith(user2Address, "1000000000000000000000")
-        .then(assert.fail)
-        .catch((error) => {
-            assert.equal(error.reason, "You don't has SAC Tokens");
-        })
+            .then(assert.fail)
+            .catch((error) => {
+                assert.equal(error.reason, "You don't has SAC Tokens");
+            })
     });
-    
+
     it("when call transferWith and has tokens should transfer some tokens to contract pool address", async () => {
         await instance.transferWith(user1Address, "1000000000000000000000");
 
@@ -76,20 +76,20 @@ contract('IsaPool', (accounts) => {
 
     it("when call approve should return error message when is not a allowed caller", async () => {
         await instance.approveWith(owner, 0)
-        .then(assert.fail)
-        .catch((error) => {
-            assert.equal(error.reason, "Not allowed caller");
-        })
+            .then(assert.fail)
+            .catch((error) => {
+                assert.equal(error.reason, "Not allowed caller");
+            })
     });
-    
+
     it("when call approve should return error message when is not a contract pool", async () => {
         await instance.changeAllowedCaller(owner);
         await satToken.removeContractPool(instance.address);
         await instance.approveWith(owner, 0)
-        .then(assert.fail)
-        .catch((error) => {
-            assert.equal(error.reason, "Not a contract pool");
-        })
+            .then(assert.fail)
+            .catch((error) => {
+                assert.equal(error.reason, "Not a contract pool");
+            })
     });
 
     it("should approve tokens when approve is called by allowed caller and is a contract pool", async () => {

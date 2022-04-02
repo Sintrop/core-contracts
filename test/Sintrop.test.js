@@ -22,7 +22,7 @@ contract('Sintrop', (accounts) => {
       "SP",
       "Jundiai",
       "135465-005",
-      {from: address}
+      { from: address }
     )
   }
 
@@ -35,7 +35,7 @@ contract('Sintrop', (accounts) => {
       "SP",
       "Jundiai",
       "135465-005",
-      {from: address}
+      { from: address }
     )
   }
 
@@ -70,19 +70,19 @@ contract('Sintrop', (accounts) => {
 
   it("should return message error when is not an producer and try request inspection", async () => {
     await instance.requestInspection()
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "Please register as producer")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "Please register as producer")
+      })
   })
 
   it("should return message error when has inspection OPEN o ACCEPTED and try request inspection", async () => {
     await instance.requestInspection({ from: producerAddress })
     await instance.requestInspection({ from: producerAddress })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "You have a inspection request OPEN or ACCEPTED")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "You have a inspection request OPEN or ACCEPTED")
+      })
   })
 
   it("should create request inspection with initial status equal OPEN", async () => {
@@ -139,7 +139,7 @@ contract('Sintrop', (accounts) => {
     const inspectionsList = await instance.getInspections();
     assert.equal(inspectionsList.length, 0)
   })
-  
+
   it("should be same inspection in array of mapping when call getInspections and dont has it", async () => {
     await addProducer("Producer B", producer2Address);
 
@@ -184,18 +184,18 @@ contract('Sintrop', (accounts) => {
   it("should return error message when is not activist and try accepet inspection", async () => {
     await instance.requestInspection({ from: producerAddress });
     await instance.acceptInspection(1, { from: producerAddress })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "Please register as activist")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "Please register as activist")
+      })
   })
 
   it("should return error message when inspection don't exists and try accept", async () => {
     await instance.acceptInspection(1, { from: activistAddress })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "This inspection don't exists")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "This inspection don't exists")
+      })
   })
 
   it("should return error message when inspection is not OPEN and try accept", async () => {
@@ -203,10 +203,10 @@ contract('Sintrop', (accounts) => {
     await instance.acceptInspection(1, { from: activistAddress });
 
     await instance.acceptInspection(1, { from: activistAddress })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "This inspection is not OPEN")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "This inspection is not OPEN")
+      })
   })
 
   it("should realize Inspection when is activist owner to a accepted inspection and try realize", async () => {
@@ -217,7 +217,7 @@ contract('Sintrop', (accounts) => {
     await addCategory("Solo B");
     await addCategory("Solo C");
 
-    const isas = [[1,0],[2,0], [3,1]];
+    const isas = [[1, 0], [2, 0], [3, 1]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspection = await instance.getInspection(1);
@@ -229,10 +229,10 @@ contract('Sintrop', (accounts) => {
     await instance.requestInspection({ from: producerAddress });
 
     await instance.realizeInspection(1, [], { from: activistAddress })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "Accept this inspection before")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "Accept this inspection before")
+      })
   })
 
   it("should return error message when is not inspection owner and try realize inspection", async () => {
@@ -242,10 +242,10 @@ contract('Sintrop', (accounts) => {
     await addActivist("Activist B", activist2Address);
 
     await instance.realizeInspection(1, [], { from: activist2Address })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "You not accepted this inspection")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "You not accepted this inspection")
+      })
   })
 
   it("should return error message when is not activist and try realize inspection", async () => {
@@ -253,18 +253,18 @@ contract('Sintrop', (accounts) => {
     await instance.acceptInspection(1, { from: activistAddress });
 
     await instance.realizeInspection(1, [], { from: producerAddress })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "Please register as activist")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "Please register as activist")
+      })
   })
 
   it("should return error message when inspection don't exists and try realize inspection", async () => {
     await instance.realizeInspection(1, [], { from: activistAddress })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "This inspection don't exists")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "This inspection don't exists")
+      })
   })
 
   it("should update inspectionList when realize inspection", async () => {
@@ -275,7 +275,7 @@ contract('Sintrop', (accounts) => {
     await addCategory("Solo B");
     await addCategory("Solo C");
 
-    const isas = [[1,0],[2,0], [3,1]];
+    const isas = [[1, 0], [2, 0], [3, 1]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspections = await instance.getInspections();
@@ -291,7 +291,7 @@ contract('Sintrop', (accounts) => {
     await addCategory("Solo B");
     await addCategory("Solo C");
 
-    const isas = [[1,0],[2,0], [3,1]];
+    const isas = [[1, 0], [2, 0], [3, 1]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspection = await instance.getInspection(1);
@@ -305,7 +305,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,0]];
+    const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspection = await instance.getInspection(1);
@@ -319,7 +319,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,1]];
+    const isas = [[1, 1]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspection = await instance.getInspection(1);
@@ -333,7 +333,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,2]];
+    const isas = [[1, 2]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspection = await instance.getInspection(1);
@@ -347,7 +347,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,3]];
+    const isas = [[1, 3]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspection = await instance.getInspection(1);
@@ -361,7 +361,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,4]];
+    const isas = [[1, 4]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspection = await instance.getInspection(1);
@@ -375,9 +375,9 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,4]];
+    const isas = [[1, 4]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
-    
+
     const inspection = await instance.getInspection(1);
     const producer = await instance.getProducer(producerAddress);
 
@@ -392,7 +392,7 @@ contract('Sintrop', (accounts) => {
     await addCategory("Solo B");
     await addCategory("Solo C");
 
-    const isas = [[1,0],[2,0], [3,1]];
+    const isas = [[1, 0], [2, 0], [3, 1]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspection = await instance.getInspection(1);
@@ -406,7 +406,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,0]];
+    const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const producer = await instance.getProducer(producerAddress);
@@ -420,7 +420,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,0]];
+    const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const activist = await instance.getActivist(activistAddress);
@@ -434,7 +434,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,0]];
+    const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const producer = await instance.getProducer(producerAddress);
@@ -448,7 +448,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,0]];
+    const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const activist = await instance.getActivist(activistAddress);
@@ -462,7 +462,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,0]];
+    const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const userInspections = await instance.getInspectionsHistory({ from: activistAddress });
@@ -476,7 +476,7 @@ contract('Sintrop', (accounts) => {
 
     await addCategory("Solo A");
 
-    const isas = [[1,0]];
+    const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const userInspections = await instance.getInspectionsHistory({ from: producerAddress });

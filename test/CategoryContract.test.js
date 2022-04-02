@@ -33,17 +33,17 @@ contract('CategoryContract', (accounts) => {
     isaPool = await IsaPool.new(satToken.address);
 
     await satToken.addContractPool(isaPool.address, "0")
-    
+
     instance = await CategoryContract.new(isaPool.address);
     await isaPool.changeAllowedCaller(instance.address);
   })
-  
+
   it("should create category", async () => {
     await addCategory("Solo");
     const categories = await instance.getCategories();
 
     assert.equal(categories[0].name, "Solo")
-  }) 
+  })
 
   it("should add msg.sender in createdBy", async () => {
     await addCategory("Solo");
@@ -96,11 +96,11 @@ contract('CategoryContract', (accounts) => {
 
   it("when user try vote and category dont exists should return error message", async () => {
     await instance.vote(1, 0)
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "This category don't exists")
-    })
-  }) 
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "This category don't exists")
+      })
+  })
 
   it("should vote and send tokens only to the passed id", async () => {
     await addCategory("Solo");
@@ -191,19 +191,19 @@ contract('CategoryContract', (accounts) => {
   it("should return error message when try vote and dont has SAC Tokens", async () => {
     await addCategory("Solo");
     await instance.vote(1, 0, { from: user1Address })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "You don't have tokens to vote")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "You don't have tokens to vote")
+      })
   })
 
   it("should return error message when try vote and has tokens but dont send any", async () => {
     await addCategory("Solo");
     await instance.vote(1, 0)
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "You must send at least 1 SAC Token")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "You must send at least 1 SAC Token")
+      })
   })
 
   it("should subtract tokens from user after vote in a category", async () => {
@@ -214,8 +214,8 @@ contract('CategoryContract', (accounts) => {
     const balanceOf = await isaPool.balanceOf(user1Address);
 
     assert.equal(balanceOf, "49000000000000000000000");
-  })  
-  
+  })
+
   it("should add tokens to isa pool after vote in a category", async () => {
     await addCategory("Solo");
     await transferTokensTo(user1Address, "50000000000000000000000");
@@ -240,12 +240,12 @@ contract('CategoryContract', (accounts) => {
 
   it("when user try unvote and category dont exists should return error message", async () => {
     await instance.unvote(1)
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "This category don't exists")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "This category don't exists")
+      })
   })
-  
+
   it("should decrement votesCount in 1 when unvote with success", async () => {
     await addCategory("Solo");
     await transferTokensTo(user1Address, "50000000000000000000000");
@@ -257,7 +257,7 @@ contract('CategoryContract', (accounts) => {
     const category = await instance.categories(1);
 
     assert.equal(category.votesCount, 1);
-  }) 
+  })
 
   it("should return error message when user try unvote and dont voted yet", async () => {
     await addCategory("Solo 1");
@@ -265,11 +265,11 @@ contract('CategoryContract', (accounts) => {
     await instance.vote(1, "100000000000000000000");
 
     await instance.unvote(1, { from: user1Address })
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "You don't voted to this category")
-    })
-  }) 
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "You don't voted to this category")
+      })
+  })
 
   it("when a user unvoted with success should remove votes/tokens from voted mapping", async () => {
     await addCategory("Solo 1");
@@ -305,5 +305,5 @@ contract('CategoryContract', (accounts) => {
     const allowance = await isaPool.allowance({ from: user1Address });
 
     assert.equal(allowance, "1000000000000000000000");
-  }) 
+  })
 })

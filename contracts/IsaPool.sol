@@ -41,7 +41,12 @@ contract IsaPool is PoolPassiveInterface, Ownable {
      * @param tokenOwner The address of the token owner
      * @return uint256
      */
-    function balanceOf(address tokenOwner) public view override returns (uint256) {
+    function balanceOf(address tokenOwner)
+        public
+        view
+        override
+        returns (uint256)
+    {
         return satToken.balanceOf(tokenOwner);
     }
 
@@ -60,7 +65,7 @@ contract IsaPool is PoolPassiveInterface, Ownable {
     function approveWith(address delegate, uint256 _numTokens)
         public
         override
-        mustBeAllowedCaller()
+        mustBeAllowedCaller
         returns (bool)
     {
         satToken.approveWith(delegate, _numTokens);
