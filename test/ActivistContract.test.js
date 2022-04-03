@@ -13,7 +13,7 @@ contract('ActivistContract', (accounts) => {
       "SP",
       "Jundiai",
       "135465-005",
-      {from: address}
+      { from: address }
     )
   }
 
@@ -48,10 +48,10 @@ contract('ActivistContract', (accounts) => {
     await addActivist("Activist A", activ1Address);
 
     addActivist("Activist A", activ1Address)
-    .then(assert.fail)
-    .catch((error) => {
-      assert.equal(error.reason, "This activist already exist")
-    })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "This activist already exist")
+      })
   })
 
   it("should return true when activist already exists", async () => {

@@ -21,7 +21,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.2+commit.661d1103\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"delegate\",\"type\":\"address\"}],\"name\":\"getProducerApprove\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/SintropInterface.sol\":\"SintropInterface\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/SintropInterface.sol\":{\"keccak256\":\"0x20a390644676c0abc90baed2ec9d093dcc6c39b5ff0ea653e579222d6611d2ae\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://93631489d4e0620ec9a221166af9a151763af3a0852fc13c41287abc550710a1\",\"dweb:/ipfs/QmaqsJn4FcWtPxSDqnsAgTMRw3bHXkxJK6oQGMKd2RjuBm\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.2+commit.661d1103\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"delegate\",\"type\":\"address\"}],\"name\":\"getProducerApprove\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/SintropInterface.sol\":\"SintropInterface\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/SintropInterface.sol\":{\"keccak256\":\"0x2074fd276489948ffd9b7ac80eb0bce5e878402d81ce8ead2f13de5a0d5ef49d\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://32875e48c6fc951e9cbea1f63585ae3fb48f6a82520d1e74379ce6071df705ac\",\"dweb:/ipfs/QmRdacMLzfzspGdU7rC4y9RzPk2q93hS7Bhq3X6BGWQq3M\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -29,21 +29,21 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: GPL-3.0\npragma solidity >=0.7.0 <=0.9.0;\n\ninterface SintropInterface {\n    function getProducerApprove(address delegate) external view returns(uint);\n}\n",
-  "sourcePath": "/home/everson/projetos/afiliart/SAT-core-contracts/contracts/SintropInterface.sol",
+  "source": "// SPDX-License-Identifier: GPL-3.0\npragma solidity >=0.7.0 <=0.9.0;\n\ninterface SintropInterface {\n    function getProducerApprove(address delegate)\n        external\n        view\n        returns (uint256);\n}\n",
+  "sourcePath": "/home/everson/Documents/projetos/sintrop/SAT-core-contracts/contracts/SintropInterface.sol",
   "ast": {
     "absolutePath": "project:/contracts/SintropInterface.sol",
     "exportedSymbols": {
       "SintropInterface": [
-        2796
+        3333
       ]
     },
-    "id": 2797,
+    "id": 3334,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2788,
+        "id": 3325,
         "literals": [
           "solidity",
           ">=",
@@ -54,7 +54,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "36:32:13"
+        "src": "36:32:15"
       },
       {
         "abstract": false,
@@ -62,36 +62,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 2796,
+        "id": 3333,
         "linearizedBaseContracts": [
-          2796
+          3333
         ],
         "name": "SintropInterface",
-        "nameLocation": "80:16:13",
+        "nameLocation": "80:16:15",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "8cf05442",
-            "id": 2795,
+            "id": 3332,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getProducerApprove",
-            "nameLocation": "112:18:13",
+            "nameLocation": "112:18:15",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2791,
+              "id": 3328,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2790,
+                  "id": 3327,
                   "mutability": "mutable",
                   "name": "delegate",
-                  "nameLocation": "139:8:13",
+                  "nameLocation": "139:8:15",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2795,
-                  "src": "131:16:13",
+                  "scope": 3332,
+                  "src": "131:16:15",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -99,10 +99,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2789,
+                    "id": 3326,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "131:7:13",
+                    "src": "131:7:15",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -112,21 +112,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "130:18:13"
+              "src": "130:18:15"
             },
             "returnParameters": {
-              "id": 2794,
+              "id": 3331,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2793,
+                  "id": 3330,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2795,
-                  "src": "171:4:13",
+                  "scope": 3332,
+                  "src": "196:7:15",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -134,10 +134,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2792,
-                    "name": "uint",
+                    "id": 3329,
+                    "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "171:4:13",
+                    "src": "196:7:15",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -146,34 +146,34 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "170:6:13"
+              "src": "195:9:15"
             },
-            "scope": 2796,
-            "src": "103:74:13",
+            "scope": 3333,
+            "src": "103:102:15",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2797,
-        "src": "70:109:13"
+        "scope": 3334,
+        "src": "70:137:15"
       }
     ],
-    "src": "36:144:13"
+    "src": "36:172:15"
   },
   "legacyAST": {
     "absolutePath": "project:/contracts/SintropInterface.sol",
     "exportedSymbols": {
       "SintropInterface": [
-        2796
+        3333
       ]
     },
-    "id": 2797,
+    "id": 3334,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2788,
+        "id": 3325,
         "literals": [
           "solidity",
           ">=",
@@ -184,7 +184,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "36:32:13"
+        "src": "36:32:15"
       },
       {
         "abstract": false,
@@ -192,36 +192,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 2796,
+        "id": 3333,
         "linearizedBaseContracts": [
-          2796
+          3333
         ],
         "name": "SintropInterface",
-        "nameLocation": "80:16:13",
+        "nameLocation": "80:16:15",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "8cf05442",
-            "id": 2795,
+            "id": 3332,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getProducerApprove",
-            "nameLocation": "112:18:13",
+            "nameLocation": "112:18:15",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2791,
+              "id": 3328,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2790,
+                  "id": 3327,
                   "mutability": "mutable",
                   "name": "delegate",
-                  "nameLocation": "139:8:13",
+                  "nameLocation": "139:8:15",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2795,
-                  "src": "131:16:13",
+                  "scope": 3332,
+                  "src": "131:16:15",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -229,10 +229,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2789,
+                    "id": 3326,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "131:7:13",
+                    "src": "131:7:15",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -242,21 +242,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "130:18:13"
+              "src": "130:18:15"
             },
             "returnParameters": {
-              "id": 2794,
+              "id": 3331,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2793,
+                  "id": 3330,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2795,
-                  "src": "171:4:13",
+                  "scope": 3332,
+                  "src": "196:7:15",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -264,10 +264,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2792,
-                    "name": "uint",
+                    "id": 3329,
+                    "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "171:4:13",
+                    "src": "196:7:15",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -276,28 +276,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "170:6:13"
+              "src": "195:9:15"
             },
-            "scope": 2796,
-            "src": "103:74:13",
+            "scope": 3333,
+            "src": "103:102:15",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2797,
-        "src": "70:109:13"
+        "scope": 3334,
+        "src": "70:137:15"
       }
     ],
-    "src": "36:144:13"
+    "src": "36:172:15"
   },
   "compiler": {
     "name": "solc",
     "version": "0.8.2+commit.661d1103.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.4.4",
-  "updatedAt": "2022-02-26T13:04:56.756Z",
+  "schemaVersion": "3.4.6",
+  "updatedAt": "2022-04-02T18:06:16.885Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

@@ -2,6 +2,8 @@
 pragma solidity >=0.7.0 <=0.9.0;
 
 interface SatTokenInterface {
+    function balanceOf(address tokenOwner) external view returns (uint256);
+
     function allowance(address owner, address delegate)
         external
         view
@@ -10,6 +12,10 @@ interface SatTokenInterface {
     function approveWith(address delegate, uint256 numTokens)
         external
         returns (uint256);
+
+    function transferWith(address tokenOwner, uint256 numTokens)
+        external
+        returns (bool);
 
     function transferFrom(
         address owner,
