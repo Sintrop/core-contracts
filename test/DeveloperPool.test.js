@@ -1,4 +1,4 @@
-const SatToken = artifacts.require("SatToken");
+const SacToken = artifacts.require("SacToken");
 const DeveloperPool = artifacts.require("DeveloperPool");
 
 advanceBlock = async (blocksNumber) => {
@@ -47,15 +47,15 @@ contract('DeveloperPool', (accounts) => {
   }
 
   beforeEach(async () => {
-    const satToken = await SatToken.new("1500000000000000000000000000");
+    const sacToken = await SacToken.new("1500000000000000000000000000");
     instance = await DeveloperPool.new(
-      satToken.address,
+      sacToken.address,
       args.tokensPerEra,
       args.blocksPerEra,
       args.eraMax
     )
 
-    satToken.addContractPool(instance.address, "15000000000000000000000000")
+    sacToken.addContractPool(instance.address, "15000000000000000000000000")
   })
 
   it('should tokenPerEra be equal the deployed value with decimals', async () => {

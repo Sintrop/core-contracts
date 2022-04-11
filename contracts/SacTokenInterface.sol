@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <=0.9.0;
 
-interface SatTokenInterface {
+interface SacTokenInterface {
     function balanceOf(address tokenOwner) external view returns (uint256);
 
     function allowance(address owner, address delegate)

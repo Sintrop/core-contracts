@@ -2,20 +2,13 @@
 pragma solidity >=0.7.0 <=0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-import "./SafeMath.sol";
-
-contract SatToken is Ownable {
-    string public constant NAME = "SUSTAINABLE AGRICULTURE TOKEN";
-    string public constant SYMBOL = "SAT";
+contract SacToken is ERC20, Ownable {
+    string public constant NAME = "SUSTAINABLE AGRICULTURE CREDIT";
+    string public constant SYMBOL = "SAC";
     uint8 public constant DECIMALS = 18;
-
-    event Approval(
-        address indexed tokenOwner,
-        address indexed spender,
-        uint256 tokens
-    );
-    event Transfer(address indexed from, address indexed to, uint256 tokens);
 
     mapping(address => uint256) internal balances;
     mapping(address => mapping(address => uint256)) internal allowed;
@@ -26,7 +19,7 @@ contract SatToken is Ownable {
 
     mapping(address => bool) internal contractsPools;
 
-    constructor(uint256 total) {
+    constructor(uint256 total) ERC20(NAME, SYMBOL) {
         totalSupply_ = total;
         balances[msg.sender] = totalSupply_;
     }
@@ -83,16 +76,26 @@ contract SatToken is Ownable {
         return contractsPools[contractFundsAddress];
     }
 
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public view override returns (uint256) {
         return totalSupply_;
     }
+    
+    function name() public pure override returns (string memory) {
+        return NAME;
+    }
 
-    function balanceOf(address tokenOwner) public view returns (uint256) {
+    function balanceOf(address tokenOwner)
+        public
+        view
+        override
+        returns (uint256)
+    {
         return balances[tokenOwner];
     }
 
     function transfer(address receiver, uint256 numTokens)
         public
+        override
         returns (bool)
     {
         require(numTokens <= balances[msg.sender]);
@@ -104,6 +107,7 @@ contract SatToken is Ownable {
 
     function approve(address delegate, uint256 numTokens)
         public
+        override
         returns (bool)
     {
         allowed[msg.sender][delegate] = numTokens;
@@ -114,6 +118,7 @@ contract SatToken is Ownable {
     function allowance(address owner, address delegate)
         public
         view
+        override
         returns (uint256)
     {
         return allowed[owner][delegate];
@@ -123,7 +128,7 @@ contract SatToken is Ownable {
         address owner,
         address buyer,
         uint256 numTokens
-    ) public returns (bool) {
+    ) public override returns (bool) {
         require(numTokens <= balances[owner]);
         require(numTokens <= allowed[owner][msg.sender]);
 

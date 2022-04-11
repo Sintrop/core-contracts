@@ -1,4 +1,4 @@
-const SatToken = artifacts.require("SatToken");
+const SacToken = artifacts.require("SacToken");
 const IsaPool = artifacts.require("IsaPool");
 const CategoryContract = artifacts.require("CategoryContract");
 const DeveloperPool = artifacts.require("DeveloperPool");
@@ -15,15 +15,15 @@ module.exports = function(deployer) {
   deployer.then(async () => {
     await deployer.deploy(Sintrop);
 
-    await deployer.deploy(SatToken, args.totalTokens);
+    await deployer.deploy(SacToken, args.totalTokens);
 
-    await deployer.deploy(IsaPool, SatToken.address);
+    await deployer.deploy(IsaPool, SacToken.address);
     
     await deployer.deploy(CategoryContract, IsaPool.address);
 
     await deployer.deploy(
       DeveloperPool, 
-      SatToken.address, 
+      SacToken.address, 
       args.tokensPerEra, 
       args.blocksPerEra, 
       args.eraMax
