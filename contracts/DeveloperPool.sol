@@ -3,10 +3,10 @@ pragma solidity >=0.7.0 <=0.9.0;
 
 import "./PoolInterface.sol";
 
-import "./SatTokenInterface.sol";
+import "./SacTokenInterface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./SafeMath.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
  * @author Everson B. Silva
@@ -34,7 +34,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     address[] internal developersAddress;
 
-    SatTokenInterface internal satToken;
+    SacTokenInterface internal sacToken;
 
     uint256 public developersCount;
 
@@ -51,12 +51,12 @@ contract DeveloperPool is Ownable, PoolInterface {
     uint256 public constant blocksPrecision = 5;
 
     constructor(
-        address _satTokenAddress,
+        address _sacTokenAddress,
         uint256 _tokensPerEra,
         uint256 _blocksPerEra,
         uint256 _eraMax
     ) {
-        satToken = SatTokenInterface(_satTokenAddress);
+        sacToken = SacTokenInterface(_sacTokenAddress);
         deployedAt = currentBlockNumber();
         tokensPerEra = _tokensPerEra.mul(10**18);
         blocksPerEra = _blocksPerEra;
@@ -153,7 +153,7 @@ contract DeveloperPool is Ownable, PoolInterface {
     }
 
     /**
-     * @dev Allow the developer to approve tokens from DeveloperPool address. DeveloperPool address must have tokens in SAT TOKEN
+     * @dev Allow the developer to approve tokens from DeveloperPool address. DeveloperPool address must have tokens in SAC TOKEN
      * TODO Check external code call - EXTCALL
      */
     function approve() public override returns (bool) {
@@ -163,7 +163,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
         uint256 tokens = calcTokens(developer.level, developer.currentEra);
 
-        satToken.approveWith(msg.sender, tokens);
+        sacToken.approveWith(msg.sender, tokens);
 
         setEraMetrics(developer.currentEra, tokens);
 
@@ -194,7 +194,7 @@ contract DeveloperPool is Ownable, PoolInterface {
      * TODO Check external code call - EXTCALL
      */
     function withDraw() public override returns (bool) {
-        satToken.transferFrom(address(this), msg.sender, allowance());
+        sacToken.transferFrom(address(this), msg.sender, allowance());
         return true;
     }
 
@@ -203,7 +203,7 @@ contract DeveloperPool is Ownable, PoolInterface {
      * TODO Check external code call - EXTCALL
      */
     function allowance() public view override returns (uint256) {
-        return satToken.allowance(address(this), msg.sender);
+        return sacToken.allowance(address(this), msg.sender);
     }
 
     /**

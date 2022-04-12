@@ -1,7 +1,7 @@
 const Sintrop = artifacts.require("Sintrop");
 const CategoryContract = artifacts.require("CategoryContract");
 const IsaPool = artifacts.require("IsaPool");
-const SatToken = artifacts.require("SatToken");
+const SacToken = artifacts.require("SacToken");
 
 contract('Sintrop', (accounts) => {
   let instance;
@@ -52,8 +52,8 @@ contract('Sintrop', (accounts) => {
   }
 
   beforeEach(async () => {
-    satToken = await SatToken.new("1500000000000000000000000000");
-    isaPool = await IsaPool.new(satToken.address);
+    sacToken = await SacToken.new("1500000000000000000000000000");
+    isaPool = await IsaPool.new(sacToken.address);
 
     categoryContract = await CategoryContract.new(isaPool.address);
     instance = await Sintrop.new();

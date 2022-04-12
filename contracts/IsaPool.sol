@@ -2,7 +2,7 @@
 pragma solidity >=0.7.0 <=0.9.0;
 
 import "./PoolPassiveInterface.sol";
-import "./SatTokenInterface.sol";
+import "./SacTokenInterface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -12,10 +12,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract IsaPool is PoolPassiveInterface, Ownable {
     address allowedCaller;
-    SatTokenInterface internal satToken;
+    SacTokenInterface internal sacToken;
 
-    constructor(address satTokenAddress) {
-        satToken = SatTokenInterface(satTokenAddress);
+    constructor(address sacTokenAddress) {
+        sacToken = SacTokenInterface(sacTokenAddress);
     }
 
     function changeAllowedCaller(address allowed)
@@ -33,7 +33,7 @@ contract IsaPool is PoolPassiveInterface, Ownable {
      * TODO Check external code call - EXTCALL
      */
     function allowance() public view override returns (uint256) {
-        return satToken.allowance(address(this), msg.sender);
+        return sacToken.allowance(address(this), msg.sender);
     }
 
     /**
@@ -47,7 +47,7 @@ contract IsaPool is PoolPassiveInterface, Ownable {
         override
         returns (uint256)
     {
-        return satToken.balanceOf(tokenOwner);
+        return sacToken.balanceOf(tokenOwner);
     }
 
     /**
@@ -68,7 +68,7 @@ contract IsaPool is PoolPassiveInterface, Ownable {
         mustBeAllowedCaller
         returns (bool)
     {
-        satToken.approveWith(delegate, _numTokens);
+        sacToken.approveWith(delegate, _numTokens);
         return true;
     }
 
@@ -87,7 +87,7 @@ contract IsaPool is PoolPassiveInterface, Ownable {
         override
         returns (bool)
     {
-        satToken.transferWith(tokenOwner, numTokens);
+        sacToken.transferWith(tokenOwner, numTokens);
         return true;
     }
 

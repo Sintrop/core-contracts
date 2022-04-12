@@ -1,21 +1,21 @@
 const IsaPool = artifacts.require("IsaPool");
-const SatToken = artifacts.require("SatToken");
+const SacToken = artifacts.require("SacToken");
 
 contract('IsaPool', (accounts) => {
     let instance;
-    let satToken;
+    let sacToken;
     let [owner, user1Address, user2Address] = accounts;
 
     const transferTokensTo = async (userAddress, tokens) => {
-        await satToken.transfer(userAddress, tokens);
+        await sacToken.transfer(userAddress, tokens);
     }
 
     beforeEach(async () => {
-        satToken = await SatToken.new("1500000000000000000000000000");
+        sacToken = await SacToken.new("1500000000000000000000000000");
 
-        instance = await IsaPool.new(satToken.address);
+        instance = await IsaPool.new(sacToken.address);
 
-        await satToken.addContractPool(instance.address, "15000000000000000000000000");
+        await sacToken.addContractPool(instance.address, "15000000000000000000000000");
         await transferTokensTo(user1Address, "500000000000000000000000");
     })
 
@@ -48,7 +48,7 @@ contract('IsaPool', (accounts) => {
     })
 
     it("when call transferWith and dont is a contract pool should return error message", async () => {
-        await satToken.removeContractPool(instance.address);
+        await sacToken.removeContractPool(instance.address);
         await instance.transferWith(user2Address, "1000000000000000000000")
             .then(assert.fail)
             .catch((error) => {
@@ -84,7 +84,7 @@ contract('IsaPool', (accounts) => {
 
     it("when call approve should return error message when is not a contract pool", async () => {
         await instance.changeAllowedCaller(owner);
-        await satToken.removeContractPool(instance.address);
+        await sacToken.removeContractPool(instance.address);
         await instance.approveWith(owner, 0)
             .then(assert.fail)
             .catch((error) => {

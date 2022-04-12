@@ -1,10 +1,10 @@
 const CategoryContract = artifacts.require("CategoryContract");
-const SatToken = artifacts.require("SatToken");
+const SacToken = artifacts.require("SacToken");
 const IsaPool = artifacts.require("IsaPool");
 
 contract('CategoryContract', (accounts) => {
   let instance;
-  let satToken;
+  let sacToken;
   let isaPool;
   let [msgSender, user1Address, user2Address] = accounts;
 
@@ -21,18 +21,18 @@ contract('CategoryContract', (accounts) => {
   }
 
   const transferTokensTo = async (userAddress, tokens) => {
-    await satToken.transfer(userAddress, tokens);
+    await sacToken.transfer(userAddress, tokens);
   }
 
   const balanceOf = async (userAddress) => {
-    return await satToken.balanceOf(userAddress);
+    return await sacToken.balanceOf(userAddress);
   }
 
   beforeEach(async () => {
-    satToken = await SatToken.new("1500000000000000000000000000");
-    isaPool = await IsaPool.new(satToken.address);
+    sacToken = await SacToken.new("1500000000000000000000000000");
+    isaPool = await IsaPool.new(sacToken.address);
 
-    await satToken.addContractPool(isaPool.address, "0")
+    await sacToken.addContractPool(isaPool.address, "0")
 
     instance = await CategoryContract.new(isaPool.address);
     await isaPool.changeAllowedCaller(instance.address);
