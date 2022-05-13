@@ -1,7 +1,9 @@
 const ActivistContract = artifacts.require("ActivistContract");
+const UserContract = artifacts.require("UserContract");
 
 contract('ActivistContract', (accounts) => {
   let instance;
+  let userContract;
   let [ownerAddress, activ1Address, activ2Address] = accounts;
 
   const addActivist = async (name, address) => {
@@ -18,7 +20,11 @@ contract('ActivistContract', (accounts) => {
   }
 
   beforeEach(async () => {
-    instance = await ActivistContract.new();
+    userContract = await UserContract.new(); 
+
+    instance = await ActivistContract.new(userContract.address);
+
+    await userContract.newAllowedCaller(instance.address);
   })
 
   it("should create activist", async () => {
@@ -97,8 +103,8 @@ contract('ActivistContract', (accounts) => {
   it("should add created activist in userType contract as a ACTIVIST", async () => {
     await addActivist("Activist A", activ1Address);
 
-    const userType = await instance.getUser(activ1Address);
-    const ACTIVIST = 2
+    const userType = await userContract.getUser(activ1Address);
+    const ACTIVIST = 1
 
     assert.equal(userType, ACTIVIST);
   })

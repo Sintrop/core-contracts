@@ -1,7 +1,9 @@
 const ProducerContract = artifacts.require("ProducerContract");
+const UserContract = artifacts.require("UserContract");
 
 contract('ProducerContract', (accounts) => {
   let instance;
+  let userContract;
   let [ownerAddress, prod1Address, prod2Address] = accounts;
 
   const addProducer = async (name, address) => {
@@ -18,7 +20,11 @@ contract('ProducerContract', (accounts) => {
   }
 
   beforeEach(async () => {
-    instance = await ProducerContract.new();
+    userContract = await UserContract.new(); 
+
+    instance = await ProducerContract.new(userContract.address);
+    
+    await userContract.newAllowedCaller(instance.address);
   })
 
   it("should create producer", async () => {
@@ -26,7 +32,7 @@ contract('ProducerContract', (accounts) => {
     await addProducer("Producer B", prod2Address);
     const producer = await instance.getProducer(prod1Address);
 
-    assert.equal(producer.producer_wallet, prod1Address);
+    assert.equal(producer.producerWallet, prod1Address);
   })
 
   it("should return error when try create same producer", async () => {
@@ -116,8 +122,8 @@ contract('ProducerContract', (accounts) => {
   it("should add created producer in userType contract as a PRODUCER", async () => {
     await addProducer("Producer A", prod1Address);
 
-    const userType = await instance.getUser(prod1Address);
-    const PRODUCER = 1
+    const userType = await userContract.getUser(prod1Address);
+    const PRODUCER = 0
 
     assert.equal(userType, PRODUCER);
   })
@@ -127,6 +133,6 @@ contract('ProducerContract', (accounts) => {
 
     const producer = await instance.getProducer(prod1Address);
 
-    assert.equal(producer.producer_wallet, prod1Address);
+    assert.equal(producer.producerWallet, prod1Address);
   })
 })

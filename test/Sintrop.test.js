@@ -2,9 +2,15 @@ const Sintrop = artifacts.require("Sintrop");
 const CategoryContract = artifacts.require("CategoryContract");
 const IsaPool = artifacts.require("IsaPool");
 const SacToken = artifacts.require("SacToken");
+const UserContract = artifacts.require("UserContract");
+const ActivistContract = artifacts.require("ActivistContract");
+const ProducerContract = artifacts.require("ProducerContract");
 
 contract('Sintrop', (accounts) => {
   let instance;
+  let userContract;
+  let activistContract;
+  let producerContract;
   let [ownerAddress, producerAddress, producer2Address, activistAddress, activist2Address] = accounts;
   const STATUS = {
     open: 0,
@@ -14,7 +20,7 @@ contract('Sintrop', (accounts) => {
   }
 
   const addProducer = async (name, address) => {
-    await instance.addProducer(
+    await producerContract.addProducer(
       name,
       "111.111.111-00",
       "CPF",
@@ -27,7 +33,7 @@ contract('Sintrop', (accounts) => {
   }
 
   const addActivist = async (name, address) => {
-    await instance.addActivist(
+    await activistContract.addActivist(
       name,
       "111.111.111-00",
       "CPF",
@@ -52,11 +58,20 @@ contract('Sintrop', (accounts) => {
   }
 
   beforeEach(async () => {
+    userContract = await UserContract.new();
+
+    producerContract = await ProducerContract.new(userContract.address);
+    activistContract = await ActivistContract.new(userContract.address);
+
     sacToken = await SacToken.new("1500000000000000000000000000");
     isaPool = await IsaPool.new(sacToken.address);
 
     categoryContract = await CategoryContract.new(isaPool.address);
-    instance = await Sintrop.new();
+    instance = await Sintrop.new(activistContract.address, producerContract.address);
+
+    await userContract.newAllowedCaller(activistContract.address)
+    await userContract.newAllowedCaller(producerContract.address)
+
     await addProducer("Producer A", producerAddress);
     await addActivist("Activist A", activistAddress);
   })
@@ -122,7 +137,7 @@ contract('Sintrop', (accounts) => {
 
   it("should set to true producer recentInspection when request inspection", async () => {
     await instance.requestInspection({ from: producerAddress });
-    const producer = await instance.getProducer(producerAddress);
+    const producer = await producerContract.getProducer(producerAddress);
 
     assert.equal(producer.recentInspection, true);
   })
@@ -176,7 +191,7 @@ contract('Sintrop', (accounts) => {
     await instance.requestInspection({ from: producerAddress });
     await instance.acceptInspection(1, { from: activistAddress });
 
-    const activist = await instance.getActivist(activistAddress);
+    const activist = await activistContract.getActivist(activistAddress);
 
     assert.equal(activist.recentInspection, true);
   })
@@ -379,7 +394,7 @@ contract('Sintrop', (accounts) => {
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
     const inspection = await instance.getInspection(1);
-    const producer = await instance.getProducer(producerAddress);
+    const producer = await producerContract.getProducer(producerAddress);
 
     assert.equal(inspection.isaPoints, producer.isaPoints);
   })
@@ -409,7 +424,7 @@ contract('Sintrop', (accounts) => {
     const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
-    const producer = await instance.getProducer(producerAddress);
+    const producer = await producerContract.getProducer(producerAddress);
 
     assert.equal(producer.recentInspection, false);
   })
@@ -423,12 +438,12 @@ contract('Sintrop', (accounts) => {
     const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
-    const activist = await instance.getActivist(activistAddress);
+    const activist = await activistContract.getActivist(activistAddress);
 
     assert.equal(activist.recentInspection, false);
   })
 
-  it("should increment producer totalRequests after realize inspection", async () => {
+  it("should increment producer totalRequests after realized inspection", async () => {
     await instance.requestInspection({ from: producerAddress });
     await instance.acceptInspection(1, { from: activistAddress });
 
@@ -437,7 +452,7 @@ contract('Sintrop', (accounts) => {
     const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
-    const producer = await instance.getProducer(producerAddress);
+    const producer = await producerContract.getProducer(producerAddress);
 
     assert.equal(producer.totalRequests, 1);
   })
@@ -451,7 +466,7 @@ contract('Sintrop', (accounts) => {
     const isas = [[1, 0]];
     await instance.realizeInspection(1, isas, { from: activistAddress });
 
-    const activist = await instance.getActivist(activistAddress);
+    const activist = await activistContract.getActivist(activistAddress);
 
     assert.equal(activist.totalInspections, 1);
   })

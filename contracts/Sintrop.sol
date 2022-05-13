@@ -9,7 +9,10 @@ import "./CategoryContract.sol";
  * @title SintropContract
  * @dev Sintrop application to certificated a rural producer
  */
-contract Sintrop is ProducerContract, ActivistContract {
+contract Sintrop {
+    ActivistContract public activistContract;
+    ProducerContract public producerContract;
+
     enum InspectionStatus {
         OPEN,
         EXPIRED,
@@ -29,9 +32,18 @@ contract Sintrop is ProducerContract, ActivistContract {
         uint256 createdAt;
         uint256 updatedAt;
     }
+
     mapping(address => Inspection[]) userInspections;
     mapping(uint256 => Inspection) inspections;
     uint256 public inspectionsCount;
+
+    constructor(
+        address activistContractAddress,
+        address producerContractAddress
+    ) {
+        activistContract = ActivistContract(activistContractAddress);
+        producerContract = ProducerContract(producerContractAddress);
+    }
 
     /**
      * @dev Allows the current user producer/activist get all yours inspections with status INSPECTED
@@ -44,14 +56,17 @@ contract Sintrop is ProducerContract, ActivistContract {
      * @dev Allows the current user (producer) request a inspection.
      */
     function requestInspection() public returns (bool) {
-        require(producerExists(msg.sender), "Please register as producer");
         require(
-            !producers[msg.sender].recentInspection,
+            producerContract.producerExists(msg.sender),
+            "Please register as producer"
+        );
+        require(
+            !producerContract.getProducer(msg.sender).recentInspection,
             "You have a inspection request OPEN or ACCEPTED"
         );
 
         createRequest();
-        producers[msg.sender].recentInspection = true;
+        producerContract.recentInspection(msg.sender, true);
 
         return true;
     }
@@ -96,7 +111,8 @@ contract Sintrop is ProducerContract, ActivistContract {
         inspection.activistWallet = msg.sender;
         inspections[inspectionId] = inspection;
 
-        activists[msg.sender].recentInspection = true;
+        // activists[msg.sender].recentInspection = true;
+        activistContract.recentInspection(msg.sender, true);
 
         return true;
     }
@@ -126,7 +142,10 @@ contract Sintrop is ProducerContract, ActivistContract {
 
         updateProducerIsa(inspection);
 
-        approveProducerNewTokens(inspection.producerWallet, 2000);
+        producerContract.approveProducerNewTokens(
+            inspection.producerWallet,
+            2000
+        );
 
         return true;
     }
@@ -182,7 +201,10 @@ contract Sintrop is ProducerContract, ActivistContract {
     }
 
     function updateProducerIsa(Inspection memory inspection) internal {
-        producers[inspection.producerWallet].isaPoints = inspection.isaPoints;
+        producerContract.updateIsaPoints(
+            inspection.producerWallet,
+            inspection.isaPoints
+        );
     }
 
     /**
@@ -241,12 +263,14 @@ contract Sintrop is ProducerContract, ActivistContract {
         address activistWallet = inspection.activistWallet;
 
         // Increment actvist inspections and release to carry out new inspections
-        activists[activistWallet].recentInspection = false;
-        activists[activistWallet].totalInspections++;
+        // activists[].recentInspection = false;
+        activistContract.recentInspection(activistWallet, false);
+        activistContract.incrementRequests(activistWallet);
+        // activists[activistWallet].totalInspections++;
 
         // Increment producer requests and release to carry out new requests
-        producers[producerWallet].recentInspection = false;
-        producers[producerWallet].totalRequests++;
+        producerContract.recentInspection(producerWallet, false);
+        producerContract.incrementRequests(producerWallet);
 
         userInspections[producerWallet].push(inspection);
         userInspections[activistWallet].push(inspection);
@@ -266,7 +290,10 @@ contract Sintrop is ProducerContract, ActivistContract {
 
     // MODIFIERS
     modifier requireActivist() {
-        require(activistExists(msg.sender), "Please register as activist");
+        require(
+            activistContract.activistExists(msg.sender),
+            "Please register as activist"
+        );
         _;
     }
 

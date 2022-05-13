@@ -3,7 +3,9 @@ pragma solidity >=0.7.0 <=0.9.0;
 
 import "./UserContract.sol";
 
-contract ActivistContract is UserContract {
+contract ActivistContract {
+    UserContract internal userContract;
+
     struct Activist {
         uint256 id;
         address activistWallet;
@@ -27,6 +29,10 @@ contract ActivistContract is UserContract {
     address[] internal activistsAddress;
     uint256 public activistsCount;
 
+    constructor(address userContractAddress) {
+        userContract = UserContract(userContractAddress);
+    }
+
     /**
      * @dev Allow a new register of activist
      * @param name the name of the activist
@@ -38,6 +44,7 @@ contract ActivistContract is UserContract {
      * @param cep the cep of the activist
      * @return a Activist
      */
+    // TODO Add mustBeAllowedCaller
     function addActivist(
         string memory name,
         string memory document,
@@ -57,6 +64,7 @@ contract ActivistContract is UserContract {
             city,
             cep
         );
+
         Activist memory activist = Activist(
             id,
             msg.sender,
@@ -72,7 +80,7 @@ contract ActivistContract is UserContract {
         activists[msg.sender] = activist;
         activistsAddress.push(msg.sender);
         activistsCount++;
-        addUser(msg.sender, userType);
+        userContract.addUser(msg.sender, userType);
 
         return activist;
     }
@@ -106,5 +114,15 @@ contract ActivistContract is UserContract {
      */
     function activistExists(address addr) public view returns (bool) {
         return bytes(activists[addr].name).length > 0;
+    }
+
+    // TODO Add mustBeAllowedCaller
+    function recentInspection(address addr, bool state) public {
+        activists[addr].recentInspection = state;
+    }
+
+    // TODO Add mustBeAllowedCaller
+    function incrementRequests(address addr) public {
+        activists[addr].totalInspections++;
     }
 }
