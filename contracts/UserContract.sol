@@ -14,6 +14,16 @@ contract UserContract is Ownable {
 
   uint256 public usersCount;
 
+  enum UserType {
+    PRODUCER,
+    ACTIVIST,
+    RESEARCHER,
+    DEVELOPER,
+    ADVISER,
+    CONTRIBUTOR,
+    INVESTOR
+  }
+
   function newAllowedCaller(address allowed) public onlyOwner {
     allowedCaller[allowed] = true;
   }
