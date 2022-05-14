@@ -3,12 +3,13 @@ pragma solidity >=0.7.0 <=0.9.0;
 
 import "./UserContract.sol";
 import "./types/ProducerTypes.sol";
+import "./Callable.sol";
 
 /**
  * @title ProducerContract
  * @dev Producer resource that represent a user that can request a inspection
  */
-contract ProducerContract {
+contract ProducerContract is Callable {
   mapping(address => Producer) public producers;
 
   UserContract internal userContract;
@@ -37,11 +38,10 @@ contract ProducerContract {
     string memory state,
     string memory city,
     string memory cep
-  ) public returns (bool) {
+  ) public {
     require(!producerExists(msg.sender), "This producer already exist");
     UserType userType = UserType.PRODUCER;
-    PropertyAddress memory propertyAddress = PropertyAddress(country, state, city, cep);
-    TokenApprove memory tokenApprove = TokenApprove(0, false);
+
     Producer memory producer = Producer(
       producersCount + 1,
       msg.sender,
@@ -52,15 +52,14 @@ contract ProducerContract {
       false,
       0,
       0,
-      tokenApprove,
-      propertyAddress
+      TokenApprove(0, false),
+      PropertyAddress(country, state, city, cep)
     );
 
     producers[msg.sender] = producer;
     producersAddress.push(msg.sender);
     producersCount++;
     userContract.addUser(msg.sender, userType);
-    return true;
   }
 
   /**
@@ -94,19 +93,19 @@ contract ProducerContract {
     return bytes(producers[addr].name).length > 0;
   }
 
-  function recentInspection(address addr, bool state) public {
+  function recentInspection(address addr, bool state) public mustBeAllowedCaller {
     producers[addr].recentInspection = state;
   }
 
-  function updateIsaPoints(address addr, int256 isaPoints) public {
+  function updateIsaPoints(address addr, int256 isaPoints) public mustBeAllowedCaller {
     producers[addr].isaPoints = isaPoints;
   }
 
-  function incrementRequests(address addr) public {
+  function incrementRequests(address addr) public mustBeAllowedCaller {
     producers[addr].totalRequests++;
   }
 
-  function approveProducerNewTokens(address addr, uint256 numTokens) public {
+  function approveProducerNewTokens(address addr, uint256 numTokens) public mustBeAllowedCaller {
     uint256 tokens = producers[addr].tokenApprove.allowed;
     producers[addr].tokenApprove = TokenApprove(tokens += numTokens, false);
   }
