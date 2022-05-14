@@ -10,8 +10,9 @@ import "./UserInterface.sol";
  */
 contract UserContract is Ownable {
   mapping(address => UserType) internal users;
-  uint256 public usersCount;
   mapping(address => bool) internal allowedCaller;
+
+  uint256 public usersCount;
 
   function newAllowedCaller(address allowed) public onlyOwner {
     allowedCaller[allowed] = true;
