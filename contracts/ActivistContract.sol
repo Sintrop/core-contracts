@@ -36,8 +36,7 @@ contract ActivistContract is Callable {
     string memory state,
     string memory city,
     string memory cep
-  ) public returns (Activist memory) {
-    require(!activistExists(msg.sender), "This activist already exist");
+  ) public uniqueActivist returns (Activist memory) {
     uint256 id = activistsCount + 1;
     UserType userType = UserType.ACTIVIST;
 
@@ -100,5 +99,12 @@ contract ActivistContract is Callable {
 
   function incrementRequests(address addr) public mustBeAllowedCaller {
     activists[addr].totalInspections++;
+  }
+
+  // MODIFIERS
+
+  modifier uniqueActivist() {
+    require(!activistExists(msg.sender), "This activist already exist");
+    _;
   }
 }
