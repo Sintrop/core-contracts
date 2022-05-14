@@ -4,23 +4,18 @@ pragma solidity >=0.7.0 <=0.9.0;
 import "./PoolPassiveInterface.sol";
 import "./SacTokenInterface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./Callable.sol";
 
 /**
  * @author Sintrop
  * @title IsaPool
  * @dev IsaPool is a contract to manage user votes
  */
-contract IsaPool is PoolPassiveInterface, Ownable {
-  mapping(address => bool) internal allowedCaller;
-
+contract IsaPool is PoolPassiveInterface, Ownable, Callable {
   SacTokenInterface internal sacToken;
 
   constructor(address sacTokenAddress) {
     sacToken = SacTokenInterface(sacTokenAddress);
-  }
-
-  function newAllowedCaller(address allowed) public onlyOwner {
-    allowedCaller[allowed] = true;
   }
 
   /**
@@ -76,10 +71,5 @@ contract IsaPool is PoolPassiveInterface, Ownable {
   function transferWith(address tokenOwner, uint256 numTokens) public override returns (bool) {
     sacToken.transferWith(tokenOwner, numTokens);
     return true;
-  }
-
-  modifier mustBeAllowedCaller() {
-    require(allowedCaller[msg.sender], "Not allowed caller");
-    _;
   }
 }

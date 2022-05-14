@@ -3,20 +3,16 @@ pragma solidity >=0.7.0 <=0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./types/UserTypes.sol";
+import "./Callable.sol";
 
 /**
  * @title UserContract
  * @dev This contract work as a centralized user's system, where all users has your userType here
  */
-contract UserContract is Ownable {
+contract UserContract is Ownable, Callable {
   mapping(address => UserType) internal users;
-  mapping(address => bool) internal allowedCaller;
 
   uint256 public usersCount;
-
-  function newAllowedCaller(address allowed) public onlyOwner {
-    allowedCaller[allowed] = true;
-  }
 
   /**
    * @dev Add new user in the system
@@ -61,10 +57,5 @@ contract UserContract is Ownable {
       "CONTRIBUTOR",
       "INVESTOR"
     );
-  }
-
-  modifier mustBeAllowedCaller() {
-    require(allowedCaller[msg.sender], "Not allowed caller");
-    _;
   }
 }
