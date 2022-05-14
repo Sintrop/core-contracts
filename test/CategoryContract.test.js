@@ -35,7 +35,7 @@ contract('CategoryContract', (accounts) => {
     await sacToken.addContractPool(isaPool.address, "0")
 
     instance = await CategoryContract.new(isaPool.address);
-    await isaPool.changeAllowedCaller(instance.address);
+    await isaPool.newAllowedCaller(instance.address);
   })
 
   it("should create category", async () => {

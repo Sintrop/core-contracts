@@ -2,30 +2,12 @@
 pragma solidity >=0.7.0 <=0.9.0;
 
 import "./UserContract.sol";
+import "./types/ActivistTypes.sol";
 
 contract ActivistContract {
-  UserContract internal userContract;
-
-  struct Activist {
-    uint256 id;
-    address activistWallet;
-    UserType userType;
-    string name;
-    string document;
-    string documentType;
-    bool recentInspection;
-    uint256 totalInspections;
-    ActivistAddress activistAddress;
-  }
-
-  struct ActivistAddress {
-    string country;
-    string state;
-    string city;
-    string cep;
-  }
-
   mapping(address => Activist) internal activists;
+
+  UserContract internal userContract;
   address[] internal activistsAddress;
   uint256 public activistsCount;
 

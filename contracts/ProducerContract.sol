@@ -2,47 +2,21 @@
 pragma solidity >=0.7.0 <=0.9.0;
 
 import "./UserContract.sol";
-import "./UserTypes.sol";
+import "./types/ProducerTypes.sol";
 
 /**
  * @title ProducerContract
  * @dev Producer resource that represent a user that can request a inspection
  */
 contract ProducerContract {
-  UserContract internal userContract;
-
-  struct Producer {
-    uint256 id;
-    address producerWallet;
-    UserType userType;
-    string name;
-    string document;
-    string documentType;
-    bool recentInspection;
-    uint256 totalRequests;
-    int256 isaPoints;
-    TokenApprove tokenApprove;
-    PropertyAddress propertyAddress;
-  }
-
-  struct TokenApprove {
-    uint256 allowed;
-    bool withdrewToken;
-  }
-
-  struct PropertyAddress {
-    string country;
-    string state;
-    string city;
-    string cep;
-  }
-
   mapping(address => Producer) public producers;
+
+  UserContract internal userContract;
   address[] internal producersAddress;
   uint256 public producersCount;
 
-  constructor(address UserContractAddress) {
-    userContract = UserContract(UserContractAddress);
+  constructor(address userContractAddress) {
+    userContract = UserContract(userContractAddress);
   }
 
   /**

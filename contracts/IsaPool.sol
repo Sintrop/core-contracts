@@ -11,16 +11,16 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * @dev IsaPool is a contract to manage user votes
  */
 contract IsaPool is PoolPassiveInterface, Ownable {
-  address allowedCaller;
+  mapping(address => bool) internal allowedCaller;
+
   SacTokenInterface internal sacToken;
 
   constructor(address sacTokenAddress) {
     sacToken = SacTokenInterface(sacTokenAddress);
   }
 
-  function changeAllowedCaller(address allowed) public onlyOwner returns (bool) {
-    allowedCaller = allowed;
-    return true;
+  function newAllowedCaller(address allowed) public onlyOwner {
+    allowedCaller[allowed] = true;
   }
 
   /**
@@ -79,7 +79,7 @@ contract IsaPool is PoolPassiveInterface, Ownable {
   }
 
   modifier mustBeAllowedCaller() {
-    require(allowedCaller == msg.sender, "Not allowed caller");
+    require(allowedCaller[msg.sender], "Not allowed caller");
     _;
   }
 }

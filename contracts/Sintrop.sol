@@ -4,37 +4,20 @@ pragma solidity >=0.7.0 <=0.9.0;
 import "./ProducerContract.sol";
 import "./ActivistContract.sol";
 import "./CategoryContract.sol";
+import "./types/InspectionTypes.sol";
 
 /**
  * @title SintropContract
  * @dev Sintrop application to certificated a rural producer
  */
 contract Sintrop {
+  mapping(address => Inspection[]) internal userInspections;
+  mapping(uint256 => Inspection) internal inspections;
+
   ActivistContract public activistContract;
   ProducerContract public producerContract;
 
-  enum InspectionStatus {
-    OPEN,
-    EXPIRED,
-    INSPECTED,
-    ACCEPTED
-  }
-  uint256 inspactionExpireIn = 604800;
-
-  struct Inspection {
-    uint256 id;
-    InspectionStatus status;
-    address producerWallet;
-    address activistWallet;
-    uint256[][] isas;
-    int256 isaPoints;
-    uint256 expiresIn;
-    uint256 createdAt;
-    uint256 updatedAt;
-  }
-
-  mapping(address => Inspection[]) userInspections;
-  mapping(uint256 => Inspection) inspections;
+  uint256 internal inspactionExpireIn = 604800;
   uint256 public inspectionsCount;
 
   constructor(address activistContractAddress, address producerContractAddress) {

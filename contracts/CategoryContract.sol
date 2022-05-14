@@ -2,6 +2,7 @@
 pragma solidity >=0.7.0 <=0.9.0;
 
 import "./PoolPassiveInterface.sol";
+import "./types/CategoryTypes.sol";
 
 /**
  * @author Sintrop
@@ -9,32 +10,12 @@ import "./PoolPassiveInterface.sol";
  * @dev Category resource that is a part of Sintrop business
  */
 contract CategoryContract {
-  enum isas {
-    TOTALLY_SUSTAINABLE,
-    PARTIAL_SUSTAINABLE,
-    NEUTRO,
-    PARTIAL_NOT_SUSTAINABLE,
-    TOTALLY_NOT_SUSTAINABLE
-  }
-
-  struct Category {
-    uint256 id;
-    address createdBy;
-    string name;
-    string description;
-    string totallySustainable;
-    string partiallySustainable;
-    string neutro;
-    string partiallyNotSustainable;
-    string totallyNotSustainable;
-    uint256 votesCount;
-  }
-  Category public category;
-  uint256 public categoryCounts;
   mapping(uint256 => Category) public categories;
   mapping(uint256 => uint256) public votes;
   mapping(address => mapping(uint256 => uint256)) public voted;
 
+  Category public category;
+  uint256 public categoryCounts;
   PoolPassiveInterface internal isaPool;
 
   constructor(address _isaPoolAddress) {

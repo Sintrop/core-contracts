@@ -20,7 +20,7 @@ contract('IsaPool', (accounts) => {
     })
 
     it("when call allowance should return how much token the user has approved from this pool", async () => {
-        await instance.changeAllowedCaller(user2Address);
+        await instance.newAllowedCaller(user2Address);
         const allowance = await instance.allowance({ from: user1Address });
         await instance.approveWith(user2Address, "1500000000000000000000", { from: user2Address });
         const allowance2 = await instance.allowance({ from: user2Address });
@@ -83,7 +83,7 @@ contract('IsaPool', (accounts) => {
     });
 
     it("when call approve should return error message when is not a contract pool", async () => {
-        await instance.changeAllowedCaller(owner);
+        await instance.newAllowedCaller(owner);
         await sacToken.removeContractPool(instance.address);
         await instance.approveWith(owner, 0)
             .then(assert.fail)
@@ -93,7 +93,7 @@ contract('IsaPool', (accounts) => {
     });
 
     it("should approve tokens when approve is called by allowed caller and is a contract pool", async () => {
-        await instance.changeAllowedCaller(owner);
+        await instance.newAllowedCaller(owner);
         await instance.approveWith(owner, "500000000000000000000");
 
         const allowance = await instance.allowance();
