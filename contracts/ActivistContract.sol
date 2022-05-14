@@ -3,8 +3,9 @@ pragma solidity >=0.7.0 <=0.9.0;
 
 import "./UserContract.sol";
 import "./types/ActivistTypes.sol";
+import "./Callable.sol";
 
-contract ActivistContract {
+contract ActivistContract is Callable {
   mapping(address => Activist) internal activists;
 
   UserContract internal userContract;
@@ -93,13 +94,11 @@ contract ActivistContract {
     return bytes(activists[addr].name).length > 0;
   }
 
-  // TODO Add mustBeAllowedCaller
-  function recentInspection(address addr, bool state) public {
+  function recentInspection(address addr, bool state) public mustBeAllowedCaller {
     activists[addr].recentInspection = state;
   }
 
-  // TODO Add mustBeAllowedCaller
-  function incrementRequests(address addr) public {
+  function incrementRequests(address addr) public mustBeAllowedCaller {
     activists[addr].totalInspections++;
   }
 }

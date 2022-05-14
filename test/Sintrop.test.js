@@ -71,6 +71,7 @@ contract('Sintrop', (accounts) => {
 
     await userContract.newAllowedCaller(activistContract.address)
     await userContract.newAllowedCaller(producerContract.address)
+    await activistContract.newAllowedCaller(instance.address)
     await producerContract.newAllowedCaller(instance.address)
     
 
