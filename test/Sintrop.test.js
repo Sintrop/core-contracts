@@ -96,7 +96,7 @@ contract('Sintrop', (accounts) => {
     await instance.requestInspection({ from: producerAddress })
       .then(assert.fail)
       .catch((error) => {
-        assert.equal(error.reason, "You have a inspection request OPEN or ACCEPTED")
+        assert.equal(error.reason, "Inspection request OPEN or ACCEPTED")
       })
   })
 
