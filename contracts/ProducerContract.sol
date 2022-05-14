@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <=0.9.0;
 
-// import "./UserContract.sol";
-import "./UserInterface.sol";
+import "./UserContract.sol";
+import "./UserTypes.sol";
 
 /**
  * @title ProducerContract
  * @dev Producer resource that represent a user that can request a inspection
  */
 contract ProducerContract {
-  UserInterface internal UserContract;
+  UserContract internal userContract;
 
   struct Producer {
     uint256 id;
@@ -42,7 +42,7 @@ contract ProducerContract {
   uint256 public producersCount;
 
   constructor(address UserContractAddress) {
-    UserContract = UserInterface(UserContractAddress);
+    userContract = UserContract(UserContractAddress);
   }
 
   /**
@@ -85,7 +85,7 @@ contract ProducerContract {
     producers[msg.sender] = producer;
     producersAddress.push(msg.sender);
     producersCount++;
-    UserContract.addUser(msg.sender, userType);
+    userContract.addUser(msg.sender, userType);
     return true;
   }
 

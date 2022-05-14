@@ -2,7 +2,7 @@
 pragma solidity >=0.7.0 <=0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./UserInterface.sol";
+import "./UserTypes.sol";
 
 /**
  * @title UserContract
@@ -13,16 +13,6 @@ contract UserContract is Ownable {
   mapping(address => bool) internal allowedCaller;
 
   uint256 public usersCount;
-
-  enum UserType {
-    PRODUCER,
-    ACTIVIST,
-    RESEARCHER,
-    DEVELOPER,
-    ADVISER,
-    CONTRIBUTOR,
-    INVESTOR
-  }
 
   function newAllowedCaller(address allowed) public onlyOwner {
     allowedCaller[allowed] = true;
