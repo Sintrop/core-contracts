@@ -35,13 +35,11 @@ contract Sintrop {
   /**
    * @dev Allows the current user (producer) request a inspection.
    */
-  function requestInspection() public returns (bool) {
-    require(producerContract.producerExists(msg.sender), "Please register as producer");
-    require(
-      !producerContract.getProducer(msg.sender).recentInspection,
-      "Inspection request OPEN or ACCEPTED"
-    );
-
+  function requestInspection()
+    public
+    producerMustExist
+    mustBeAbleToRequest
+    returns (bool) {
     createRequest();
     producerContract.recentInspection(msg.sender, true);
 
@@ -100,11 +98,10 @@ contract Sintrop {
     public
     requireActivist
     requireInspectionExists(inspectionId)
+    requireInspectionAccepted(inspectionId)
+    requireInspectionOwner(inspectionId)
     returns (bool)
   {
-    require(isAccepted(inspectionId), "Accept this inspection before");
-    require(isActivistOwner(inspectionId), "You not accepted this inspection");
-
     Inspection memory inspection = inspections[inspectionId];
 
     markAsRealized(inspection, isas);
@@ -229,6 +226,7 @@ contract Sintrop {
   }
 
   // MODIFIERS
+
   modifier requireActivist() {
     require(activistContract.activistExists(msg.sender), "Please register as activist");
     _;
@@ -236,6 +234,26 @@ contract Sintrop {
 
   modifier requireInspectionExists(uint256 inspectionId) {
     require(inspectionExists(inspectionId), "This inspection don't exists");
+    _;
+  }
+
+  modifier producerMustExist() {
+    require(producerContract.producerExists(msg.sender), "Please register as producer");
+    _;
+  }
+
+  modifier mustBeAbleToRequest() {
+    require(!producerContract.getProducer(msg.sender).recentInspection, "Request OPEN or ACCEPTED");
+    _;
+  }
+
+  modifier requireInspectionAccepted(uint256 inspectionId) {
+    require(isAccepted(inspectionId), "Accept this inspection before");
+    _;
+  }
+
+  modifier requireInspectionOwner(uint256 inspectionId) {
+    require(isActivistOwner(inspectionId), "You not accepted this inspection");
     _;
   }
 }

@@ -114,7 +114,8 @@ contract CategoryContract {
     return tokens;
   }
 
-  // Modifiers
+  // MODIFIERS
+
   modifier categoryMustExists(uint256 id) {
     require(categories[id].id > 0, "This category don't exists");
     _;

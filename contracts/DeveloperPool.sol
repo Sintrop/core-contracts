@@ -131,9 +131,7 @@ contract DeveloperPool is Ownable, PoolInterface {
    * @dev Allow the developer to approve tokens from DeveloperPool address. DeveloperPool address must have tokens in SAC TOKEN
    * TODO Check external code call - EXTCALL
    */
-  function approve() public override returns (bool) {
-    require(canApprove(), "You can't withdraw yet");
-
+  function approve() public mustBeAbleToApprove override returns (bool) {
     Developer memory developer = getDeveloper(msg.sender);
 
     uint256 tokens = calcTokens(developer.level, developer.currentEra);
@@ -264,5 +262,12 @@ contract DeveloperPool is Ownable, PoolInterface {
    */
   function currentBlockNumber() internal view returns (uint256) {
     return block.number;
+  }
+
+  // MODIFIERS
+
+  modifier mustBeAbleToApprove {
+    require(canApprove(), "You can't withdraw yet");
+    _;
   }
 }

@@ -38,8 +38,7 @@ contract ProducerContract is Callable {
     string memory state,
     string memory city,
     string memory cep
-  ) public {
-    require(!producerExists(msg.sender), "This producer already exist");
+  ) public uniqueProducer {
     UserType userType = UserType.PRODUCER;
 
     Producer memory producer = Producer(
@@ -117,5 +116,12 @@ contract ProducerContract is Callable {
   function undoProducerApprove() internal returns (bool) {
     producers[msg.sender].tokenApprove = TokenApprove(0, false);
     return true;
+  }
+
+  // MODIFIERS
+
+  modifier uniqueProducer() {
+    require(!producerExists(msg.sender), "This producer already exist");
+    _;
   }
 }
