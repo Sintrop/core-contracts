@@ -28,95 +28,95 @@ contract('ActivistContract', (accounts) => {
     await instance.newAllowedCaller(ownerAddress);
   })
 
-  // it("should create activist", async () => {
-  //   await addActivist("Activist A", activ1Address);
-  //   await addActivist("Activist B", activ2Address);
-  //   const activist = await instance.getActivist(activ1Address);
+  it("should create activist", async () => {
+    await addActivist("Activist A", activ1Address);
+    await addActivist("Activist B", activ2Address);
+    const activist = await instance.getActivist(activ1Address);
 
-  //   assert.equal(activist.activistWallet, activ1Address);
-  // })
+    assert.equal(activist.activistWallet, activ1Address);
+  })
 
-  // it("should return activists when call getActivists and has activists", async () => {
-  //   await addActivist("Activist A", activ1Address);
-  //   await addActivist("Activist B", activ2Address);
+  it("should return activists when call getActivists and has activists", async () => {
+    await addActivist("Activist A", activ1Address);
+    await addActivist("Activist B", activ2Address);
 
-  //   const activists = await instance.getActivists();
+    const activists = await instance.getActivists();
 
-  //   assert.equal(activists.length, 2);
-  // })
+    assert.equal(activists.length, 2);
+  })
 
-  // it("should return activists equal zero when call getActivists and dont has it", async () => {
-  //   const activists = await instance.getActivists();
+  it("should return activists equal zero when call getActivists and dont has it", async () => {
+    const activists = await instance.getActivists();
 
-  //   assert.equal(activists.length, 0);
-  // })
+    assert.equal(activists.length, 0);
+  })
 
-  // it("should return error when try create same activist", async () => {
-  //   await addActivist("Activist A", activ1Address);
+  it("should return error when try create same activist", async () => {
+    await addActivist("Activist A", activ1Address);
 
-  //   addActivist("Activist A", activ1Address)
-  //     .then(assert.fail)
-  //     .catch((error) => {
-  //       assert.equal(error.reason, "This activist already exist")
-  //     })
-  // })
+    addActivist("Activist A", activ1Address)
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "This activist already exist")
+      })
+  })
 
-  // it("should return true when activist already exists", async () => {
-  //   await addActivist("Activist A", activ1Address);
-  //   const activistExists = await instance.activistExists(activ1Address);
+  it("should return true when activist already exists", async () => {
+    await addActivist("Activist A", activ1Address);
+    const activistExists = await instance.activistExists(activ1Address);
 
-  //   assert.equal(activistExists, true);
-  // })
+    assert.equal(activistExists, true);
+  })
 
-  // it("should be created with totalInspections equal zero", async () => {
-  //   await addActivist("Activist A", activ1Address);
+  it("should be created with totalInspections equal zero", async () => {
+    await addActivist("Activist A", activ1Address);
 
-  //   const activist = await instance.getActivist(activ1Address);
+    const activist = await instance.getActivist(activ1Address);
 
-  //   assert.equal(activist.totalInspections, 0);
-  // })
+    assert.equal(activist.totalInspections, 0);
+  })
 
-  // it("should be created with recentInspection equal false", async () => {
-  //   await addActivist("Activist A", activ1Address);
+  it("should be created with recentInspection equal false", async () => {
+    await addActivist("Activist A", activ1Address);
 
-  //   const activist = await instance.getActivist(activ1Address);
+    const activist = await instance.getActivist(activ1Address);
 
-  //   assert.equal(activist.recentInspection, false);
-  // })
+    assert.equal(activist.recentInspection, false);
+  })
 
-  // it("should increment activistsCount after create activist", async () => {
-  //   await addActivist("Activist A", activ1Address);
-  //   await addActivist("Activist B", activ2Address);
-  //   const activistsCount = await instance.activistsCount();
+  it("should increment activistsCount after create activist", async () => {
+    await addActivist("Activist A", activ1Address);
+    await addActivist("Activist B", activ2Address);
+    const activistsCount = await instance.activistsCount();
 
-  //   assert.equal(activistsCount, 2);
-  // })
+    assert.equal(activistsCount, 2);
+  })
 
-  // it("should add created activist in activistList (array)", async () => {
-  //   await addActivist("Activist A", activ1Address);
-  //   await addActivist("Activist B", activ2Address);
+  it("should add created activist in activistList (array)", async () => {
+    await addActivist("Activist A", activ1Address);
+    await addActivist("Activist B", activ2Address);
 
-  //   const activists = await instance.getActivists();
+    const activists = await instance.getActivists();
 
-  //   assert.equal(activists[0].activistWallet, activ1Address);
-  // })
+    assert.equal(activists[0].activistWallet, activ1Address);
+  })
 
-  // it("should add created activist in userType contract as a ACTIVIST", async () => {
-  //   await addActivist("Activist A", activ1Address);
+  it("should add created activist in userType contract as a ACTIVIST", async () => {
+    await addActivist("Activist A", activ1Address);
 
-  //   const userType = await userContract.getUser(activ1Address);
-  //   const ACTIVIST = 1
+    const userType = await userContract.getUser(activ1Address);
+    const ACTIVIST = 1
 
-  //   assert.equal(userType, ACTIVIST);
-  // })
+    assert.equal(userType, ACTIVIST);
+  })
 
-  // it("should return a activist", async () => {
-  //   await addActivist("Activist A", activ1Address);
+  it("should return a activist", async () => {
+    await addActivist("Activist A", activ1Address);
 
-  //   const activist = await instance.getActivist(activ1Address);
+    const activist = await instance.getActivist(activ1Address);
 
-  //   assert.equal(activist.activistWallet, activ1Address);
-  // })
+    assert.equal(activist.activistWallet, activ1Address);
+  })
 
   it("should success .recentInspection when is allowed caller", async () => {
     await addActivist("Activist A", activ1Address);
