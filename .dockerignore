@@ -1,0 +1,6 @@
+Dockerfile
+docker-compose.yml
+LICENSE
+README.md
+node_modules
+.dockerignore
