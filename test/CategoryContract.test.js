@@ -35,7 +35,7 @@ contract('CategoryContract', (accounts) => {
     await sacToken.addContractPool(isaPool.address, "0")
 
     instance = await CategoryContract.new(isaPool.address);
-    await isaPool.changeAllowedCaller(instance.address);
+    await isaPool.newAllowedCaller(instance.address);
   })
 
   it("should create category", async () => {
@@ -202,7 +202,7 @@ contract('CategoryContract', (accounts) => {
     await instance.vote(1, 0)
       .then(assert.fail)
       .catch((error) => {
-        assert.equal(error.reason, "You must send at least 1 SAC Token")
+        assert.equal(error.reason, "Send at least 1 SAC Token")
       })
   })
 
