@@ -83,7 +83,6 @@ contract Sintrop {
     inspection.activistWallet = msg.sender;
     inspections[inspectionId] = inspection;
 
-    // activists[msg.sender].recentInspection = true;
     activistContract.recentInspection(msg.sender, true);
 
     return true;
