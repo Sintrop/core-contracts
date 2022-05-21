@@ -1,0 +1,18 @@
+version: '3.6'
+
+services:
+  sintrop-app:
+    container_name: SINTROP-APP
+    command: ["sleep","infinity"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - 8545:8545
+    networks: 
+      - app-tunnel
+    volumes: 
+      - ./:/app
+networks: 
+  app-tunnel:
+    driver: bridge
