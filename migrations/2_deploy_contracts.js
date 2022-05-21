@@ -3,6 +3,9 @@ const IsaPool = artifacts.require("IsaPool");
 const CategoryContract = artifacts.require("CategoryContract");
 const DeveloperPool = artifacts.require("DeveloperPool");
 const Sintrop = artifacts.require("Sintrop");
+const ProducerContract = artifacts.require("ProducerContract");
+const ActivistContract = artifacts.require("ActivistContract");
+const UserContract = artifacts.require("UserContract");
 
 module.exports = function(deployer) {
   const args = {
@@ -13,7 +16,16 @@ module.exports = function(deployer) {
   }
 
   deployer.then(async () => {
-    await deployer.deploy(Sintrop);
+    await deployer.deploy(UserContract);
+
+    await deployer.deploy(ActivistContract, UserContract.address);
+
+    await deployer.deploy(ProducerContract, UserContract.address);
+
+    await deployer.deploy(Sintrop,
+      ActivistContract.address,
+      ProducerContract.address
+    );
 
     await deployer.deploy(SacToken, args.totalTokens);
 

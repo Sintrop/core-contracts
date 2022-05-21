@@ -235,7 +235,7 @@ contract('DeveloperPool', (accounts) => {
     await advanceBlock(args.blocksPerEra * 2);
 
     const canApproveTimes = await instance.canApproveTimes({ from: dev1Address });
-    const blocksPrecision = await instance.blocksPrecision();
+    const blocksPrecision = await instance.BLOCKS_PRECISION();
 
     const fixedPoint = canApproveTimes / (10 ** blocksPrecision)
 

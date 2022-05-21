@@ -1,7 +1,9 @@
 const ActivistContract = artifacts.require("ActivistContract");
+const UserContract = artifacts.require("UserContract");
 
 contract('ActivistContract', (accounts) => {
   let instance;
+  let userContract;
   let [ownerAddress, activ1Address, activ2Address] = accounts;
 
   const addActivist = async (name, address) => {
@@ -18,7 +20,12 @@ contract('ActivistContract', (accounts) => {
   }
 
   beforeEach(async () => {
-    instance = await ActivistContract.new();
+    userContract = await UserContract.new(); 
+
+    instance = await ActivistContract.new(userContract.address);
+
+    await userContract.newAllowedCaller(instance.address);
+    await instance.newAllowedCaller(ownerAddress);
   })
 
   it("should create activist", async () => {
@@ -97,8 +104,8 @@ contract('ActivistContract', (accounts) => {
   it("should add created activist in userType contract as a ACTIVIST", async () => {
     await addActivist("Activist A", activ1Address);
 
-    const userType = await instance.getUser(activ1Address);
-    const ACTIVIST = 2
+    const userType = await userContract.getUser(activ1Address);
+    const ACTIVIST = 1
 
     assert.equal(userType, ACTIVIST);
   })
@@ -109,5 +116,41 @@ contract('ActivistContract', (accounts) => {
     const activist = await instance.getActivist(activ1Address);
 
     assert.equal(activist.activistWallet, activ1Address);
+  })
+
+  it("should success .recentInspection when is allowed caller", async () => {
+    await addActivist("Activist A", activ1Address);
+    await instance.recentInspection(activ1Address, true);
+
+    const activist = await instance.getActivist(activ1Address);
+
+    assert.equal(activist.recentInspection, true);
+  })
+
+  it("should return error .recentInspection when is not allowed caller", async () => {
+    await addActivist("Activist A", activ1Address);
+    await instance.recentInspection(activ1Address, true, { from: activ1Address })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "Not allowed caller")
+      })
+  })
+
+  it("should success .incrementRequests when is allowed caller", async () => {
+    await addActivist("Activist A", activ1Address);
+    await instance.incrementRequests(activ1Address);
+
+    const activist = await instance.getActivist(activ1Address);
+
+    assert.equal(activist.totalInspections, 1);
+  })
+
+  it("should return error .incrementRequests when is not allowed caller", async () => {
+    await addActivist("Activist A", activ1Address);
+    await instance.incrementRequests(activ1Address, { from: activ1Address })
+      .then(assert.fail)
+      .catch((error) => {
+        assert.equal(error.reason, "Not allowed caller")
+      })
   })
 })
