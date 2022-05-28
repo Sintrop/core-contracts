@@ -59,11 +59,4 @@ contract Blockable {
   function currentContractBlockNumber() internal view returns (uint256) {
     return block.number;
   }
-
-  // MODIFIERS
-
-  modifier mustCanApprove(uint256 currentUserEra) {
-    require(canApprove(currentUserEra), "Can't approve");
-    _;
-  }
 }
