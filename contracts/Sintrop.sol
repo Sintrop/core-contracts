@@ -80,7 +80,7 @@ contract Sintrop {
 
     inspection.status = InspectionStatus.ACCEPTED;
     inspection.updatedAt = block.timestamp;
-    inspection.activistWallet = msg.sender;
+    inspection.acceptedBy = msg.sender;
     inspections[inspectionId] = inspection;
 
     activistContract.recentInspection(msg.sender, true);
@@ -109,7 +109,7 @@ contract Sintrop {
 
     updateProducerIsa(inspection);
 
-    producerContract.approveProducerNewTokens(inspection.producerWallet, 2000);
+    producerContract.approveProducerNewTokens(inspection.createdBy, 2000);
 
     return true;
   }
@@ -148,7 +148,7 @@ contract Sintrop {
   }
 
   function updateProducerIsa(Inspection memory inspection) internal {
-    producerContract.updateIsaPoints(inspection.producerWallet, inspection.isaPoints);
+    producerContract.updateIsaPoints(inspection.createdBy, inspection.isaPoints);
   }
 
   /**
@@ -185,7 +185,7 @@ contract Sintrop {
       string memory
     )
   {
-    return ("OPEN", "EXPIRED", "INSPECTED", "ACCEPTED");
+    return ("OPEN", "ACCEPTED", "INSPECTED", "EXPIRED" );
   }
 
   /**
@@ -201,23 +201,23 @@ contract Sintrop {
    * @param inspection the inspected inspection
    */
   function afterRealizeInspection(Inspection memory inspection) internal {
-    address producerWallet = inspection.producerWallet;
-    address activistWallet = inspection.activistWallet;
+    address createdBy = inspection.createdBy;
+    address acceptedBy = inspection.acceptedBy;
 
     // Increment actvist inspections and release to carry out new inspections
-    activistContract.recentInspection(activistWallet, false);
-    activistContract.incrementRequests(activistWallet);
+    activistContract.recentInspection(acceptedBy, false);
+    activistContract.incrementRequests(acceptedBy);
 
     // Increment producer requests and release to carry out new requests
-    producerContract.recentInspection(producerWallet, false);
-    producerContract.incrementRequests(producerWallet);
+    producerContract.recentInspection(createdBy, false);
+    producerContract.incrementRequests(createdBy);
 
-    userInspections[producerWallet].push(inspection);
-    userInspections[activistWallet].push(inspection);
+    userInspections[createdBy].push(inspection);
+    userInspections[acceptedBy].push(inspection);
   }
 
   function isActivistOwner(uint256 inspectionId) internal view returns (bool) {
-    return inspections[inspectionId].activistWallet == msg.sender;
+    return inspections[inspectionId].acceptedBy == msg.sender;
   }
 
   function isAccepted(uint256 inspectionId) internal view returns (bool) {
