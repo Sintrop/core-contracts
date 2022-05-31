@@ -6,26 +6,23 @@ import "./SacTokenInterface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./types/DeveloperPoolTypes.sol";
+import "./Blockable.sol";
 
 /**
  * @author Everson B. Silva
  * @title DeveloperContract
  * @dev DeveloperPool is a contract to reward developers
  */
-contract DeveloperPool is Ownable, PoolInterface {
+contract DeveloperPool is Ownable, Blockable, PoolInterface {
   using SafeMath for uint256;
 
   mapping(address => Developer) internal developers;
   mapping(uint256 => Era) public eras;
 
-  address[]   internal developersAddress;
-  uint256     public   developersCount;
-  uint256[18] public   levelsSumPerEra;
-  uint256     public   deployedAt;
-  uint256     public   tokensPerEra;
-  uint256     public   blocksPerEra;
-  uint256     public   eraMax;
-  uint256     public constant BLOCKS_PRECISION = 5;
+  address[] internal developersAddress;
+  uint256 public developersCount;
+  uint256[18] public levelsSumPerEra;
+  uint256 public tokensPerEra;
 
   SacTokenInterface internal sacToken;
 
@@ -34,12 +31,9 @@ contract DeveloperPool is Ownable, PoolInterface {
     uint256 _tokensPerEra,
     uint256 _blocksPerEra,
     uint256 _eraMax
-  ) {
+  ) Blockable(_blocksPerEra, _eraMax) {
     sacToken = SacTokenInterface(_sacTokenAddress);
-    deployedAt = currentBlockNumber();
     tokensPerEra = _tokensPerEra.mul(10**18);
-    blocksPerEra = _blocksPerEra;
-    eraMax = _eraMax;
   }
 
   /**
@@ -63,7 +57,7 @@ contract DeveloperPool is Ownable, PoolInterface {
    */
   function addDeveloper(address _address) public onlyOwner {
     uint256 _currentEra = currentContractEra();
-    developers[_address] = Developer(_address, 1, _currentEra, timestamp());
+    developers[_address] = Developer(_address, 1, _currentEra, block.timestamp);
     upLevels(_currentEra);
     developersCount++;
     developersAddress.push(_address);
@@ -100,13 +94,6 @@ contract DeveloperPool is Ownable, PoolInterface {
   }
 
   /**
-   * @dev Return the current era of the contract
-   */
-  function currentContractEra() public view returns (uint256) {
-    return currentBlockNumber().sub(deployedAt).div(blocksPerEra).add(1);
-  }
-
-  /**
    * @dev Increment the level of the develop
    * @param _address the address of the developer
    */
@@ -131,7 +118,7 @@ contract DeveloperPool is Ownable, PoolInterface {
    * @dev Allow the developer to approve tokens from DeveloperPool address. DeveloperPool address must have tokens in SAC TOKEN
    * TODO Check external code call - EXTCALL
    */
-  function approve() public mustBeAbleToApprove override returns (bool) {
+  function approve() public override mustBeAbleToApprove returns (bool) {
     Developer memory developer = getDeveloper(msg.sender);
 
     uint256 tokens = calcTokens(developer.level, developer.currentEra);
@@ -142,7 +129,7 @@ contract DeveloperPool is Ownable, PoolInterface {
 
     developerNextEra();
 
-    if (canApprove()) approve();
+    if (canApprove(developer.currentEra + 1)) approve();
 
     return true;
   }
@@ -180,41 +167,14 @@ contract DeveloperPool is Ownable, PoolInterface {
   }
 
   /**
-   * @dev Check if the developer can approve tokens
-   */
-  function canApprove() internal view returns (bool) {
-    Developer memory developer = getDeveloper(msg.sender);
-
-    if (developer.level == 0) return false;
-
-    return
-      canApproveFromPresent(currentBlockNumber(), developer.currentEra) &&
-      eraLimit(developer.currentEra);
-  }
-
-  /**
-   * @dev Check if the limit of eras is the maximum. The state eraMax is the limit
-   */
-  function eraLimit(uint256 _currentEra) internal view returns (bool) {
-    return _currentEra <= eraMax;
-  }
-
-  /**
-   * @dev Check if the developer can approve. This funcion check the initial block deploy with the current block
-   */
-  function canApproveFromPresent(uint256 _currentBlock, uint256 _currentEra)
-    internal
-    view
-    returns (bool)
-  {
-    return deployedAt.add(blocksPerEra.mul(_currentEra)) <= _currentBlock;
-  }
-
-  /**
    * @dev Increment a new era to a developer. This funcions called when the developer approve tokens
    */
   function developerNextEra() internal {
     developers[msg.sender].currentEra++;
+  }
+
+  function currentDeveloper() internal view returns (Developer memory) {
+    return developers[msg.sender];
   }
 
   /**
@@ -228,46 +188,10 @@ contract DeveloperPool is Ownable, PoolInterface {
     return _level.mul((tokensPerEra.div(_levelsSum)));
   }
 
-  /**
-   * @dev Show how much block missing to approve new tokens
-   */
-  function nextApproveTime() public view returns (int256) {
-    Developer memory developer = getDeveloper(msg.sender);
-    return
-      int256(deployedAt) +
-      (int256(blocksPerEra) * int256(developer.currentEra)) -
-      int256(currentBlockNumber());
-  }
-
-  /**
-   * @dev Show how much times the developer can approve tokens. How much eras passed.
-   * @return A uint with precision of blocksPrecision state. The real return can be get by return/blocksPrecision and Math.ceil
-   */
-  function canApproveTimes() public view returns (uint256) {
-    int256 approvesTimes = nextApproveTime();
-    if (approvesTimes > 0) return 0;
-
-    return uint256(-approvesTimes).mul(10**BLOCKS_PRECISION).div(blocksPerEra);
-  }
-
-  /**
-   * @dev Returns the timestamp
-   */
-  function timestamp() internal view returns (uint256) {
-    return block.timestamp;
-  }
-
-  /**
-   * @dev Returns the current block number
-   */
-  function currentBlockNumber() internal view returns (uint256) {
-    return block.number;
-  }
-
   // MODIFIERS
 
-  modifier mustBeAbleToApprove {
-    require(canApprove(), "You can't withdraw yet");
+  modifier mustBeAbleToApprove() {
+    require(canApprove(currentDeveloper().currentEra), "You can't withdraw yet");
     _;
   }
 }
