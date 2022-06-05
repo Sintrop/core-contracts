@@ -99,7 +99,7 @@ contract('ActivistContract', (accounts) => {
 
   context("when will get activists (.getActivists)", () => {
 
-    it("should return activists has activists", async () => {
+    it("should return activists when has activists", async () => {
       await addActivist("Activist A", activ1Address);
       await addActivist("Activist B", activ2Address);
   
