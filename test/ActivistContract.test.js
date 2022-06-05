@@ -28,11 +28,11 @@ contract('ActivistContract', (accounts) => {
     await instance.newAllowedCaller(ownerAddress);
   })
 
-  ,context("when will create new activist (.addActivist)", () => {
+  context("when will create new activist (.addActivist)", () => {
     context("when is allowed", () => {
 
       context("when activist exists", () => {
-        it("should return error" async () => {
+        it("should return error", async () => {
           await addActivist("Activist A", activ1Address);
       
           addActivist("Activist A", activ1Address)
