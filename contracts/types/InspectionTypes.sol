@@ -3,16 +3,16 @@ pragma solidity >=0.7.0 <=0.9.0;
 
 enum InspectionStatus {
   OPEN,
-  EXPIRED,
+  ACCEPTED,
   INSPECTED,
-  ACCEPTED
+  EXPIRED
 }
 
 struct Inspection {
   uint256 id;
   InspectionStatus status;
-  address producerWallet;
-  address activistWallet;
+  address createdBy;
+  address acceptedBy;
   uint256[][] isas;
   int256 isaPoints;
   uint256 expiresIn;
