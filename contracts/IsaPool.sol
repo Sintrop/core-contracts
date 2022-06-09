@@ -19,7 +19,7 @@ contract IsaPool is PoolPassiveInterface, Ownable, Callable {
   }
 
   /**
-   * @dev Show how much tokens the developer can withdraw from DeveloperPool address
+   * @dev Show how many tokens the developer can withdraw from DeveloperPool address
    * @return uint256
    * TODO Check external code call - EXTCALL
    */
@@ -28,7 +28,7 @@ contract IsaPool is PoolPassiveInterface, Ownable, Callable {
   }
 
   /**
-   * @dev Allow a user know how much SAC Tokens has
+   * @dev Allow a user know how many SAC Tokens he has
    * @param tokenOwner The address of the token owner
    * @return uint256
    */

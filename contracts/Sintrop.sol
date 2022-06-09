@@ -8,7 +8,7 @@ import "./types/InspectionTypes.sol";
 
 /**
  * @title SintropContract
- * @dev Sintrop application to certificated a rural producer
+ * @dev Sintrop application to certificate a rural producer
  */
 contract Sintrop {
   mapping(address => Inspection[]) internal userInspections;
@@ -232,7 +232,7 @@ contract Sintrop {
   }
 
   modifier requireInspectionExists(uint256 inspectionId) {
-    require(inspectionExists(inspectionId), "This inspection don't exists");
+    require(inspectionExists(inspectionId), "This inspection doesn't exists");
     _;
   }
 

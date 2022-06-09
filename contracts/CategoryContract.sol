@@ -117,7 +117,7 @@ contract CategoryContract {
   // MODIFIERS
 
   modifier categoryMustExists(uint256 id) {
-    require(categories[id].id > 0, "This category don't exists");
+    require(categories[id].id > 0, "This category doesn't exists");
     _;
   }
 
@@ -132,7 +132,7 @@ contract CategoryContract {
   }
 
   modifier mustHaveVoted(uint256 id) {
-    require(voted[msg.sender][id] > 0, "You don't voted to this category");
+    require(voted[msg.sender][id] > 0, "You didn't vote to this category");
     _;
   }
 }

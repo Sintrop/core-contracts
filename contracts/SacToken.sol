@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract SacToken is ERC20, Ownable {
-  string public constant NAME = "SUSTAINABLE AGRICULTURE CREDIT";
+  string public constant NAME = "SUSTAINABLE AGRICULTURE CREDIT TOKEN";
   string public constant SYMBOL = "SAC";
   uint8 public constant DECIMALS = 18;
 

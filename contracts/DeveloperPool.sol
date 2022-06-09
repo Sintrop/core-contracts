@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./types/DeveloperPoolTypes.sol";
 
 /**
- * @author Everson B. Silva
+ * @author Sintrop
  * @title DeveloperContract
  * @dev DeveloperPool is a contract to reward developers
  */
