@@ -1,55 +1,60 @@
 const Blockable = artifacts.require("Blockable");
 
-contract('Blockable', (accounts) => {
+contract("Blockable", (accounts) => {
   let instance;
+  let blocksPrecision;
   let [owner, user1Address, user2Address] = accounts;
 
   const params = {
     blocksPerEra: 10,
-    eraMax: 12
-  }
+    eraMax: 12,
+  };
 
   advanceBlock = async (blocksNumber) => {
     for (let i = 0; i < blocksNumber; i++) {
       let promise = new Promise((resolve, reject) => {
-        web3.currentProvider.send({
-          jsonrpc: '2.0',
-          method: 'evm_mine',
-          id: new Date().getTime()
-        }, (err, result) => {
-          if (err) { return reject(err) }
-          const newBlockHash = web3.eth.getBlock('latest').hash
+        web3.currentProvider.send(
+          {
+            jsonrpc: "2.0",
+            method: "evm_mine",
+            id: new Date().getTime(),
+          },
+          (err, result) => {
+            if (err) {
+              return reject(err);
+            }
+            const newBlockHash = web3.eth.getBlock("latest").hash;
 
-          return resolve(newBlockHash)
-        })
-      })
+            return resolve(newBlockHash);
+          }
+        );
+      });
     }
-  }
-
+  };
 
   beforeEach(async () => {
     instance = await Blockable.new(params.blocksPerEra, params.eraMax);
-  })
+  });
 
   context("when deploy", () => {
     it("should have correct blocksPerEra", async () => {
       const blocksPerEra = await instance.blocksPerEra();
 
       assert.equal(blocksPerEra, params.blocksPerEra);
-    })
+    });
 
     it("should have correct eraMax", async () => {
       const eraMax = await instance.eraMax();
 
       assert.equal(eraMax, params.eraMax);
-    })
+    });
 
     it("should have deployedAt state", async () => {
       const deployedAt = await instance.deployedAt();
 
       expect(parseInt(deployedAt)).to.be.greaterThan(0);
-    })
-  })
+    });
+  });
 
   context("when call currentContractEra", () => {
     context("when don't have passed eras", () => {
@@ -57,149 +62,205 @@ contract('Blockable', (accounts) => {
         const currentContractEra = await instance.currentContractEra();
 
         assert.equal(currentContractEra, 1);
-      })
-    })
+      });
+    });
 
     context("when have passed 1x the blocksPerEra", () => {
       beforeEach(async () => {
-        await advanceBlock(params.blocksPerEra)
-      })
+        await advanceBlock(params.blocksPerEra);
+      });
 
       it("should return that be in era 2", async () => {
         const currentContractEra = await instance.currentContractEra();
         assert.equal(currentContractEra, 2);
-      })
-    })
+      });
+    });
 
     context("when have passed 5x the blocksPerEra", () => {
       beforeEach(async () => {
-        await advanceBlock(5 * params.blocksPerEra)
-      })
+        await advanceBlock(5 * params.blocksPerEra);
+      });
 
       it("should return that be in era 6", async () => {
         const currentContractEra = await instance.currentContractEra();
         assert.equal(currentContractEra, 6);
-      })
-    })
-  })
+      });
+    });
+  });
 
   context("when call canApproveTimes", () => {
-    context("when currentContractEra is 1 and currentUserEra is 1", () => {
-      const currentUserEra = 1;
+    beforeEach(async () => {
+      blocksPrecision = await instance.BLOCKS_PRECISION();
+    });
 
-      it("should can aprove zero times", async () => {
-        const canApproveTimes = await instance.canApproveTimes(currentUserEra);
-        assert.equal(canApproveTimes, 0);
-      })
-    })
+    context("when currentContractEra is equal currentUserEra", () => {
+      context("with currentContractEra = 1 and currentUserEra = 1", () => {
+        beforeEach(async () => {
+          await advanceBlock(2);
+        });
 
-    context("when currentContractEra is 3 and currentUserEra is 1", () => {
-      beforeEach(async () => {
-        await advanceBlock(3 * params.blocksPerEra)
-      })
+        it("should can aprove zero times", async () => {
+          const currentUserEra = 1;
+          const canApproveTimes = await instance.canApproveTimes(currentUserEra);
+          assert.equal(canApproveTimes, 0);
+        });
+      });
 
-      const currentUserEra = 1;
+      context("with currentContractEra = 5 and currentUserEra = 5", () => {
+        beforeEach(async () => {
+          await advanceBlock(params.blocksPerEra * 4 + 2);
+        });
 
-      it("should can aprove two times", async () => {
-        let canApproveTimes = await instance.canApproveTimes(currentUserEra);
-        const blocksPrecision = await instance.BLOCKS_PRECISION();
-        canApproveTimes = canApproveTimes / (10 ** blocksPrecision)
+        const currentUserEra = 5;
 
-        assert.equal(canApproveTimes, 2);
-      })
-    })
+        it("should can aprove zero times", async () => {
+          const canApproveTimes = await instance.canApproveTimes(currentUserEra);
+          assert.equal(canApproveTimes, 0);
+        });
+      });
+    });
 
-    context("when currentContractEra is 10 and currentUserEra is 1", () => {
-      beforeEach(async () => {
-        await advanceBlock(10 * params.blocksPerEra)
-      })
+    context("when currentContractEra is bigger in one than currentUserEra", () => {
+      context("with currentContractEra = 2 and currentUserEra = 1", () => {
+        beforeEach(async () => {
+          await advanceBlock(params.blocksPerEra + 2);
+        });
 
-      const currentUserEra = 1;
+        const currentUserEra = 1;
 
-      it("should can aprove two times", async () => {
-        let canApproveTimes = await instance.canApproveTimes(currentUserEra);
-        const blocksPrecision = await instance.BLOCKS_PRECISION();
-        canApproveTimes = canApproveTimes / (10 ** blocksPrecision)
+        it("should can aprove one times", async () => {
+          let canApproveTimes = await instance.canApproveTimes(currentUserEra);
+          canApproveTimes = Math.ceil(canApproveTimes / 10 ** blocksPrecision);
+          assert.equal(canApproveTimes, 1);
+        });
+      });
 
-        assert.equal(canApproveTimes, 9);
-      })
-    })
+      context("with currentContractEra = 5 and currentUserEra = 4", () => {
+        beforeEach(async () => {
+          await advanceBlock(params.blocksPerEra * 4 + 2);
+        });
 
-    context("when currentContractEra is 4 and currentUserEra is 2", () => {
-      beforeEach(async () => {
-        await advanceBlock(4 * params.blocksPerEra)
-      })
+        const currentUserEra = 4;
 
-      const currentUserEra = 2;
+        it("should can aprove one times", async () => {
+          let canApproveTimes = await instance.canApproveTimes(currentUserEra);
+          canApproveTimes = Math.ceil(canApproveTimes / 10 ** blocksPrecision);
+          assert.equal(canApproveTimes, 1);
+        });
+      });
+    });
 
-      it("should can aprove one time", async () => {
-        let canApproveTimes = await instance.canApproveTimes(currentUserEra);
-        const blocksPrecision = await instance.BLOCKS_PRECISION();
-        canApproveTimes = canApproveTimes / (10 ** blocksPrecision)
+    context("when currentContractEra is bigger in two than currentUserEra", () => {
+      context("with currentContractEra = 3 and currentUserEra = 1", () => {
+        beforeEach(async () => {
+          await advanceBlock(2 * params.blocksPerEra + 2);
+        });
 
-        assert.equal(canApproveTimes, 2);
-      })
-    })
-  })
+        const currentUserEra = 1;
+
+        it("should can aprove 2 times", async () => {
+          let canApproveTimes = await instance.canApproveTimes(currentUserEra);
+          canApproveTimes = Math.ceil(canApproveTimes / 10 ** blocksPrecision);
+          assert.equal(canApproveTimes, 2);
+        });
+      });
+
+      context("with currentContractEra = 10 and currentUserEra = 8", () => {
+        beforeEach(async () => {
+          await advanceBlock(9 * params.blocksPerEra + 2);
+        });
+
+        const currentUserEra = 8;
+
+        it("should can aprove 2 times", async () => {
+          let canApproveTimes = await instance.canApproveTimes(currentUserEra);
+          canApproveTimes = Math.ceil(canApproveTimes / 10 ** blocksPrecision);
+          assert.equal(canApproveTimes, 2);
+        });
+      });
+    });
+
+    context("when currentContractEra is bigger in five than currentUserEra", () => {
+      context("with currentContractEra = 6 and currentUserEra = 1", () => {
+        beforeEach(async () => {
+          await advanceBlock(5 * params.blocksPerEra + 2);
+        });
+
+        const currentUserEra = 1;
+
+        it("should can aprove 4 times", async () => {
+          let canApproveTimes = await instance.canApproveTimes(currentUserEra);
+          canApproveTimes = Math.ceil(canApproveTimes / 10 ** blocksPrecision);
+          assert.equal(canApproveTimes, 5);
+        });
+      });
+    });
+  });
 
   context("when call nextApproveIn", () => {
     context("when user can approve", () => {
       beforeEach(async () => {
-        await advanceBlock(2 * params.blocksPerEra)
-      })
+        await advanceBlock(2 * params.blocksPerEra);
+      });
 
       const currentUserEra = 1;
 
-      it("should return negative blocks number", async () => {     
+      it("should return negative blocks number", async () => {
         const nextApproveIn = await instance.nextApproveIn(currentUserEra);
-        assert.isBelow(parseInt(nextApproveIn), 0)
-      })
-    })
+        assert.isBelow(parseInt(nextApproveIn), 0);
+      });
+    });
 
     context("when user can't approve", () => {
       const currentUserEra = 1;
 
-      it("should return positive blocks number", async () => {     
+      it("should return positive blocks number", async () => {
         const nextApproveIn = await instance.nextApproveIn(currentUserEra);
-        assert.isAbove(parseInt(nextApproveIn), 0)
-      })
-    })
-  })
+        assert.isAbove(parseInt(nextApproveIn), 0);
+      });
+    });
+  });
 
   context("when call canApprove", () => {
-    context("when currentUserEra is less than currentContractEra and currentUserEra don't have passed eraMax", () => {
-      beforeEach(async () => {
-        await advanceBlock(5 * params.blocksPerEra)
-      })
+    context(
+      "when currentUserEra is less than currentContractEra and currentUserEra don't have passed eraMax",
+      () => {
+        beforeEach(async () => {
+          await advanceBlock(5 * params.blocksPerEra);
+        });
 
-      const currentUserEra = 1;
+        const currentUserEra = 1;
 
-      it("should return true", async () => {
-        const canApprove = await instance.canApprove(currentUserEra);
-        assert.equal(canApprove, true)
-      })
-    })
+        it("should return true", async () => {
+          const canApprove = await instance.canApprove(currentUserEra);
+          assert.equal(canApprove, true);
+        });
+      }
+    );
 
-    context("when currentUserEra is less than currentContractEra and currentUserEra have passed eraMax", () => {
-      beforeEach(async () => {
-        await advanceBlock(20 * params.blocksPerEra)
-      })
+    context(
+      "when currentUserEra is less than currentContractEra and currentUserEra have passed eraMax",
+      () => {
+        beforeEach(async () => {
+          await advanceBlock(20 * params.blocksPerEra);
+        });
 
-      const currentUserEra = params.eraMax + 1;
+        const currentUserEra = params.eraMax + 1;
 
-      it("should return false", async () => {
-        const canApprove = await instance.canApprove(currentUserEra);
-        assert.equal(canApprove, false)
-      })
-    })
+        it("should return false", async () => {
+          const canApprove = await instance.canApprove(currentUserEra);
+          assert.equal(canApprove, false);
+        });
+      }
+    );
 
     context("when currentUserEra is equal currentContractEra", () => {
       const currentUserEra = 1;
 
       it("should return false", async () => {
         const canApprove = await instance.canApprove(currentUserEra);
-        assert.equal(canApprove, false)
-      })
-    })
-  })
-})
+        assert.equal(canApprove, false);
+      });
+    });
+  });
+});
