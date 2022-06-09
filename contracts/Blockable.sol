@@ -20,7 +20,7 @@ contract Blockable {
   constructor(uint256 _blocksPerEra, uint256 _eraMax) {
     blocksPerEra = _blocksPerEra;
     eraMax = _eraMax;
-    deployedAt = currentContractBlockNumber();
+    deployedAt = currentBlockNumber();
   }
 
   function canApprove(uint256 currentUserEra) public view returns (bool) {
@@ -28,14 +28,14 @@ contract Blockable {
   }
 
   function currentContractEra() public view returns (uint256) {
-    return currentContractBlockNumber().sub(deployedAt).div(blocksPerEra).add(1);
+    return currentBlockNumber().sub(deployedAt).div(blocksPerEra).add(1);
   }
 
   function nextApproveIn(uint256 currentUserEra) public view returns (int256) {
     return
       int256(deployedAt) +
       (int256(blocksPerEra) * int256(currentUserEra)) -
-      int256(currentContractBlockNumber());
+      int256(currentBlockNumber());
   }
 
   function canApproveTimes(uint256 currentUserEra) public view returns (uint256) {
@@ -56,7 +56,7 @@ contract Blockable {
     return deployedAt.add(blocksPerEra.mul(currentUserEra));
   }
 
-  function currentContractBlockNumber() internal view returns (uint256) {
+  function currentBlockNumber() internal view returns (uint256) {
     return block.number;
   }
 }
