@@ -315,7 +315,7 @@ contract('DeveloperPool', (accounts) => {
 
   it("should return error when the dev try approve tokens and can't yet", async () => {
     await addDeveloper(dev1Address);
-    instance.approve({ from: dev1Address })
+    await instance.approve({ from: dev1Address })
       .then(assert.fail)
       .catch((error) => {
         assert.equal(error.reason, "You can't withdraw yet")

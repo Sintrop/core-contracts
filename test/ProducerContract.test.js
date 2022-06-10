@@ -39,7 +39,7 @@ contract('ProducerContract', (accounts) => {
   it("should return error when try create same producer", async () => {
     await addProducer("Producer A", prod1Address);
 
-    addProducer("Producer A", prod1Address)
+    await addProducer("Producer A", prod1Address)
       .then(assert.fail)
       .catch((error) => {
         assert.equal(error.reason, "This producer already exist")

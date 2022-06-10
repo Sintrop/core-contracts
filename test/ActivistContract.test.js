@@ -35,7 +35,7 @@ contract('ActivistContract', (accounts) => {
         it("should return error", async () => {
           await addActivist("Activist A", activ1Address);
       
-          addActivist("Activist A", activ1Address)
+          await addActivist("Activist A", activ1Address)
             .then(assert.fail)
             .catch((error) => {
               assert.equal(error.reason, "This activist already exist")
