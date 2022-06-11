@@ -179,7 +179,7 @@ contract('ActivistContract', (accounts) => {
         await instance.incrementRequests(activ1Address, { from: activ1Address })
           .then(assert.fail)
           .catch((error) => {
-            await assert.equal(error.reason, "Not allowed caller")
+            assert.equal(error.reason, "Not allowed caller")
           })
       })
     })
