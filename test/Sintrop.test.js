@@ -6,6 +6,8 @@ const UserContract = artifacts.require("UserContract");
 const ActivistContract = artifacts.require("ActivistContract");
 const ProducerContract = artifacts.require("ProducerContract");
 
+const expectRevert = require("@openzeppelin/test-helpers").expectRevert;
+
 contract("Sintrop", (accounts) => {
   let instance;
   let userContract;
@@ -87,22 +89,15 @@ contract("Sintrop", (accounts) => {
   });
 
   it("should return message error when is not an producer and try request inspection", async () => {
-    await instance
-      .requestInspection()
-      .then(assert.fail)
-      .catch((error) => {
-        assert.equal(error.reason, "Please register as producer");
-      });
+    await expectRevert(instance.requestInspection(), "Please register as producer");
   });
 
   it("should return message error when has inspection OPEN o ACCEPTED and try request inspection", async () => {
     await instance.requestInspection({from: producerAddress});
-    await instance
-      .requestInspection({from: producerAddress})
-      .then(assert.fail)
-      .catch((error) => {
-        assert.equal(error.reason, "Request OPEN or ACCEPTED");
-      });
+    await expectRevert(
+      instance.requestInspection({from: producerAddress}),
+      "Request OPEN or ACCEPTED"
+    );
   });
 
   it("should create request inspection with initial status equal OPEN", async () => {
@@ -203,33 +198,27 @@ contract("Sintrop", (accounts) => {
 
   it("should return error message when is not activist and try accepet inspection", async () => {
     await instance.requestInspection({from: producerAddress});
-    await instance
-      .acceptInspection(1, {from: producerAddress})
-      .then(assert.fail)
-      .catch((error) => {
-        assert.equal(error.reason, "Please register as activist");
-      });
+    await expectRevert(
+      instance.acceptInspection(1, {from: producerAddress}),
+      "Please register as activist"
+    );
   });
 
   it("should return error message when inspection don't exists and try accept", async () => {
-    await instance
-      .acceptInspection(1, {from: activistAddress})
-      .then(assert.fail)
-      .catch((error) => {
-        assert.equal(error.reason, "This inspection don't exists");
-      });
+    await expectRevert(
+      instance.acceptInspection(1, {from: activistAddress}),
+      "This inspection don't exists"
+    );
   });
 
   it("should return error message when inspection is not OPEN and try accept", async () => {
     await instance.requestInspection({from: producerAddress});
     await instance.acceptInspection(1, {from: activistAddress});
 
-    await instance
-      .acceptInspection(1, {from: activistAddress})
-      .then(assert.fail)
-      .catch((error) => {
-        assert.equal(error.reason, "This inspection is not OPEN");
-      });
+    await expectRevert(
+      instance.acceptInspection(1, {from: activistAddress}),
+      "This inspection is not OPEN"
+    );
   });
 
   it("should realize Inspection when is activist owner to a accepted inspection and try realize", async () => {
@@ -255,12 +244,10 @@ contract("Sintrop", (accounts) => {
   it("should return error message when inspection is not accepted and try realize inspection", async () => {
     await instance.requestInspection({from: producerAddress});
 
-    await instance
-      .realizeInspection(1, [], {from: activistAddress})
-      .then(assert.fail)
-      .catch((error) => {
-        assert.equal(error.reason, "Accept this inspection before");
-      });
+    await expectRevert(
+      instance.realizeInspection(1, [], {from: activistAddress}),
+      "Accept this inspection before"
+    );
   });
 
   it("should return error message when is not inspection owner and try realize inspection", async () => {
@@ -269,33 +256,27 @@ contract("Sintrop", (accounts) => {
 
     await addActivist("Activist B", activist2Address);
 
-    await instance
-      .realizeInspection(1, [], {from: activist2Address})
-      .then(assert.fail)
-      .catch((error) => {
-        assert.equal(error.reason, "You not accepted this inspection");
-      });
+    await expectRevert(
+      instance.realizeInspection(1, [], {from: activist2Address}),
+      "You not accepted this inspection"
+    );
   });
 
   it("should return error message when is not activist and try realize inspection", async () => {
     await instance.requestInspection({from: producerAddress});
     await instance.acceptInspection(1, {from: activistAddress});
 
-    await instance
-      .realizeInspection(1, [], {from: producerAddress})
-      .then(assert.fail)
-      .catch((error) => {
-        assert.equal(error.reason, "Please register as activist");
-      });
+    await expectRevert(
+      instance.realizeInspection(1, [], {from: producerAddress}),
+      "Please register as activist"
+    );
   });
 
   it("should return error message when inspection don't exists and try realize inspection", async () => {
-    await instance
-      .realizeInspection(1, [], {from: activistAddress})
-      .then(assert.fail)
-      .catch((error) => {
-        assert.equal(error.reason, "This inspection don't exists");
-      });
+    await expectRevert(
+      instance.realizeInspection(1, [], {from: activistAddress}),
+      "This inspection don't exists"
+    );
   });
 
   it("should update inspectionList when realize inspection", async () => {
