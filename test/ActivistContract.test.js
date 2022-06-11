@@ -173,7 +173,7 @@ contract('ActivistContract', (accounts) => {
       })
     })
 
-    context("with don't allowed caller", () => {
+    context("with don't allowed caller", async () => {
       it("should return error .incrementRequests when is not allowed caller", async () => {
         await addActivist("Activist A", activ1Address);
         await instance.incrementRequests(activ1Address, { from: activ1Address })
