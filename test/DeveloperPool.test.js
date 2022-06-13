@@ -184,19 +184,22 @@ contract("DeveloperPool", (accounts) => {
     assert.equal(developers.length, 1);
   });
 
-  it("should return integer greater than zero when cant approve tokens", async () => {
-    await addDeveloper(dev1Address);
-    const nextApproveTime = await instance.nextApproveTime({from: dev1Address});
+  it('should return integer greater than zero when cant approve tokens', async () => {
+    await addDeveloper(dev1Address)
+    const developer = await instance.getDeveloper(dev1Address);
+    const nextApproveIn = await instance.nextApproveIn(developer.currentEra);
 
-    assert.isAbove(parseInt(nextApproveTime), 0);
-  });
+    assert.isAbove(parseInt(nextApproveIn), 0);
+  })
 
   it("should return integer smaller than zero when can approve tokens", async () => {
     await addDeveloper(dev1Address);
     await advanceBlock(args.blocksPerEra);
-    const nextApproveTime = await instance.nextApproveTime({from: dev1Address});
 
-    assert.isBelow(parseInt(nextApproveTime), 1);
+    const developer = await instance.getDeveloper(dev1Address);
+    const nextApproveIn = await instance.nextApproveIn(developer.currentEra);
+
+    assert.isBelow(parseInt(nextApproveIn), 1);
   });
 
   it("should set to zero the developer level when undoLevel", async () => {
@@ -230,20 +233,21 @@ contract("DeveloperPool", (accounts) => {
 
   it("should return zero times to approve when can't approve", async () => {
     await addDeveloper(dev1Address);
+    const developer = await instance.getDeveloper(dev1Address);
 
-    const canApproveTimes = await instance.canApproveTimes({from: dev1Address});
+    const canApproveTimes = await instance.canApproveTimes(developer.currentEra);
 
     assert.equal(canApproveTimes, 0);
   });
 
   it(`should return integer with fixed point that represent 2 times to approve
-     when the dev is in second era and did not approve tokens yet`, async () => {
+     when the contract is in third era and did not approve tokens yet`, async () => {
     await addDeveloper(dev1Address);
-    await advanceBlock(args.blocksPerEra * 2);
+    await advanceBlock(args.blocksPerEra * 2 + 2);
 
-    const canApproveTimes = await instance.canApproveTimes({from: dev1Address});
+    const developer = await instance.getDeveloper(dev1Address);
+    const canApproveTimes = await instance.canApproveTimes(developer.currentEra);
     const blocksPrecision = await instance.BLOCKS_PRECISION();
-
     const fixedPoint = canApproveTimes / 10 ** blocksPrecision;
 
     assert.equal(Math.ceil(fixedPoint), 2);
