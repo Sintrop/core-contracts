@@ -7,23 +7,25 @@ contract("UserContract", (accounts) => {
   let [owner, user1Address, user2Address] = accounts;
 
   let userTypes = {
-    Producer: 0,
-    Activist: 1,
-    Researcher: 2,
-    Developer: 3,
-    Adviser: 4,
-    Contributor: 5,
-    Investor: 6,
+    Undefined: 0,
+    Producer: 1,
+    Activist: 2,
+    Researcher: 3,
+    Developer: 4,
+    Adviser: 5,
+    Contributor: 6,
+    Investor: 7,
   };
 
   const definedTypes = {
-    0: "PRODUCER",
-    1: "ACTIVIST",
-    2: "RESEARCHER",
-    3: "DEVELOPER",
-    4: "ADVISER",
-    5: "CONTRIBUTOR",
-    6: "INVESTOR",
+    0: "UNDEFINED",
+    1: "PRODUCER",
+    2: "ACTIVIST",
+    3: "RESEARCHER",
+    4: "DEVELOPER",
+    5: "ADVISER",
+    6: "CONTRIBUTOR",
+    7: "INVESTOR",
   };
 
   const addUser = async (address, userType, caller) => {
@@ -36,19 +38,37 @@ contract("UserContract", (accounts) => {
     await instance.newAllowedCaller(owner);
   });
 
-  it("should add new user with success when allowed caller", async () => {
-    await addUser(user1Address, userTypes.Producer, owner);
+  context("when adding a user", () => {
+    context("with allowed caller", () => {
+      context("when the user not exists", () => {
+        it("should add a user", async () => {
+          await addUser(user1Address, userTypes.Producer, owner);
+          const user = await instance.getUser(user1Address);
+      
+          assert.equal(user, userTypes.Producer);
+        });
+      });
 
-    const user = await instance.getUser(user1Address);
+      context("when the user exists", () => {
+        it("should return error message", async () => {
+          await addUser(user1Address, userTypes.Producer, owner);
 
-    assert.equal(user, userTypes.Producer);
-  });
+          await expectRevert(
+            addUser(user1Address, userTypes.Producer, owner),
+            "User already exists"
+          );
+        });
+      });
+    });
 
-  it("should return error message when not allowed caller try add new user", async () => {
-    await expectRevert(
-      addUser(user1Address, userTypes.Producer, user1Address),
-      "Not allowed caller"
-    );
+    context("without allowed caller", () => {
+      it("should return error message", async () => {
+        await expectRevert(
+          addUser(user1Address, userTypes.Producer, user1Address),
+          "Not allowed caller"
+        );
+      });
+    });
   });
 
   it("should usersCount be zero when not has user", async () => {
