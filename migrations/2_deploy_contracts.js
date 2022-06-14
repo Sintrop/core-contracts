@@ -22,19 +22,20 @@ module.exports = function (deployer) {
 
     await deployer.deploy(ProducerContract, UserContract.address);
 
-    await userContract.newAllowedCaller(ActivistContract.address);
-
-    await userContract.newAllowedCaller(ProducerContract.address);
-
     await deployer.deploy(Sintrop, ActivistContract.address, ProducerContract.address);
 
-    const activistContract = await deployer.deploy(ActivistContract, UserContract.address);
+    await deployer.deploy(ActivistContract, UserContract.address);
 
-    const producerContract = await deployer.deploy(ProducerContract, UserContract.address);
+    await deployer.deploy(ProducerContract, UserContract.address);
+
+    const activistContract = await ActivistContract.deployed();
+    const producerContract = await ProducerContract.deployed();
 
     await activistContract.newAllowedCaller(Sintrop.address);
-
     await producerContract.newAllowedCaller(Sintrop.address);
+
+    await userContract.newAllowedCaller(activistContract.address);
+    await userContract.newAllowedCaller(producerContract.address);
 
     await deployer.deploy(SacToken, args.totalTokens);
 
