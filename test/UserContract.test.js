@@ -71,90 +71,109 @@ contract("UserContract", (accounts) => {
     });
   });
 
-  it("should usersCount be zero when not has user", async () => {
-    const usersCount = await instance.usersCount();
-
-    assert.equal(usersCount, 0);
+  context("when there is no user", () => {
+    it("should usersCount be zero when not has user", async () => {
+      const usersCount = await instance.usersCount();
+  
+      assert.equal(usersCount, 0);
+    });
   });
 
-  it("should increment usersCount when add new user", async () => {
-    await addUser(user1Address, userTypes.Producer, owner);
+  context("when enum correctly to users", () => {
+    context("to Undefined", () => {
+      it("should add correct enum to Undefined", async () => {
+        await addUser(user1Address, userTypes.Undefined, owner);
+    
+        const user = await instance.getUser(user1Address)
+    
+        assert.equal(user, userTypes.Undefined);
+      })
+    });
 
-    const usersCount = await instance.usersCount();
+    context("to Activist", () => {
+      it("should add correct enum to activist", async () => {
+        await addUser(user1Address, userTypes.Activist, owner);
+    
+        const user = await instance.getUser(user1Address)
+    
+        assert.equal(user, userTypes.Activist);
+      })
+    });
 
-    assert.equal(usersCount, 1);
+    context("to researcher", () => {
+      it("should add correct enum to researcher", async () => {
+        await addUser(user1Address, userTypes.Researcher, owner);
+    
+        const user = await instance.getUser(user1Address)
+    
+        assert.equal(user, userTypes.Researcher);
+      })
+    });
+
+    context("to developer", () => {
+      it("should add correct enum to developer", async () => {
+        await addUser(user1Address, userTypes.Developer, owner);
+    
+        const user = await instance.getUser(user1Address)
+    
+        assert.equal(user, userTypes.Developer);
+      })
+    });
+
+    context("to adviser", () => {
+      it("should add correct enum to adviser", async () => {
+        await addUser(user1Address, userTypes.Adviser, owner);
+    
+        const user = await instance.getUser(user1Address)
+    
+        assert.equal(user, userTypes.Adviser);
+      })
+    });
+
+    context("to contributor", () => {
+      it("should add correct enum to contributor", async () => {
+        await addUser(user1Address, userTypes.Contributor, owner);
+    
+        const user = await instance.getUser(user1Address)
+    
+        assert.equal(user, userTypes.Contributor);
+      })
+    });
+
+    context("to investor", () => {
+      it("should add correct enum to investor", async () => {
+        await addUser(user1Address, userTypes.Investor, owner);
+    
+        const user = await instance.getUser(user1Address)
+    
+        assert.equal(user, userTypes.Investor);
+      })
+    });
   });
 
-  it("should add correct enum to producer", async () => {
-    await addUser(user1Address, userTypes.Producer, owner);
-
-    const user = await instance.getUser(user1Address);
-
-    assert.equal(user, userTypes.Producer);
+  context("when there's enums", () => {
+    it("should have enums", async () => {
+      const types = await instance.userTypes()
+  
+      assert.equal(JSON.stringify(types), JSON.stringify(definedTypes));
+    });
   });
+  
+  context("when adding new allowed caller", () => {
+    context("with owner", () => {
+      it("should add new allowed caller with sucess when is owner", async () => {
+        await instance.newAllowedCaller(user1Address, { from: owner });
+      });
+    });
 
-  it("should add correct enum to activist", async () => {
-    await addUser(user1Address, userTypes.Activist, owner);
-
-    const user = await instance.getUser(user1Address);
-
-    assert.equal(user, userTypes.Activist);
-  });
-
-  it("should add correct enum to researcher", async () => {
-    await addUser(user1Address, userTypes.Researcher, owner);
-
-    const user = await instance.getUser(user1Address);
-
-    assert.equal(user, userTypes.Researcher);
-  });
-
-  it("should add correct enum to developer", async () => {
-    await addUser(user1Address, userTypes.Developer, owner);
-
-    const user = await instance.getUser(user1Address);
-
-    assert.equal(user, userTypes.Developer);
-  });
-
-  it("should add correct enum to adviser", async () => {
-    await addUser(user1Address, userTypes.Adviser, owner);
-
-    const user = await instance.getUser(user1Address);
-
-    assert.equal(user, userTypes.Adviser);
-  });
-
-  it("should add correct enum to contributor", async () => {
-    await addUser(user1Address, userTypes.Contributor, owner);
-
-    const user = await instance.getUser(user1Address);
-
-    assert.equal(user, userTypes.Contributor);
-  });
-
-  it("should add correct enum to investor", async () => {
-    await addUser(user1Address, userTypes.Investor, owner);
-
-    const user = await instance.getUser(user1Address);
-
-    assert.equal(user, userTypes.Investor);
-  });
-
-  it("should have enums", async () => {
-    const types = await instance.userTypes();
-
-    assert.equal(JSON.stringify(types), JSON.stringify(definedTypes));
-  });
-
-  it("should add new allowed caller with sucess when is owner", async () => {
-    await instance.newAllowedCaller(user1Address, {from: owner});
-  });
-
-  it("should return error message when try add new allowed caller and is not owner", async () => {
-    await expectRevert(
-      instance.newAllowedCaller(user1Address, {from: user1Address}),
-      "Ownable: caller is not the owner"
-    );
+    context("without owner", () => {
+      it("should return error message when try add new allowed caller and is not owner", async () => {
+        await instance.newAllowedCaller(user1Address, { from: user1Address })
+          .then(assert.fail)
+          .catch((error) => {
+            assert.equal(error.reason, "Ownable: caller is not the owner")
+          })
+      })
+    });
   });
 });
