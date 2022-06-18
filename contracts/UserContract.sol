@@ -19,7 +19,7 @@ contract UserContract is Ownable, Callable {
    * @param addr The address of the user
    * @param userType The type of the user - enum UserType
    */
-  function addUser(address addr, UserType userType) public mustBeAllowedCaller {
+  function addUser(address addr, UserType userType) public mustBeAllowedCaller mustNotExists(addr) {
     users[addr] = userType;
     usersCount++;
   }
@@ -45,10 +45,12 @@ contract UserContract is Ownable, Callable {
       string memory,
       string memory,
       string memory,
+      string memory,
       string memory
     )
   {
     return (
+      "UNDEFINED",
       "PRODUCER",
       "ACTIVIST",
       "RESEARCHER",
@@ -57,5 +59,12 @@ contract UserContract is Ownable, Callable {
       "CONTRIBUTOR",
       "INVESTOR"
     );
+  }
+
+  // MODIFIER
+
+  modifier mustNotExists(address addr) {
+    require(users[addr] == UserType.UNDEFINED, "User already exists");
+    _;
   }
 }

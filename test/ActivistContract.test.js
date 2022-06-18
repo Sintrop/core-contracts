@@ -88,7 +88,7 @@ contract("ActivistContract", (accounts) => {
           await addActivist("Activist A", activ1Address);
 
           const userType = await userContract.getUser(activ1Address);
-          const ACTIVIST = 1;
+          const ACTIVIST = 2;
 
           assert.equal(userType, ACTIVIST);
         });

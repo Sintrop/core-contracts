@@ -121,7 +121,7 @@ contract("ProducerContract", (accounts) => {
     await addProducer("Producer A", prod1Address);
 
     const userType = await userContract.getUser(prod1Address);
-    const PRODUCER = 0;
+    const PRODUCER = 1;
 
     assert.equal(userType, PRODUCER);
   });
