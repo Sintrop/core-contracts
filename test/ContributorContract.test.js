@@ -27,7 +27,6 @@ contract("ContributorContract", (accounts) => {
     instance = await ContributorContract.new(userContract.address);
 
     await userContract.newAllowedCaller(instance.address);
-    await instance.newAllowedCaller(ownerAddress);
   });
 
   context("when will create new contributor (.addContributor)", () => {

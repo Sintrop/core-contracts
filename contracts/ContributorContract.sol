@@ -3,9 +3,8 @@ pragma solidity >=0.7.0 <=0.9.0;
 
 import "./UserContract.sol";
 import "./types/ContributorTypes.sol";
-import "./Callable.sol";
 
-contract ContributorContract is Callable {
+contract ContributorContract {
   mapping(address => Contributor) internal contributors;
 
   UserContract internal userContract;
