@@ -27,7 +27,6 @@ contract ContributorContract is Callable {
    * @param cep the cep of the contributor
    * @return a Contributor
    */
-  // TODO Add mustBeAllowedCaller
   function addContributor(
     string memory name,
     string memory document,
