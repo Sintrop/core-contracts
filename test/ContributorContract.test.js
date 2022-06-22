@@ -25,9 +25,8 @@ contract("ContributorContract", (accounts) => {
     userContract = await UserContract.new();
 
     instance = await ContributorContract.new(userContract.address);
-
+    
     await userContract.newAllowedCaller(instance.address);
-
   });
 
   context("when will create new contributor (.addContributor)", () => {
@@ -118,6 +117,5 @@ contract("ContributorContract", (accounts) => {
 
       assert.equal(contributorExists, false);
     })
-
   });
 });
