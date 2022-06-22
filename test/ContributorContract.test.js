@@ -26,11 +26,9 @@ contract("ContributorContract", (accounts) => {
 
     instance = await ContributorContract.new(userContract.address);
 
-    await userContract.newAllowedCaller(instance.address);
   });
 
   context("when will create new contributor (.addContributor)", () => {
-    context("when is allowed", () => {
       context("when contributor exists", () => {
         it("should return error", async () => {
           await addContributor("Contributor A", contr1Address);
@@ -38,7 +36,6 @@ contract("ContributorContract", (accounts) => {
             addContributor("Contributor A", contr1Address),
             "This contributor already exist"
           );
-        });
       });
 
       context("when contributor don't exists", () => {
@@ -114,6 +111,11 @@ contract("ContributorContract", (accounts) => {
       assert.equal(contributorExists, true);
     });
 
-    // Todo Add when not exists
+    it("it should return false when don't excists", async () => {
+      const contributorExists = await instance.contributorExists(contr1Address);
+
+      assert.equal(contributorExists, false);
+    })
+
   });
 });
