@@ -356,16 +356,19 @@ contract("Sintrop", (accounts) => {
       await addCategory("Solo C");
 
       const isas = [
-        [1, 0],
-        [2, 0],
-        [3, 1],
+        ["1", "0"],
+        ["2", "0"],
+        ["3", "1"],
       ];
       await instance.realizeInspection(1, isas, {from: activistAddress});
 
       const inspection = await instance.getInspection(1);
 
-      //Todo: check if isas are correct
-      assert.equal(inspection.isas.length, isas.length);
+      const equal =
+        inspection.isas.length == isas.length &&
+        inspection.isas.every((v, i) => v.toString() === isas[i].toString());
+
+      assert.equal(equal, true);
     });
 
     it("should add 10 isaPoints to inspection when select totallySustainable", async () => {
