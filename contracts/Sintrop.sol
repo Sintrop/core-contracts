@@ -18,12 +18,12 @@ contract Sintrop {
   ProducerContract public producerContract;
 
   uint256 public inspectionsCount;
-  uint256 internal inspectionBlocksDelay;
+  uint256 internal timeBetweenInspections;
 
-  constructor(address activistContractAddress, address producerContractAddress, uint256 inspectionBlocksDelay_) {
+  constructor(address activistContractAddress, address producerContractAddress, uint256 timeBetweenInspections_) {
     activistContract = ActivistContract(activistContractAddress);
     producerContract = ProducerContract(producerContractAddress);
-    inspectionBlocksDelay = inspectionBlocksDelay_;
+    timeBetweenInspections = timeBetweenInspections_;
   }
 
   /**
@@ -222,7 +222,7 @@ contract Sintrop {
   function producerCanRequest(Producer memory producer) public view returns (bool) {
     uint256 lastRequestAt = producer.lastRequestAt;
     bool withoutRecentRequest = !producer.recentInspection;
-    bool lastRequestAble = block.number > producer.lastRequestAt + inspectionBlocksDelay;
+    bool lastRequestAble = block.number > producer.lastRequestAt + timeBetweenInspections;
 
     return (withoutRecentRequest && lastRequestAble) || (lastRequestAt == 0);
   }
