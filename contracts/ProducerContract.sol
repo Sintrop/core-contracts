@@ -51,6 +51,7 @@ contract ProducerContract is Callable {
       false,
       0,
       0,
+      0,
       TokenApprove(0, false),
       PropertyAddress(country, state, city, cep)
     );
@@ -107,6 +108,10 @@ contract ProducerContract is Callable {
   function approveProducerNewTokens(address addr, uint256 numTokens) public mustBeAllowedCaller {
     uint256 tokens = producers[addr].tokenApprove.allowed;
     producers[addr].tokenApprove = TokenApprove(tokens += numTokens, false);
+  }
+  
+  function lastRequestAt(address addr, uint256 blocksNumber) public mustBeAllowedCaller {
+    producers[addr].lastRequestAt = blocksNumber;
   }
 
   function getProducerApprove(address address_) public view returns (uint256) {

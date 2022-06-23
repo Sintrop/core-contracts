@@ -15,7 +15,6 @@ struct Inspection {
   address acceptedBy;
   uint256[][] isas;
   int256 isaPoints;
-  uint256 expiresIn;
   uint256 createdAt;
   uint256 updatedAt;
 }

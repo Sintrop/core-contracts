@@ -24,7 +24,8 @@ module.exports = function(deployer) {
 
     await deployer.deploy(Sintrop,
       ActivistContract.address,
-      ProducerContract.address
+      ProducerContract.address,
+      1000
     );
 
     await deployer.deploy(SacToken, args.totalTokens);

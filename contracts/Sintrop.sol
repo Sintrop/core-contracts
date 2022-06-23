@@ -17,12 +17,13 @@ contract Sintrop {
   ActivistContract public activistContract;
   ProducerContract public producerContract;
 
-  uint256 internal inspactionExpireIn = 604800;
   uint256 public inspectionsCount;
+  uint256 internal inspectionBlocksDelay;
 
-  constructor(address activistContractAddress, address producerContractAddress) {
+  constructor(address activistContractAddress, address producerContractAddress, uint256 inspectionBlocksDelay_) {
     activistContract = ActivistContract(activistContractAddress);
     producerContract = ProducerContract(producerContractAddress);
+    inspectionBlocksDelay = inspectionBlocksDelay_;
   }
 
   /**
@@ -35,20 +36,15 @@ contract Sintrop {
   /**
    * @dev Allows the current user (producer) request a inspection.
    */
-  function requestInspection()
-    public
-    producerMustExist
-    mustBeAbleToRequest
-    returns (bool) {
-    createRequest();
+  function requestInspection() public producerMustExist mustBeAbleToRequest {
+    newRequest();
     producerContract.recentInspection(msg.sender, true);
-
-    return true;
+    producerContract.lastRequestAt(msg.sender, block.number);
   }
 
-  function createRequest() internal {
+  function newRequest() internal {
     uint256[][] memory isas;
-    uint256 expiresIn = block.timestamp + inspactionExpireIn;
+
     Inspection memory inspection = Inspection(
       inspectionsCount + 1,
       InspectionStatus.OPEN,
@@ -56,8 +52,7 @@ contract Sintrop {
       msg.sender,
       isas,
       0,
-      expiresIn,
-      block.timestamp,
+      block.number,
       0
     );
     inspections[inspection.id] = inspection;
@@ -224,6 +219,14 @@ contract Sintrop {
     return inspections[inspectionId].status == InspectionStatus.ACCEPTED;
   }
 
+  function producerCanRequest(Producer memory producer) public view returns (bool) {
+    uint256 lastRequestAt = producer.lastRequestAt;
+    bool withoutRecentRequest = !producer.recentInspection;
+    bool lastRequestAble = block.number > producer.lastRequestAt + inspectionBlocksDelay;
+
+    return (withoutRecentRequest && lastRequestAble) || (lastRequestAt == 0);
+  }
+
   // MODIFIERS
 
   modifier requireActivist() {
@@ -242,7 +245,9 @@ contract Sintrop {
   }
 
   modifier mustBeAbleToRequest() {
-    require(!producerContract.getProducer(msg.sender).recentInspection, "Request OPEN or ACCEPTED");
+    Producer memory producer = producerContract.getProducer(msg.sender);
+
+    require(producerCanRequest(producer), "Not able to request");
     _;
   }
 
