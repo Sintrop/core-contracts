@@ -31,7 +31,7 @@ contract("ActivistContract", (accounts) => {
   });
   context("when access activist fields", () => {
     it("should have fields", async () => {
-      await addActivist("Activist A", activ1Address).then();
+      await addActivist("Activist A", activ1Address);
       const activist = await instance.getActivist(activ1Address);
 
       assert.equal(activist.id, "1")
@@ -199,6 +199,4 @@ contract("ActivistContract", (accounts) => {
       );
     });
   });
-
-
 });
