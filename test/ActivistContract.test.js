@@ -17,7 +17,7 @@ contract("ActivistContract", (accounts) => {
       "SP",
       "Jundiai",
       "135465-005",
-      {from: address}
+      { from: address }
     );
   };
 
@@ -28,6 +28,26 @@ contract("ActivistContract", (accounts) => {
 
     await userContract.newAllowedCaller(instance.address);
     await instance.newAllowedCaller(ownerAddress);
+  });
+  context("when access activist fields", () => {
+    it("should have fields", async () => {
+      await addActivist("Activist A", activ1Address).then();
+      const activist = await instance.getActivist(activ1Address);
+
+      assert.equal(activist.id, "1")
+      assert.equal(activist.activistWallet, activ1Address)
+      assert.equal(activist.userType, "2")
+      assert.equal(activist.name, "Activist A")
+      assert.equal(activist.document, "111.111.111-00")
+      assert.equal(activist.documentType, "CPF")
+      assert.equal(activist.recentInspection, false)
+      assert.equal(activist.totalInspections, "0")
+
+      assert.equal(activist.activistAddress.country, "Brazil")
+      assert.equal(activist.activistAddress.state, "SP")
+      assert.equal(activist.activistAddress.city, "Jundiai")
+      assert.equal(activist.activistAddress.cep, "135465-005")
+    });
   });
 
   context("when will create new activist (.addActivist)", () => {
@@ -150,7 +170,7 @@ contract("ActivistContract", (accounts) => {
       it("should return error", async () => {
         await addActivist("Activist A", activ1Address);
         await expectRevert(
-          instance.recentInspection(activ1Address, true, {from: activ1Address}),
+          instance.recentInspection(activ1Address, true, { from: activ1Address }),
           "Not allowed caller"
         );
       });
@@ -174,9 +194,11 @@ contract("ActivistContract", (accounts) => {
     it("should return error when is not allowed caller", async () => {
       await addActivist("Activist A", activ1Address);
       await expectRevert(
-        instance.incrementRequests(activ1Address, {from: activ1Address}),
+        instance.incrementRequests(activ1Address, { from: activ1Address }),
         "Not allowed caller"
       );
     });
   });
+
+
 });
