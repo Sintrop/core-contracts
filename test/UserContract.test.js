@@ -80,7 +80,7 @@ contract("UserContract", (accounts) => {
     });
   });
   
- context("when don't has users", () => {
+  context("when don't has users", () => {
     it("should usersCount be zero", async () => {
       const usersCount = await instance.usersCount();
   
