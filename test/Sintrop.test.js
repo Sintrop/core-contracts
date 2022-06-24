@@ -104,7 +104,7 @@ contract("Sintrop", (accounts) => {
   });
 
   context("when producer try request inspection", () => {
-    context("when never requested inspection", () => {
+    context("when is the first request", () => {
       it("should request inspection", async () => {
         await instance.requestInspection({from: producerAddress});
         const inspection = await instance.getInspection(1);
@@ -113,7 +113,7 @@ contract("Sintrop", (accounts) => {
       });
     });
 
-    context("when already requested inspection", () => {
+    context("when is not the first request", () => {
       context("when has recentInspection", () => {
         it("should return error message", async () => {
           await instance.requestInspection({from: producerAddress});
