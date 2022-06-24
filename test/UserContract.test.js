@@ -59,6 +59,16 @@ contract("UserContract", (accounts) => {
           );
         });
       });
+
+      context("Incremente userCount", () => {
+        it("should increment usersCount when add new user", async () => {
+          await addUser(user1Address, userTypes.Producer, owner);
+
+          const usersCount = await instance.usersCount();
+      
+          assert.equal(usersCount, 1);
+        });
+      });
     });
 
     context("without allowed caller", () => {
@@ -80,13 +90,13 @@ contract("UserContract", (accounts) => {
   });
 
   context("when enum correctly to users", () => {
-    context("to Undefined", () => {
-      it("should add correct enum to Undefined", async () => {
-        await addUser(user1Address, userTypes.Undefined, owner);
+    context("to Producer", () => {
+      it("should add correct enum to producer", async () => {
+        await addUser(user1Address, userTypes.Producer, owner);
     
         const user = await instance.getUser(user1Address)
     
-        assert.equal(user, userTypes.Undefined);
+        assert.equal(user, userTypes.Producer);
       })
     });
 
@@ -168,11 +178,10 @@ contract("UserContract", (accounts) => {
 
     context("without owner", () => {
       it("should return error message when try add new allowed caller and is not owner", async () => {
-        await instance.newAllowedCaller(user1Address, { from: user1Address })
-          .then(assert.fail)
-          .catch((error) => {
-            assert.equal(error.reason, "Ownable: caller is not the owner")
-          })
+        await expectRevert(
+          instance.newAllowedCaller(user1Address, { from: user1Address }),
+          "Ownable: caller is not the owner"
+        );
       })
     });
   });
