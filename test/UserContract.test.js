@@ -79,9 +79,9 @@ contract("UserContract", (accounts) => {
       });
     });
   });
-
-  context("when don't has users", () => {
-    it("should usersCount be zero when not has user", async () => {
+  
+ context("when don't has users", () => {
+    it("should usersCount be zero", async () => {
       const usersCount = await instance.usersCount();
   
       assert.equal(usersCount, 0);
