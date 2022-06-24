@@ -41,12 +41,27 @@ contract("UserContract", (accounts) => {
   context("when adding a user", () => {
     context("with allowed caller", () => {
       context("when the user not exists", () => {
+        it("should usersCount be zero when not has user", async () => {
+          const usersCount = await instance.usersCount();
+      
+          assert.equal(usersCount, 0);
+        });
+      
         it("should add a user", async () => {
           await addUser(user1Address, userTypes.Producer, owner);
           const user = await instance.getUser(user1Address);
       
           assert.equal(user, userTypes.Producer);
         });
+
+        it("should increment usersCount when add new user", async () => {
+          await addUser(user1Address, userTypes.Producer, owner);
+
+          const usersCount = await instance.usersCount();
+      
+          assert.equal(usersCount, 1);
+        });
+        
       });
 
       context("when the user exists", () => {
@@ -59,16 +74,6 @@ contract("UserContract", (accounts) => {
           );
         });
       });
-
-      context("Incremente userCount", () => {
-        it("should increment usersCount when add new user", async () => {
-          await addUser(user1Address, userTypes.Producer, owner);
-
-          const usersCount = await instance.usersCount();
-      
-          assert.equal(usersCount, 1);
-        });
-      });
     });
 
     context("without allowed caller", () => {
@@ -78,14 +83,6 @@ contract("UserContract", (accounts) => {
           "Not allowed caller"
         );
       });
-    });
-  });
-
-  context("when there is no user", () => {
-    it("should usersCount be zero when not has user", async () => {
-      const usersCount = await instance.usersCount();
-  
-      assert.equal(usersCount, 0);
     });
   });
 
