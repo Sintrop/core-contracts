@@ -74,6 +74,14 @@ contract("ProducerContract", (accounts) => {
     assert.equal(producer.isaPoints, 0);
   });
 
+  it("should be created with lastRequestAt equal zero", async () => {
+    await addProducer("Producer A", prod1Address);
+
+    const producer = await instance.getProducer(prod1Address);
+
+    assert.equal(producer.lastRequestAt, 0);
+  });
+
   it("should return zero when can't allowed tokens", async () => {
     await addProducer("Producer A", prod1Address);
 
