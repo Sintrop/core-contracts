@@ -114,17 +114,17 @@ contract("Sintrop", (accounts) => {
     });
 
     context("when is not the first request", () => {
-      context("when has recentInspection", () => {
+      context("when has request OPEN or ACCEPTED", () => {
         it("should return error message", async () => {
           await instance.requestInspection({from: producerAddress});
           await expectRevert(
             instance.requestInspection({from: producerAddress}),
-            "Not able to request"
+            "Request OPEN or ACCEPTED"
           );
         });
       });
 
-      context("when don't has recentInspection", () => {
+      context("when don't has request OPEN or ACCEPTED", () => {
         beforeEach(async () => {
           await instance.requestInspection({from: producerAddress});
           await instance.acceptInspection(1, {from: activistAddress});
@@ -139,7 +139,7 @@ contract("Sintrop", (accounts) => {
           it("should return error message", async () => {
             await expectRevert(
               instance.requestInspection({from: producerAddress}),
-              "Not able to request"
+              "Recent inspection"
             );
           });
         });
