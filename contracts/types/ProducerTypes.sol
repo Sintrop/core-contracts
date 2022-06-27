@@ -13,6 +13,7 @@ struct Producer {
   bool recentInspection;
   uint256 totalRequests;
   int256 isaPoints;
+  uint256 lastRequestAt;
   TokenApprove tokenApprove;
   PropertyAddress propertyAddress;
 }

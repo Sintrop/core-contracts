@@ -17,12 +17,17 @@ contract Sintrop {
   ActivistContract public activistContract;
   ProducerContract public producerContract;
 
-  uint256 internal inspactionExpireIn = 604800;
   uint256 public inspectionsCount;
+  uint256 internal timeBetweenInspections;
 
-  constructor(address activistContractAddress, address producerContractAddress) {
+  constructor(
+    address activistContractAddress,
+    address producerContractAddress,
+    uint256 timeBetweenInspections_
+  ) {
     activistContract = ActivistContract(activistContractAddress);
     producerContract = ProducerContract(producerContractAddress);
+    timeBetweenInspections = timeBetweenInspections_;
   }
 
   /**
@@ -37,18 +42,19 @@ contract Sintrop {
    */
   function requestInspection()
     public
-    producerMustExist
-    mustBeAbleToRequest
-    returns (bool) {
-    createRequest();
-    producerContract.recentInspection(msg.sender, true);
+    requireProducer
+    requireNoInspectionsOpen
+    requireNoRecentInspection
+  {
+    newRequest();
 
-    return true;
+    producerContract.recentInspection(msg.sender, true);
+    producerContract.lastRequestAt(msg.sender, block.number);
   }
 
-  function createRequest() internal {
+  function newRequest() internal {
     uint256[][] memory isas;
-    uint256 expiresIn = block.timestamp + inspactionExpireIn;
+
     Inspection memory inspection = Inspection(
       inspectionsCount + 1,
       InspectionStatus.OPEN,
@@ -56,8 +62,7 @@ contract Sintrop {
       msg.sender,
       isas,
       0,
-      expiresIn,
-      block.timestamp,
+      block.number,
       0
     );
     inspections[inspection.id] = inspection;
@@ -185,7 +190,7 @@ contract Sintrop {
       string memory
     )
   {
-    return ("OPEN", "ACCEPTED", "INSPECTED", "EXPIRED" );
+    return ("OPEN", "ACCEPTED", "INSPECTED", "EXPIRED");
   }
 
   /**
@@ -224,6 +229,15 @@ contract Sintrop {
     return inspections[inspectionId].status == InspectionStatus.ACCEPTED;
   }
 
+  function canRequestInspection() public view returns (bool) {
+    Producer memory producer = producerContract.getProducer(msg.sender);
+
+    uint256 lastRequestAt = producer.lastRequestAt;
+    bool canRequest = block.number > lastRequestAt + timeBetweenInspections;
+
+    return canRequest || lastRequestAt == 0;
+  }
+
   // MODIFIERS
 
   modifier requireActivist() {
@@ -236,13 +250,18 @@ contract Sintrop {
     _;
   }
 
-  modifier producerMustExist() {
+  modifier requireProducer() {
     require(producerContract.producerExists(msg.sender), "Please register as producer");
     _;
   }
 
-  modifier mustBeAbleToRequest() {
+  modifier requireNoInspectionsOpen() {
     require(!producerContract.getProducer(msg.sender).recentInspection, "Request OPEN or ACCEPTED");
+    _;
+  }
+
+  modifier requireNoRecentInspection() {
+    require(canRequestInspection(), "Recent inspection");
     _;
   }
 

@@ -22,7 +22,11 @@ module.exports = function (deployer) {
 
     await deployer.deploy(ProducerContract, UserContract.address);
 
-    await deployer.deploy(Sintrop, ActivistContract.address, ProducerContract.address);
+    await deployer.deploy(Sintrop,
+      ActivistContract.address,
+      ProducerContract.address,
+      1000
+    );
 
     await deployer.deploy(ActivistContract, UserContract.address);
 
