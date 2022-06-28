@@ -41,9 +41,9 @@ module.exports = function (deployer) {
     await userContract.newAllowedCaller(activistContract.address);
     await userContract.newAllowedCaller(producerContract.address);
 
-    await deployer.deploy(SacToken, args.totalTokens);
+    const sacToken = await deployer.deploy(SacToken, args.totalTokens);
 
-    await deployer.deploy(IsaPool, SacToken.address);
+    const isaPool = await deployer.deploy(IsaPool, SacToken.address);
 
     await deployer.deploy(CategoryContract, IsaPool.address);
 
@@ -54,5 +54,7 @@ module.exports = function (deployer) {
       args.blocksPerEra,
       args.eraMax
     );
+
+    await sacToken.addContractPool(isaPool.address, 0)
   });
 };
