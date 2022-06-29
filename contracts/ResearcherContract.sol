@@ -35,7 +35,7 @@ contract ResearcherContract is Registrable {
     string memory state,
     string memory city,
     string memory cep
-  ) public uniqueResearcher mustBeAllowedResearcher returns (Researcher memory) {
+  ) public uniqueResearcher mustBeAllowedUser returns (Researcher memory) {
     uint256 id = researchersCount + 1;
     UserType userType = UserType.RESEARCHER;
 

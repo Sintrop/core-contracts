@@ -10,32 +10,32 @@ contract("Registrable", (accounts) => {
     instance = await Registrable.new();
   });
 
-  it("should return error when .newAllowedResearcher and is not owner", async () => {
+  it("should return error when .newAllowedUser and is not owner", async () => {
     await expectRevert(
-      instance.newAllowedResearcher(user1Address, {from: user1Address}),
+      instance.newAllowedUser(user1Address, {from: user1Address}),
       "Ownable: caller is not the owner"
     );
   });
 
-  it("should add .newAllowedResearcher when is owner", async () => {
-    await instance.newAllowedResearcher(owner);
+  it("should add .newAllowedUser when is owner", async () => {
+    await instance.newAllowedUser(owner);
 
-    const allowedResearcher = await instance.allowedResearcher(owner);
+    const allowedUser = await instance.allowedUser(owner);
 
-    assert.equal(allowedResearcher, true);
+    assert.equal(allowedUser, true);
   });
 
-  it("should be able to add many callers .newAllowedResearcher when is owner", async () => {
-    await instance.newAllowedResearcher(owner);
-    await instance.newAllowedResearcher(user1Address);
-    await instance.newAllowedResearcher(user2Address);
+  it("should be able to add many callers .newAllowedUser when is owner", async () => {
+    await instance.newAllowedUser(owner);
+    await instance.newAllowedUser(user1Address);
+    await instance.newAllowedUser(user2Address);
 
-    const allowedResearcher1 = await instance.allowedResearcher(owner);
-    const allowedResearcher2 = await instance.allowedResearcher(owner);
-    const allowedResearcher3 = await instance.allowedResearcher(owner);
+    const allowedUser1 = await instance.allowedUser(owner);
+    const allowedUser2 = await instance.allowedUser(owner);
+    const allowedUser3 = await instance.allowedUser(owner);
 
-    assert.equal(allowedResearcher1, true);
-    assert.equal(allowedResearcher2, true);
-    assert.equal(allowedResearcher3, true);
+    assert.equal(allowedUser1, true);
+    assert.equal(allowedUser2, true);
+    assert.equal(allowedUser3, true);
   });
 });
