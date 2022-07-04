@@ -12,7 +12,7 @@ struct Producer {
   string documentType;
   bool recentInspection;
   uint256 totalRequests;
-  int256 isaPoints;
+  int256 isaScore;
   uint256 lastRequestAt;
   TokenApprove tokenApprove;
   PropertyAddress propertyAddress;

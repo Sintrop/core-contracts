@@ -125,35 +125,35 @@ contract Sintrop {
    */
   function calculateIsa(Inspection memory inspection) internal pure returns (int256) {
     uint256[][] memory isas = inspection.isas;
-    int256 isaPoints = sumIsaPoints(isas);
-    return isaPoints;
+    int256 isaScore = sumIsaScore(isas);
+    return isaScore;
   }
 
   /**
    * @dev Sum the ISA points
    * @param isas The isas values as list of [[categoryId, isaIndex], [categoryId, isaIndex]]
    */
-  function sumIsaPoints(uint256[][] memory isas) internal pure returns (int256) {
+  function sumIsaScore(uint256[][] memory isas) internal pure returns (int256) {
     int256[5] memory points = [int256(10), int256(5), int256(0), int256(-5), int256(-10)];
-    int256 isaPoints = 0;
+    int256 isaScore = 0;
 
     for (uint8 i = 0; i < isas.length; i++) {
       uint256 isaIndex = isas[i][1];
-      isaPoints += points[isaIndex];
+      isaScore += points[isaIndex];
     }
-    return isaPoints;
+    return isaScore;
   }
 
   function markAsRealized(Inspection memory inspection, uint256[][] memory isas) internal {
     inspection.isas = isas;
     inspection.status = InspectionStatus.INSPECTED;
     inspection.updatedAt = block.timestamp;
-    inspection.isaPoints = calculateIsa(inspection);
+    inspection.isaScore = calculateIsa(inspection);
     inspections[inspection.id] = inspection;
   }
 
   function updateProducerIsa(Inspection memory inspection) internal {
-    producerContract.updateIsaPoints(inspection.createdBy, inspection.isaPoints);
+    producerContract.updateIsaScore(inspection.createdBy, inspection.isaScore);
   }
 
   /**
