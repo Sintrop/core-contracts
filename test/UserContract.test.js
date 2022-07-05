@@ -23,7 +23,7 @@ contract("UserContract", (accounts) => {
     2: "ACTIVIST",
     3: "RESEARCHER",
     4: "DEVELOPER",
-    5: "ADVISER",
+    5: "ADVISOR",
     6: "CONTRIBUTOR",
     7: "INVESTOR",
   };

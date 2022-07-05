@@ -36,7 +36,7 @@ contract AdvisorContract {
     string memory cep
   ) public uniqueAdvisor returns (Advisor memory) {
     uint256 id = advisorsCount + 1;
-    UserType userType = UserType.ADVISER;
+    UserType userType = UserType.ADVISOR;
 
     AdvisorAddress memory advisorAddress = AdvisorAddress(country, state, city, cep);
 

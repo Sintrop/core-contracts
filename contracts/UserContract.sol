@@ -55,7 +55,7 @@ contract UserContract is Ownable, Callable {
       "ACTIVIST",
       "RESEARCHER",
       "DEVELOPER",
-      "ADVISER",
+      "ADVISOR",
       "CONTRIBUTOR",
       "INVESTOR"
     );

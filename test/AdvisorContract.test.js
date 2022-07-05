@@ -65,13 +65,13 @@ contract("AdvisorContract", (accounts) => {
           assert.equal(advisors[0].advisorWallet, adv1Address);
         });
 
-        it("should add created advisor in userType contract as a ADVISER", async () => {
+        it("should add created advisor in userType contract as a ADVISOR", async () => {
           await addAdvisor("Advisor A", adv1Address);
 
           const userType = await userContract.getUser(adv1Address);
-          const ADVISER = 5;
+          const ADVISOR = 5;
 
-          assert.equal(userType, ADVISER);
+          assert.equal(userType, ADVISOR);
         });
       });
     });
