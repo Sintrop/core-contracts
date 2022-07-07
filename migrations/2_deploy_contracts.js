@@ -42,10 +42,10 @@ module.exports = function (deployer) {
     await userContract.newAllowedCaller(producerContract.address);
 
     const sacToken = await deployer.deploy(SacToken, args.totalTokens);
-
-    const categoryContract = await deployer.deploy(CategoryContract, IsaPool.address);
-
+    
     const isaPool = await deployer.deploy(IsaPool, SacToken.address);
+
+    const categoryContract = await deployer.deploy(CategoryContract, isaPool.address);
 
     await isaPool.newAllowedCaller(categoryContract.address);
 
