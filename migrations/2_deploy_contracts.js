@@ -43,9 +43,11 @@ module.exports = function (deployer) {
 
     const sacToken = await deployer.deploy(SacToken, args.totalTokens);
 
+    const categoryContract = await deployer.deploy(CategoryContract, IsaPool.address);
+
     const isaPool = await deployer.deploy(IsaPool, SacToken.address);
 
-    await deployer.deploy(CategoryContract, IsaPool.address);
+    await isaPool.newAllowedCaller(categoryContract.address);
 
     await deployer.deploy(
       DeveloperPool,
