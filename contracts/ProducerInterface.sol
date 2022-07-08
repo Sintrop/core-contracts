@@ -21,7 +21,7 @@ interface ProducerInterface {
     ACTIVIST,
     RESEARCHER,
     DEVELOPER,
-    ADVISER,
+    ADVISOR,
     CONTRIBUTOR,
     INVESTOR
   }
