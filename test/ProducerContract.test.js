@@ -66,12 +66,12 @@ contract("ProducerContract", (accounts) => {
     assert.equal(producer.totalRequests, 0);
   });
 
-  it("should be created with isaPoints equal zero", async () => {
+  it("should be created with isaScore equal zero", async () => {
     await addProducer("Producer A", prod1Address);
 
     const producer = await instance.getProducer(prod1Address);
 
-    assert.equal(producer.isaPoints, 0);
+    assert.equal(producer.isaScore, 0);
   });
 
   it("should be created with lastRequestAt equal zero", async () => {
@@ -159,19 +159,19 @@ contract("ProducerContract", (accounts) => {
     );
   });
 
-  it("should success .updateIsaPoints when is allowed caller", async () => {
+  it("should success .updateIsaScore when is allowed caller", async () => {
     await addProducer("Producer A", prod1Address);
-    await instance.updateIsaPoints(prod1Address, 50);
+    await instance.updateIsaScore(prod1Address, 50);
 
     const producer = await instance.getProducer(prod1Address);
 
-    assert.equal(producer.isaPoints, 50);
+    assert.equal(producer.isaScore, 50);
   });
 
-  it("should return error .updateIsaPoints when is not allowed caller", async () => {
+  it("should return error .updateIsaScore when is not allowed caller", async () => {
     await addProducer("Producer A", prod1Address);
     await expectRevert(
-      instance.updateIsaPoints(prod1Address, 50, {from: prod1Address}),
+      instance.updateIsaScore(prod1Address, 50, {from: prod1Address}),
       "Not allowed caller"
     );
   });

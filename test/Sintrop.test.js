@@ -175,10 +175,10 @@ contract("Sintrop", (accounts) => {
       assert.equal(inspection.status, STATUS.open);
     });
 
-    it("initial isaPoints should be equal zero", async () => {
+    it("initial isaScore should be equal zero", async () => {
       const inspection = await instance.getInspection(1);
 
-      assert.equal(inspection.isaPoints, 0);
+      assert.equal(inspection.isaScore, 0);
     });
 
     it("initial isas should be equal empty array", async () => {
@@ -371,7 +371,7 @@ contract("Sintrop", (accounts) => {
       assert.equal(equal, true);
     });
 
-    it("should add 10 isaPoints to inspection when select totallySustainable", async () => {
+    it("should add 10 isaScore to inspection when select totallySustainable", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
@@ -382,10 +382,10 @@ contract("Sintrop", (accounts) => {
 
       const inspection = await instance.getInspection(1);
 
-      assert.equal(inspection.isaPoints, 10);
+      assert.equal(inspection.isaScore, 10);
     });
 
-    it("should add 5 isaPoints to inspection when select partiallySustainable", async () => {
+    it("should add 5 isaScore to inspection when select partiallySustainable", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
@@ -396,10 +396,10 @@ contract("Sintrop", (accounts) => {
 
       const inspection = await instance.getInspection(1);
 
-      assert.equal(inspection.isaPoints, 5);
+      assert.equal(inspection.isaScore, 5);
     });
 
-    it("should add 0 isaPoints to inspection when select neutro", async () => {
+    it("should add 0 isaScore to inspection when select neutro", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
@@ -410,10 +410,10 @@ contract("Sintrop", (accounts) => {
 
       const inspection = await instance.getInspection(1);
 
-      assert.equal(inspection.isaPoints, 0);
+      assert.equal(inspection.isaScore, 0);
     });
 
-    it("should remove 5 isaPoints from inspection when select partiallyNotSustainable", async () => {
+    it("should remove 5 isaScore from inspection when select partiallyNotSustainable", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
@@ -424,10 +424,10 @@ contract("Sintrop", (accounts) => {
 
       const inspection = await instance.getInspection(1);
 
-      assert.equal(inspection.isaPoints, -5);
+      assert.equal(inspection.isaScore, -5);
     });
 
-    it("should remove 10 isaPoints from inspection when select totallyNotSustainable", async () => {
+    it("should remove 10 isaScore from inspection when select totallyNotSustainable", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
@@ -438,10 +438,10 @@ contract("Sintrop", (accounts) => {
 
       const inspection = await instance.getInspection(1);
 
-      assert.equal(inspection.isaPoints, -10);
+      assert.equal(inspection.isaScore, -10);
     });
 
-    it("should add isaPoints in producer", async () => {
+    it("should add isaScore in producer", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
@@ -453,7 +453,7 @@ contract("Sintrop", (accounts) => {
       const inspection = await instance.getInspection(1);
       const producer = await producerContract.getProducer(producerAddress);
 
-      assert.equal(inspection.isaPoints, producer.isaPoints);
+      assert.equal(inspection.isaScore, producer.isaScore);
     });
 
     it("should set producer recentInspection to false", async () => {
