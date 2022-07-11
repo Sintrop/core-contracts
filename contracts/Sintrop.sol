@@ -130,7 +130,7 @@ contract Sintrop {
   }
 
   /**
-   * @dev Sum the ISA points
+   * @dev Sum the ISA score
    * @param isas The isas values as list of [[categoryId, isaIndex], [categoryId, isaIndex]]
    */
   function sumIsaScore(uint256[][] memory isas) internal pure returns (int256) {

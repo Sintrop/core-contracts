@@ -17,7 +17,7 @@ contract("ProducerContract", (accounts) => {
       "SP",
       "Jundiai",
       "135465-005",
-      { from: address }
+      {from: address}
     );
   };
 
@@ -154,7 +154,7 @@ contract("ProducerContract", (accounts) => {
   it("should return error .recentInspection when is not allowed caller", async () => {
     await addProducer("Producer A", prod1Address);
     await expectRevert(
-      instance.recentInspection(prod1Address, true, { from: prod1Address }),
+      instance.recentInspection(prod1Address, true, {from: prod1Address}),
       "Not allowed caller"
     );
   });
@@ -171,7 +171,7 @@ contract("ProducerContract", (accounts) => {
   it("should return error .updateIsaScore when is not allowed caller", async () => {
     await addProducer("Producer A", prod1Address);
     await expectRevert(
-      instance.updateIsaScore(prod1Address, 50, { from: prod1Address }),
+      instance.updateIsaScore(prod1Address, 50, {from: prod1Address}),
       "Not allowed caller"
     );
   });
@@ -188,7 +188,7 @@ contract("ProducerContract", (accounts) => {
   it("should return error .incrementRequests when is not allowed caller", async () => {
     await addProducer("Producer A", prod1Address);
     await expectRevert(
-      instance.incrementRequests(prod1Address, { from: prod1Address }),
+      instance.incrementRequests(prod1Address, {from: prod1Address}),
       "Not allowed caller"
     );
   });
@@ -205,7 +205,7 @@ contract("ProducerContract", (accounts) => {
   it("should return error .approveProducerNewTokens when is not allowed caller", async () => {
     await addProducer("Producer A", prod1Address);
     await expectRevert(
-      instance.approveProducerNewTokens(prod1Address, 1000, { from: prod1Address }),
+      instance.approveProducerNewTokens(prod1Address, 1000, {from: prod1Address}),
       "Not allowed caller"
     );
   });
