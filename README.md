@@ -2,7 +2,7 @@
 Sintrop Ethereum Core Contracts
 
 ## Project introduction 
-Our goal is to develop a software with the purpose of making agriculture sustainable in the world. We are bulding a community of people to fight against non agroecological agriculture pratctices. 
+Our goal is to develop a software with the purpose of making agriculture sustainable in the world. We are bulding a community of people to fight against non agroecological agriculture practices. 
 
 To understand better, read our _whitepaper_ before start contributing.
 https://github.com/Sintrop/SDP/releases
@@ -44,10 +44,18 @@ You can contribute:
 .
 
 ## Commits and Pull Requests Rules
-.
+Each Pull Request must be associated with an existing issue. Each Pull Request must change only necessary lines and in case that you want to implement a different feature, open a new issue.
+
+To commit files, create a new branch with your name and the issue that is being solved. 
+Example:
+xxx-issue75-add-new-contract
+
+To open a PR, associate it to the properly issue and select at least 2 other developers to review the code.
+Before it, make sure that all tests are passing.
 
 ## How to run locally the contracts
-.
+To run the project and start contributing please follow our wiki tutorials:
+https://github.com/Sintrop/core-contracts/wiki
 
 ## DevelopersPool
 We will update information about DevelopersPool here as soon as we publish it to mainnet.
