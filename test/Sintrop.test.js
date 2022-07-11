@@ -231,7 +231,7 @@ contract("Sintrop", (accounts) => {
   });
 
   context("when getInspections", () => {
-    it("show return all inspectionfrom mapping", async () => {
+    it("show return all inspection from mapping", async () => {
       await addProducer("Producer B", producer2Address);
 
       await instance.requestInspection({from: producerAddress});
@@ -247,7 +247,7 @@ contract("Sintrop", (accounts) => {
   });
 
   context("when activist accept inspection", () => {
-    it("should accept inspection with successwhen is OPEN", async () => {
+    it("should accept inspection with success when is OPEN", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
@@ -256,7 +256,7 @@ contract("Sintrop", (accounts) => {
       assert.equal(inspection.status, STATUS.accepted);
     });
 
-    it("should set addressof activist in inspection", async () => {
+    it("should set address of activist in inspection", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
@@ -413,7 +413,7 @@ contract("Sintrop", (accounts) => {
       assert.equal(inspection.isaScore, 0);
     });
 
-    it("should remove 5 isaScorefrom inspection when select partiallyNotSustainable", async () => {
+    it("should remove 5 isaScore from inspection when select partiallyNotSustainable", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
@@ -427,7 +427,7 @@ contract("Sintrop", (accounts) => {
       assert.equal(inspection.isaScore, -5);
     });
 
-    it("should remove 10 isaScorefrom inspection when select totallyNotSustainable", async () => {
+    it("should remove 10 isaScore from inspection when select totallyNotSustainable", async () => {
       await instance.requestInspection({from: producerAddress});
       await instance.acceptInspection(1, {from: activistAddress});
 
