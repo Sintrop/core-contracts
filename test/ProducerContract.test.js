@@ -53,13 +53,13 @@ contract("ProducerContract", (accounts) => {
 
       assert.equal(producer.isa.isaAverage, "0")
     });
-    
-    it("should be created with isaPoints equal zero", async () => {
+
+  it("should be created with isaScore equal zero", async () => {
     await addProducer("Producer A", prod1Address);
 
     const producer = await instance.getProducer(prod1Address);
 
-    assert.equal(producer.isa.isaPoints, 0);
+    assert.equal(producer.isa.isaScore, 0);
   });
 
   it("should be created with lastRequestAt equal zero", async () => {
@@ -147,7 +147,7 @@ contract("ProducerContract", (accounts) => {
 
       assert.equal(producers.length, 0);
     });
-
+    
     it("should return same producer in mapping and array list", async () => {
       await addProducer("Producer A", prod1Address);
       await addProducer("Producer A", prod2Address);
@@ -171,13 +171,13 @@ contract("ProducerContract", (accounts) => {
       assert.equal(producer.recentInspection, true);
     });
 
-    it("should success .updateIsaPoints when is allowed caller", async () => {
+    it("should success .updateIsaScore when is allowed caller", async () => {
       await addProducer("Producer A", prod1Address);
-      await instance.updateIsaPoints(prod1Address, 50);
+      await instance.updateIsaScore(prod1Address, 50);
 
       const producer = await instance.getProducer(prod1Address);
 
-      assert.equal(producer.isa.isaPoints, 50);
+      assert.equal(producer.isa.isaScore, 50);
     });
     
     it("should success .incrementRequests when is allowed caller", async () => {
@@ -208,10 +208,10 @@ contract("ProducerContract", (accounts) => {
       );
     });
 
-    it("should return error .updateIsaPoints when is not allowed caller", async () => {
+    it("should return error .updateIsaScore when is not allowed caller", async () => {
       await addProducer("Producer A", prod1Address);
       await expectRevert(
-        instance.updateIsaPoints(prod1Address, 50, {from: prod1Address}),
+        instance.updateIsaScore(prod1Address, 50, {from: prod1Address}),
         "Not allowed caller"
       );
     });

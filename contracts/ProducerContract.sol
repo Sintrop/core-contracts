@@ -97,8 +97,9 @@ contract ProducerContract is Callable {
     producers[addr].recentInspection = state;
   }
 
-  function updateIsaPoints(address addr, int256 isaPoints) public mustBeAllowedCaller {
-    producers[addr].isa.isaPoints = isaPoints;
+
+  function updateIsaScore(address addr, int256 isaScore) public mustBeAllowedCaller {
+    producers[addr].isa.isaScore = isaScore;
   }
 
   function incrementRequests(address addr) public mustBeAllowedCaller {
@@ -109,7 +110,7 @@ contract ProducerContract is Callable {
     uint256 tokens = producers[addr].tokenApprove.allowed;
     producers[addr].tokenApprove = TokenApprove(tokens += numTokens, false);
   }
-  
+
   function lastRequestAt(address addr, uint256 blocksNumber) public mustBeAllowedCaller {
     producers[addr].lastRequestAt = blocksNumber;
   }

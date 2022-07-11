@@ -19,7 +19,7 @@ struct Producer {
 }
 
 struct Isa {
-  int256 isaPoints;
+  int256 isaScore;
   int256 isaAverage;
 }
 

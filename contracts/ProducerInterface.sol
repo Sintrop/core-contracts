@@ -11,7 +11,7 @@ interface ProducerInterface {
     string documentType;
     bool recentInspection;
     uint256 totalRequests;
-    int256 isaPoints;
+    int256 isaScore;
     TokenApprove tokenApprove;
     PropertyAddress propertyAddress;
   }
@@ -21,7 +21,7 @@ interface ProducerInterface {
     ACTIVIST,
     RESEARCHER,
     DEVELOPER,
-    ADVISER,
+    ADVISOR,
     CONTRIBUTOR,
     INVESTOR
   }
