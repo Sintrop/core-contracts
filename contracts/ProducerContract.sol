@@ -90,7 +90,7 @@ contract ProducerContract is Callable {
    * @return a bool that represent if a producer exists or not
    */
   function producerExists(address addr) public view returns (bool) {
-    return bytes(producers[addr].name).length > 0;
+    return producers[addr].id > 0;
   }
 
   function recentInspection(address addr, bool state) public mustBeAllowedCaller {
