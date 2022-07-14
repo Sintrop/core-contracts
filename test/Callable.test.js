@@ -20,7 +20,7 @@ contract("Callable", (accounts) => {
   it("should add .newAllowedCaller when is owner", async () => {
     await instance.newAllowedCaller(owner);
 
-    const allowedCaller = await instance.allowedCaller(owner);
+    const allowedCaller = await instance.allowedCallers(owner);
 
     assert.equal(allowedCaller, true);
   });
@@ -30,9 +30,9 @@ contract("Callable", (accounts) => {
     await instance.newAllowedCaller(user1Address);
     await instance.newAllowedCaller(user2Address);
 
-    const allowedCaller1 = await instance.allowedCaller(owner);
-    const allowedCaller2 = await instance.allowedCaller(owner);
-    const allowedCaller3 = await instance.allowedCaller(owner);
+    const allowedCaller1 = await instance.allowedCallers(owner);
+    const allowedCaller2 = await instance.allowedCallers(owner);
+    const allowedCaller3 = await instance.allowedCallers(owner);
 
     assert.equal(allowedCaller1, true);
     assert.equal(allowedCaller2, true);
