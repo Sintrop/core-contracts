@@ -103,7 +103,7 @@ contract("IsaPool", (accounts) => {
   it("should add .newAllowedCaller when is owner", async () => {
     await instance.newAllowedCaller(owner);
 
-    const allowedCaller = await instance.allowedCaller(owner);
+    const allowedCaller = await instance.allowedCallers(owner);
 
     assert.equal(allowedCaller, true);
   });
