@@ -14,7 +14,7 @@ struct Inspection {
   address createdBy;
   address acceptedBy;
   uint256[][] isas;
-  int256 isaPoints;
+  int256 isaScore;
   uint256 createdAt;
   uint256 updatedAt;
 }
