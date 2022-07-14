@@ -453,7 +453,7 @@ contract("Sintrop", (accounts) => {
       const inspection = await instance.getInspection(1);
       const producer = await producerContract.getProducer(producerAddress);
 
-      assert.equal(inspection.isaScore, producer.isaScore);
+      assert.equal(inspection.isaScore, producer.isa.isaScore);
     });
 
     it("should set producer recentInspection to false", async () => {

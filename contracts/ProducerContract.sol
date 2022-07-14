@@ -51,7 +51,7 @@ contract ProducerContract is Callable {
       false,
       0,
       0,
-      0,
+      Isa(0, 0),
       TokenApprove(0, false),
       PropertyAddress(country, state, city, cep)
     );
@@ -97,8 +97,9 @@ contract ProducerContract is Callable {
     producers[addr].recentInspection = state;
   }
 
+
   function updateIsaScore(address addr, int256 isaScore) public mustBeAllowedCaller {
-    producers[addr].isaScore = isaScore;
+    producers[addr].isa.isaScore = isaScore;
   }
 
   function incrementRequests(address addr) public mustBeAllowedCaller {
