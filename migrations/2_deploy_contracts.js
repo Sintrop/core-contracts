@@ -16,17 +16,12 @@ module.exports = function (deployer) {
   };
 
   deployer.then(async () => {
-    const userContract = await deployer.deploy(UserContract);
+    await deployer.deploy(UserContract);
+    const userContract = await UserContract.deployed();
 
     await deployer.deploy(ActivistContract, UserContract.address);
 
     await deployer.deploy(ProducerContract, UserContract.address);
-
-    await deployer.deploy(Sintrop,
-      ActivistContract.address,
-      ProducerContract.address,
-      1000
-    );
 
     await deployer.deploy(ActivistContract, UserContract.address);
 
@@ -35,17 +30,27 @@ module.exports = function (deployer) {
     const activistContract = await ActivistContract.deployed();
     const producerContract = await ProducerContract.deployed();
 
-    await activistContract.newAllowedCaller(Sintrop.address);
-    await producerContract.newAllowedCaller(Sintrop.address);
+    await deployer.deploy(Sintrop,
+      activistContract.address,
+      producerContract.address,
+      1000
+    );
+
+    const sintrop = await Sintrop.deployed();
+
+    await activistContract.newAllowedCaller(sintrop.address);
+    await producerContract.newAllowedCaller(sintrop.address);
 
     await userContract.newAllowedCaller(activistContract.address);
     await userContract.newAllowedCaller(producerContract.address);
 
     const sacToken = await deployer.deploy(SacToken, args.totalTokens);
     
-    const isaPool = await deployer.deploy(IsaPool, SacToken.address);
+    await deployer.deploy(IsaPool, SacToken.address);
+    const isaPool = await IsaPool.deployed();
 
-    const categoryContract = await deployer.deploy(CategoryContract, isaPool.address);
+    await deployer.deploy(CategoryContract, isaPool.address);
+    const categoryContract = await CategoryContract.deployed();
 
     await isaPool.newAllowedCaller(categoryContract.address);
 
