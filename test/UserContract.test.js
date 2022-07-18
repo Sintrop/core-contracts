@@ -68,6 +68,15 @@ contract("UserContract", (accounts) => {
           );
         });
       });
+
+      context("with UNDEFINED user type", () => {
+        it("should return error message", async () => {
+          await expectRevert(
+            addUser(user1Address, userTypes.Undefined, owner),
+            "Invalid user type"
+          );
+        });
+      });
     });
 
     context("without allowed caller", () => {
