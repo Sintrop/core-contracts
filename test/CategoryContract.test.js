@@ -42,18 +42,19 @@ contract("CategoryContract", (accounts) => {
 
   context("When access category fields", () => {
     it("should have fields", async () => {
-      await addCategory("Solo");
-      const category = await instace.categories(1);
+      const name = "Solo"
+      await addCategory(name);
+      const category = await instance.categories(1);
       
       assert.equal(category.id, 1);
-      assert.equal(category.createBy, msgSender);
+      assert.equal(category.createdBy, msgSender);
       assert.equal(category.name, "Solo");
-      assert.equal(category.description, "Está categoria visa avaliar as qualidades do Solo");
-      assert.equal(category.totallySustainable, "Solo totalmente sustentável");
-      assert.equal(category.partiallySustainable, "Solo parcialmente sustentável");
-      assert.equal(category.neutro, "Solo neutro");
-      assert.equal(category.partiallyNotSustainable, "Solo parcialmente não sustentável");
-      assert.equal(category.totallyNotSustainable, "Solo totalmente não sustentável");
+      assert.equal(category.description, `Está categoria visa avaliar as qualidades do ${name}`);
+      assert.equal(category.totallySustainable, `${name} totalmente sustentável`);
+      assert.equal(category.partiallySustainable, `${name} parcialmente sustentável`);
+      assert.equal(category.neutro, `${name} neutro`);
+      assert.equal(category.partiallyNotSustainable, `${name} parcialmente não sustentável`);
+      assert.equal(category.totallyNotSustainable, `${name} totalmente não sustentável`);
       assert.equal(category.votesCount, 0);
     });
   });
