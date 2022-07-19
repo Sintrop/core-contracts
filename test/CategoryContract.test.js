@@ -40,6 +40,24 @@ contract("CategoryContract", (accounts) => {
     await isaPool.newAllowedCaller(instance.address);
   });
 
+  context("When access category fields", () => {
+    it("should have fields", async () => {
+      await addCategory("Solo");
+      const category = await instace.categories(1);
+      
+      assert.equal(category.id, 1);
+      assert.equal(category.createBy, msgSender);
+      assert.equal(category.name, "Solo");
+      assert.equal(category.description, "Está categoria visa avaliar as qualidades do Solo");
+      assert.equal(category.totallySustainable, "Solo totalmente sustentável");
+      assert.equal(category.partiallySustainable, "Solo parcialmente sustentável");
+      assert.equal(category.neutro, "Solo neutro");
+      assert.equal(category.partiallyNotSustainable, "Solo parcialmente não sustentável");
+      assert.equal(category.totallyNotSustainable, "Solo totalmente não sustentável");
+      assert.equal(category.votesCount, 0);
+    });
+  });
+
   it("should create category", async () => {
     await addCategory("Solo");
     const categories = await instance.getCategories();
