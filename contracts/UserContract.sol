@@ -11,15 +11,15 @@ import "@openzeppelin/contracts/utils/Counters.sol";
  * @dev This contract work as a centralized user's system, where all users has your userType here
  */
 contract UserContract is Ownable, Callable {
+  using Counters for Counters.Counter;
   
   mapping(address => UserType) internal users;
   mapping(uint => Delation) private idToDelation;
+  mapping(address => Delation) private userReported;
 
-  using Counters for Counters.Counter;
   Counters.Counter private _delationIds;
   uint256 public usersCount;
   
-
   struct Delation {
     uint id;
     address informer;
@@ -83,7 +83,7 @@ contract UserContract is Ownable, Callable {
    * @param testimony Content the delation
    * @param proofPhoto Photo proof the delation
    */
-  function createDelation(address addr, string memory title, string memory testimony, string memory proofPhoto) public {
+  function addDelation(address addr, string memory title, string memory testimony, string memory proofPhoto) public {
     _delationIds.increment();
     uint delationId = _delationIds.current();
     Delation storage delation = idToDelation[delationId];
@@ -93,12 +93,20 @@ contract UserContract is Ownable, Callable {
     delation.title = title;
     delation.testimony = testimony;
     delation.proofPhoto = proofPhoto;
+    userReported[addr] = delation;
   }
 
   /**
-   * @dev fetches all delations
+   * @dev Returns the user address delated
    */
-  function fetchDelations() public view returns (Delation[] memory) {
+  function getDelation(address addr) public view returns (Delation memory) {
+    return userReported[addr];
+  }
+
+  /**
+   * @dev Returns all delations
+   */
+  function getDelations() public view returns (Delation[] memory) {
     uint itemCount = _delationIds.current();
     
     Delation[] memory delations = new Delation[](itemCount);
