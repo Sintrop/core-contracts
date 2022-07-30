@@ -4,15 +4,30 @@ pragma solidity >=0.7.0 <=0.9.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./types/UserTypes.sol";
 import "./Callable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title UserContract
  * @dev This contract work as a centralized user's system, where all users has your userType here
  */
 contract UserContract is Ownable, Callable {
+  using Counters for Counters.Counter;
+  
   mapping(address => UserType) internal users;
+  mapping(uint => Delation) private idToDelation;
+  mapping(address => Delation) private userReported;
 
+  Counters.Counter private _delationIds;
   uint256 public usersCount;
+  
+  struct Delation {
+    uint id;
+    address informer;
+    address reported;
+    string title;
+    string testimony;
+    string proofPhoto;
+  }
 
   /**
    * @dev Add new user in the system
@@ -59,6 +74,48 @@ contract UserContract is Ownable, Callable {
       "CONTRIBUTOR",
       "INVESTOR"
     );
+  }
+
+  /**
+   * @dev Add new delation in the system
+   * @param addr The address of the user
+   * @param title Title the delation 
+   * @param testimony Content the delation
+   * @param proofPhoto Photo proof the delation
+   */
+  function addDelation(address addr, string memory title, string memory testimony, string memory proofPhoto) public {
+    _delationIds.increment();
+    uint delationId = _delationIds.current();
+    Delation storage delation = idToDelation[delationId];
+    delation.id = delationId;
+    delation.informer = msg.sender;
+    delation.reported = addr;
+    delation.title = title;
+    delation.testimony = testimony;
+    delation.proofPhoto = proofPhoto;
+    userReported[addr] = delation;
+  }
+
+  /**
+   * @dev Returns the user address delated
+   */
+  function getDelation(address addr) public view returns (Delation memory) {
+    return userReported[addr];
+  }
+
+  /**
+   * @dev Returns all delations
+   */
+  function getDelations() public view returns (Delation[] memory) {
+    uint itemCount = _delationIds.current();
+    
+    Delation[] memory delations = new Delation[](itemCount);
+    for (uint i = 0; i < itemCount; i++) {
+      uint currentId = i + 1;
+      Delation storage currentItem = idToDelation[currentId];
+      delations[i] = currentItem;  
+    }
+    return delations;
   }
 
   // MODIFIER
